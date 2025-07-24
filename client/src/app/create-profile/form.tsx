@@ -93,12 +93,12 @@ const SimpleProfileForm = () => {
           fill
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute inset-0 bg-black/30" />
       </div>
 
       {/* Main Content */}
       <div className="relative z-10 flex items-center justify-center min-h-screen p-8">
-        <div className="w-full max-w-6xl backdrop-blur-3xl rounded-3xl shadow-2xl overflow-hidden border border-white/10">
+        <div className="w-full max-w-6xl backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/10">
           {/* Header */}
           <div className="text-center py-8 border-b border-white/20">
             <div className="bg-gray-600 p-3 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
@@ -146,7 +146,7 @@ const SimpleProfileForm = () => {
                     value={formData.firstName}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all text-white placeholder-gray-400"
+                    className="w-full px-4 py-3  border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all text-white placeholder-gray-400"
                     placeholder="Нэрээ оруулна уу"
                   />
                 </div>
@@ -163,7 +163,7 @@ const SimpleProfileForm = () => {
                     onChange={handleChange}
                     required
                     maxLength={1}
-                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all text-white placeholder-gray-400"
+                    className="w-full px-4 py-3  border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all text-white placeholder-gray-400"
                     placeholder="ө.а, А"
                   />
                 </div>
@@ -179,7 +179,7 @@ const SimpleProfileForm = () => {
                       name="nickname"
                       value={formData.nickname}
                       onChange={handleChange}
-                      className="flex-1 px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all text-white placeholder-gray-400"
+                      className="flex-1 px-4 py-3  border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all text-white placeholder-gray-400"
                       placeholder="ө.а, Twissu"
                     />
                     <button
@@ -212,13 +212,13 @@ const SimpleProfileForm = () => {
                       value={formData.professionalField}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all text-white appearance-none"
+                      className="w-full px-4 py-3  border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all text-white appearance-none"
                     >
                       {professionalFields.map((field) => (
                         <option
                           key={field.value}
                           value={field.value}
-                          className="bg-gray-800 text-white"
+                          className=" text-white"
                         >
                           {field.label}
                         </option>
@@ -235,13 +235,13 @@ const SimpleProfileForm = () => {
                       value={formData.experience}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all text-white appearance-none"
+                      className="w-full px-4 py-3  border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all text-white appearance-none"
                     >
                       {experienceOptions.map((exp) => (
                         <option
                           key={exp.value}
                           value={exp.value}
-                          className="bg-gray-800 text-white"
+                          className=" text-white"
                         >
                           {exp.label}
                         </option>
@@ -261,7 +261,7 @@ const SimpleProfileForm = () => {
                     value={formData.profession}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all text-white placeholder-gray-400"
+                    className="w-full px-4 py-3  border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all text-white placeholder-gray-400"
                     placeholder="Мэргэжлээ оруулна уу"
                   />
                 </div>
@@ -281,7 +281,7 @@ const SimpleProfileForm = () => {
                     />
                     <label
                       htmlFor="profileImage"
-                      className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-full focus:outline-none transition-all text-gray-400 cursor-pointer hover:bg-gray-600/50 flex items-center"
+                      className="w-full px-4 py-3  border border-gray-600 rounded-full focus:outline-none transition-all text-gray-400 cursor-pointer hover:bg-gray-600/50 flex items-center"
                     >
                       <span className="flex-1">
                         {formData.profileImage
@@ -308,7 +308,7 @@ const SimpleProfileForm = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full bg-gray-600 hover:bg-gray-500 text-white py-4 rounded-full font-medium transition-colors"
+                  className="w-full bg-white- hover:bg-gray-500 text-white py-4 rounded-full font-medium transition-colors"
                 >
                   Үргэлжлүүлэх
                 </button>
