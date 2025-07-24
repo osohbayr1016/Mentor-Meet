@@ -97,15 +97,15 @@ const SimpleProfileForm = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen px-8 py-12">
-        <div className="w-full max-w-5xl backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/10">
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-8">
+        <div className="w-[980px] h-[600px] backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/10">
           {/* Header */}
-          <div className="text-center py-8 px-8 border-b border-white/20">
+          <div className="text-center py-4 px-6 border-b border-white/20">
             {/* Logo and Title */}
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
                 <svg
-                  className="w-5 h-5 text-gray-800"
+                  className="w-3.5 h-3.5 text-gray-800"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -116,29 +116,29 @@ const SimpleProfileForm = () => {
                   />
                 </svg>
               </div>
-              <h1 className="font-bold text-[22px] text-white">Mentor Meet</h1>
+              <h1 className="font-bold text-lg text-white">Mentor Meet</h1>
             </div>
 
             {/* Subtext */}
-            <h2 className="text-white text-xl mb-6 font-medium">
+            <h2 className="text-white text-base mb-3 font-medium">
               Профайл үүсэж байна...
             </h2>
 
             {/* Step Progress Bar */}
             <div className="flex justify-center items-center gap-2">
-              <div className="h-1 w-12 rounded-full bg-white"></div>
-              <div className="h-1 w-12 rounded-full bg-white"></div>
-              <div className="h-1 w-12 rounded-full bg-gray-500"></div>
+              <div className="h-1 w-8 rounded-full bg-white"></div>
+              <div className="h-1 w-8 rounded-full bg-white"></div>
+              <div className="h-1 w-8 rounded-full bg-gray-500"></div>
             </div>
           </div>
 
           {/* Main Form Area */}
-          <div className="flex">
+          <div className="flex h-[calc(600px-140px)]">
             {/* Left Side - Form */}
-            <div className="flex-1 p-8">
+            <div className="w-3/5 p-5">
               {message && (
                 <div
-                  className={`mb-6 p-4 rounded-xl text-center ${
+                  className={`mb-3 p-2.5 rounded-xl text-center text-xs ${
                     message.includes("✅")
                       ? "bg-green-600/20 text-green-100 border border-green-500/30"
                       : "bg-red-600/20 text-red-100 border border-red-500/30"
@@ -148,11 +148,11 @@ const SimpleProfileForm = () => {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-3">
                 {/* Name and Initial Row */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-2.5">
                   <div>
-                    <label className="block text-white text-sm font-medium mb-2">
+                    <label className="block text-white text-xs font-medium mb-1">
                       Нэр
                     </label>
                     <input
@@ -161,13 +161,13 @@ const SimpleProfileForm = () => {
                       value={formData.firstName}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 bg-black/20 border border-white/30 rounded-2xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all text-white placeholder-white/60"
+                      className="w-full px-3 py-2 bg-black/20 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all text-white placeholder-white/60 text-xs"
                       placeholder="Нэрээ оруулна уу"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-white text-sm font-medium mb-2">
+                    <label className="block text-white text-xs font-medium mb-1">
                       Овгийн эхний үсэг
                     </label>
                     <input
@@ -177,7 +177,7 @@ const SimpleProfileForm = () => {
                       onChange={handleChange}
                       required
                       maxLength={1}
-                      className="w-full px-4 py-3 bg-black/20 border border-white/30 rounded-2xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all text-white placeholder-white/60"
+                      className="w-full px-3 py-2 bg-black/20 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all text-white placeholder-white/60 text-xs"
                       placeholder="ө.а, А"
                     />
                   </div>
@@ -185,16 +185,16 @@ const SimpleProfileForm = () => {
 
                 {/* Nickname with Toggle */}
                 <div>
-                  <label className="block text-white text-sm font-medium mb-2">
+                  <label className="block text-white text-xs font-medium mb-1">
                     Дуудаж нэр (заавал биш)
                   </label>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <input
                       type="text"
                       name="nickname"
                       value={formData.nickname}
                       onChange={handleChange}
-                      className="flex-1 px-4 py-3 bg-black/20 border border-white/30 rounded-2xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all text-white placeholder-white/60"
+                      className="flex-1 px-3 py-2 bg-black/20 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all text-white placeholder-white/60 text-xs"
                       placeholder="ө.а, Twissu"
                     />
                     <button
@@ -205,7 +205,7 @@ const SimpleProfileForm = () => {
                           showNickname: !prev.showNickname,
                         }))
                       }
-                      className={`px-6 py-3 rounded-2xl font-medium transition-all border ${
+                      className={`px-3 py-2 rounded-xl font-medium transition-all border text-xs ${
                         formData.showNickname
                           ? "bg-white/20 text-white border-white/50"
                           : "bg-black/20 text-white/80 border-white/30 hover:bg-white/10"
@@ -217,9 +217,9 @@ const SimpleProfileForm = () => {
                 </div>
 
                 {/* Professional Field and Experience Row */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-2.5">
                   <div>
-                    <label className="block text-white text-sm font-medium mb-2">
+                    <label className="block text-white text-xs font-medium mb-1">
                       Мэргэжлийн салбар
                     </label>
                     <div className="relative">
@@ -228,7 +228,7 @@ const SimpleProfileForm = () => {
                         value={formData.professionalField}
                         onChange={handleChange}
                         required
-                        className="w-full px-4 py-3 bg-black/20 border border-white/30 rounded-2xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all text-white appearance-none cursor-pointer"
+                        className="w-full px-3 py-2 bg-black/20 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all text-white appearance-none cursor-pointer text-xs"
                       >
                         {professionalFields.map((field) => (
                           <option
@@ -240,9 +240,9 @@ const SimpleProfileForm = () => {
                           </option>
                         ))}
                       </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-2.5 pointer-events-none">
                         <svg
-                          className="w-4 h-4 text-white/60"
+                          className="w-3.5 h-3.5 text-white/60"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -259,7 +259,7 @@ const SimpleProfileForm = () => {
                   </div>
 
                   <div>
-                    <label className="block text-white text-sm font-medium mb-2">
+                    <label className="block text-white text-xs font-medium mb-1">
                       Туршлага
                     </label>
                     <div className="relative">
@@ -268,7 +268,7 @@ const SimpleProfileForm = () => {
                         value={formData.experience}
                         onChange={handleChange}
                         required
-                        className="w-full px-4 py-3 bg-black/20 border border-white/30 rounded-2xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all text-white appearance-none cursor-pointer"
+                        className="w-full px-3 py-2 bg-black/20 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all text-white appearance-none cursor-pointer text-xs"
                       >
                         {experienceOptions.map((exp) => (
                           <option
@@ -280,9 +280,9 @@ const SimpleProfileForm = () => {
                           </option>
                         ))}
                       </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-2.5 pointer-events-none">
                         <svg
-                          className="w-4 h-4 text-white/60"
+                          className="w-3.5 h-3.5 text-white/60"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -301,7 +301,7 @@ const SimpleProfileForm = () => {
 
                 {/* Profession */}
                 <div>
-                  <label className="block text-white text-sm font-medium mb-2">
+                  <label className="block text-white text-xs font-medium mb-1">
                     Мэргэжил
                   </label>
                   <input
@@ -310,7 +310,7 @@ const SimpleProfileForm = () => {
                     value={formData.profession}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-black/20 border border-white/30 rounded-2xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all text-white placeholder-white/60"
+                    className="w-full px-3 py-2 bg-black/20 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all text-white placeholder-white/60 text-xs"
                     placeholder="Мэргэжлээ оруулна уу"
                   />
                 </div>
@@ -327,10 +327,10 @@ const SimpleProfileForm = () => {
                     />
                     <label
                       htmlFor="profileImage"
-                      className="w-full px-4 py-3 bg-black/20 border border-white/30 rounded-2xl transition-all text-white/80 cursor-pointer hover:bg-black/30 flex items-center gap-2"
+                      className="w-full px-3 py-2 bg-black/20 border border-white/30 rounded-xl transition-all text-white/80 cursor-pointer hover:bg-black/30 flex items-center gap-2 text-xs"
                     >
                       <svg
-                        className="w-5 h-5"
+                        className="w-3.5 h-3.5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -358,10 +358,10 @@ const SimpleProfileForm = () => {
                 </div>
 
                 {/* Submit Button */}
-                <div className="pt-4">
+                <div className="pt-2">
                   <button
                     type="submit"
-                    className="w-full bg-white/20 hover:bg-white/30 text-white py-4 rounded-2xl font-medium transition-all border border-white/40 hover:border-white/60"
+                    className="w-full bg-white/20 hover:bg-white/30 text-white py-2.5 rounded-xl font-medium transition-all border border-white/40 hover:border-white/60 text-xs"
                   >
                     Үргэлжлүүлэх
                   </button>
@@ -370,26 +370,26 @@ const SimpleProfileForm = () => {
             </div>
 
             {/* Right Side - Live Preview */}
-            <div className="flex-1 p-8 border-l border-white/20">
-              <div className="sticky top-8">
-                <h3 className="text-white text-lg font-medium mb-8 text-center">
+            <div className="w-2/5 p-5 border-l border-white/20">
+              <div className="h-full flex flex-col">
+                <h3 className="text-white text-sm font-medium mb-4 text-center">
                   Таны мэдээлэл хэрхэн харагдах вэ?
                 </h3>
 
                 {/* Preview Card */}
-                <div className="backdrop-blur-xl rounded-3xl p-8 border border-white/20">
-                  <div className="text-center">
+                <div className="backdrop-blur-xl rounded-2xl p-4 border border-white/20 flex-1">
+                  <div className="text-center h-full flex flex-col justify-center">
                     {/* Profile Image Preview */}
-                    <div className="w-20 h-20 bg-black/30 rounded-2xl mx-auto mb-6 flex items-center justify-center border border-white/20">
+                    <div className="w-12 h-12 bg-black/30 rounded-xl mx-auto mb-3 flex items-center justify-center border border-white/20">
                       {formData.profileImage ? (
                         <img
                           src={URL.createObjectURL(formData.profileImage)}
                           alt="Profile"
-                          className="w-full h-full object-cover rounded-2xl"
+                          className="w-full h-full object-cover rounded-xl"
                         />
                       ) : (
                         <svg
-                          className="w-10 h-10 text-white/60"
+                          className="w-6 h-6 text-white/60"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -403,7 +403,7 @@ const SimpleProfileForm = () => {
                     </div>
 
                     {/* Dynamic Name Display */}
-                    <div className="text-white/90 text-lg font-medium mb-2">
+                    <div className="text-white/90 text-sm font-medium mb-1">
                       {formData.showNickname && formData.nickname ? (
                         <>
                           {formData.nickname}
@@ -420,13 +420,13 @@ const SimpleProfileForm = () => {
                     </div>
 
                     {/* Profession Display */}
-                    <div className="text-white/70 text-sm mb-4">
+                    <div className="text-white/70 text-xs mb-2">
                       {formData.profession || "Мэргэжил"}
                     </div>
 
                     {/* Professional Field */}
                     {formData.professionalField && (
-                      <div className="text-white/60 text-xs mb-3">
+                      <div className="text-white/60 text-xs mb-2">
                         {
                           professionalFields.find(
                             (field) =>
@@ -437,9 +437,9 @@ const SimpleProfileForm = () => {
                     )}
 
                     {/* Profile Info Card */}
-                    <div className="bg-black/20 rounded-xl p-4 mb-4 border border-white/10">
+                    <div className="bg-black/20 rounded-lg p-2.5 mb-2 border border-white/10">
                       <svg
-                        className="w-8 h-8 text-white/40 mx-auto mb-2"
+                        className="w-5 h-5 text-white/40 mx-auto mb-1"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -452,16 +452,16 @@ const SimpleProfileForm = () => {
 
                       {/* Bio Preview */}
                       {formData.bio && (
-                        <p className="text-white/70 text-xs leading-relaxed mt-2">
-                          {formData.bio.length > 50
-                            ? formData.bio.substring(0, 50) + "..."
+                        <p className="text-white/70 text-xs leading-relaxed">
+                          {formData.bio.length > 30
+                            ? formData.bio.substring(0, 30) + "..."
                             : formData.bio}
                         </p>
                       )}
                     </div>
 
                     {/* Experience Display */}
-                    <div className="flex items-center justify-center gap-2 text-white/60 text-xs">
+                    <div className="flex items-center justify-center gap-1 text-white/60 text-xs">
                       <span>Туршлага:</span>
                       <span className="text-white/80">
                         {formData.experience
@@ -479,7 +479,7 @@ const SimpleProfileForm = () => {
                     {!formData.firstName &&
                       !formData.profession &&
                       !formData.experience && (
-                        <div className="text-white/40 text-xs space-y-2">
+                        <div className="text-white/40 text-xs space-y-1 mt-2">
                           <div>...</div>
                           <div>...</div>
                         </div>
@@ -488,13 +488,13 @@ const SimpleProfileForm = () => {
                 </div>
 
                 {/* Form Completion Progress */}
-                <div className="mt-6 text-center">
-                  <div className="text-white/50 text-xs mb-2">
+                <div className="mt-3 text-center">
+                  <div className="text-white/50 text-xs mb-1">
                     Форм бөглөх явц
                   </div>
-                  <div className="w-full bg-white/20 rounded-full h-1">
+                  <div className="w-full bg-white/20 rounded-full h-0.5">
                     <div
-                      className="bg-white h-1 rounded-full transition-all duration-500"
+                      className="bg-white h-0.5 rounded-full transition-all duration-500"
                       style={{
                         width: `${
                           (((formData.firstName ? 1 : 0) +
@@ -519,15 +519,15 @@ const SimpleProfileForm = () => {
       {/* Bottom Navigation */}
       <div className="absolute bottom-0 left-0 right-0 z-20">
         <div className="backdrop-blur-2xl border-t border-white/10">
-          <div className="max-w-6xl mx-auto px-8 py-6">
-            <div className="flex justify-center space-x-8">
-              <button className="px-8 py-3 text-white/70 hover:text-white transition-colors rounded-2xl backdrop-blur-sm border border-white/20 hover:border-white/40">
+          <div className="max-w-5xl mx-auto px-6 py-4">
+            <div className="flex justify-center space-x-6">
+              <button className="px-6 py-2 text-white/70 hover:text-white transition-colors rounded-xl backdrop-blur-sm border border-white/20 hover:border-white/40 text-sm">
                 Нүүр хуудас
               </button>
-              <button className="px-8 py-3 text-white/70 hover:text-white transition-colors rounded-2xl backdrop-blur-sm border border-white/20 hover:border-white/40">
+              <button className="px-6 py-2 text-white/70 hover:text-white transition-colors rounded-xl backdrop-blur-sm border border-white/20 hover:border-white/40 text-sm">
                 Менторууд
               </button>
-              <button className="px-8 py-3 bg-white/20 text-white font-medium rounded-2xl backdrop-blur-sm border border-white/50 hover:border-white/70">
+              <button className="px-6 py-2 bg-white/20 text-white font-medium rounded-xl backdrop-blur-sm border border-white/50 hover:border-white/70 text-sm">
                 Бүртгүүлэх
               </button>
             </div>
@@ -536,7 +536,7 @@ const SimpleProfileForm = () => {
       </div>
 
       {/* Copyright Footer */}
-      <div className="absolute bottom-4 left-8 text-xs text-white/60 z-20">
+      <div className="absolute bottom-2 left-6 text-xs text-white/60 z-20">
         <div>Copyright © 2025 Mentor Meet</div>
         <div>All rights reserved.</div>
       </div>
