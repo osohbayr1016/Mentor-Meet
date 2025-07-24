@@ -1,4 +1,7 @@
+
 import { ObjectId, Schema } from "mongoose";
+
+
 
 export type StudentType = {
   _id: string;
