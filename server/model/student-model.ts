@@ -1,5 +1,5 @@
 
-import { ObjectId, Schema } from "mongoose";
+import { model, ObjectId, Schema } from "mongoose";
 
 
 
@@ -31,3 +31,7 @@ const StudentSchema = new Schema<StudentType>({
   meetingHistory: { type: Schema.ObjectId, ref: "Meeting" },
   bookedHistory: { type: Schema.ObjectId, ref: "Booking" },
 });
+
+
+
+export const StudentModel = model<StudentType>("Student",StudentSchema)

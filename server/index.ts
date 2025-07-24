@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import { MentorRouter } from "./router/mentor-router";
+import { StudentRouter } from "./router/student-router";
 
 const dataBaseConnection = async () => {
   await mongoose.connect(
@@ -27,6 +28,7 @@ if (!uri) {
 }
 
 app.use(MentorRouter);
+app.use(StudentRouter)
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
