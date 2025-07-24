@@ -15,8 +15,9 @@ export const MentorSignUp = async (req: Request, res: Response) => {
 
   const isEmailExisted = await MentorModel.findOne({ email });
   if (!isEmailExisted) {
-    const hashedPassword = await bcrypt.hashsync(password, 10);
+    const hashedPassword = await bcrypt.hashSync(password, 10);
     await MentorModel.create({ email, password: hashedPassword });
     res.status(200).send({ message: "Бүртгэл амжилттай" });
   }
 };
+//check
