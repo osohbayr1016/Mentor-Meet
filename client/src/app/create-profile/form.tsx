@@ -16,7 +16,7 @@ const SimpleProfileForm = () => {
   const [message, setMessage] = useState("");
 
   const professionalFields = [
-    "Санхүү сэргээн үү",
+    "Салбар сонгоно уу",
     "Технологи",
     "Боловсрол",
     "Эрүүл мэнд",
@@ -24,6 +24,7 @@ const SimpleProfileForm = () => {
     "Инженер",
     "Дизайн",
     "Маркетинг",
+    "Санхүү",
   ];
 
   const experienceOptions = [
@@ -79,7 +80,7 @@ const SimpleProfileForm = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden bg-gray-900">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -88,15 +89,20 @@ const SimpleProfileForm = () => {
           fill
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 bg-black/60" />
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <div className="w-full max-w-md bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-8">
+      <div className="relative z-10 flex items-center justify-center min-h-screen p-8">
+        <div className="w-[980px] h-[600px] bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-12 flex flex-col">
+          {/* Header */}
           <div className="text-center mb-8">
-            <div className="bg-white text-gray-800 p-3 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+            <div className="bg-gray-800 text-white p-4 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <svg
+                className="w-10 h-10"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path
                   fillRule="evenodd"
                   d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
@@ -104,15 +110,15 @@ const SimpleProfileForm = () => {
                 />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Mentor Meet
             </h1>
-            <p className="text-gray-600 text-sm">Профайл үүсэх боломж</p>
+            <p className="text-gray-600">Профайл үүсэх боломж</p>
           </div>
 
           {message && (
             <div
-              className={`mb-6 p-3 rounded-lg text-center text-sm ${
+              className={`mb-6 p-4 rounded-xl text-center ${
                 message.includes("✅")
                   ? "bg-green-100 text-green-700"
                   : "bg-red-100 text-red-700"
@@ -122,113 +128,126 @@ const SimpleProfileForm = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Нэр
-              </label>
-              <input
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Нэрээ оруулна уу"
-              />
+          {/* Form */}
+          <form
+            onSubmit={handleSubmit}
+            className="flex-1 grid grid-cols-2 gap-8"
+          >
+            {/* Left Column */}
+            <div className="space-y-6">
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-3">
+                  Нэр
+                </label>
+                <input
+                  type="text"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                  placeholder="Нэрээ оруулна уу"
+                />
+              </div>
+
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-3">
+                  Овгийн нэрийн эхний үсэг
+                </label>
+                <input
+                  type="text"
+                  name="lastNameInitial"
+                  value={formData.lastNameInitial}
+                  onChange={handleChange}
+                  required
+                  maxLength={1}
+                  className="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                  placeholder="ө.а, Б"
+                />
+              </div>
+
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-3">
+                  Мэргэжлийн салбар
+                </label>
+                <select
+                  name="professionalField"
+                  value={formData.professionalField}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none bg-white text-base"
+                >
+                  <option value="">Салбар сонгоно уу</option>
+                  {professionalFields.slice(1).map((field, index) => (
+                    <option key={index} value={field}>
+                      {field}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Овгийн нэрийн эхний үсэг
-              </label>
-              <input
-                type="text"
-                name="lastNameInitial"
-                value={formData.lastNameInitial}
-                onChange={handleChange}
-                required
-                maxLength={1}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="ө.а, Б"
-              />
+            {/* Right Column */}
+            <div className="space-y-6">
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-3">
+                  Туршлага
+                </label>
+                <select
+                  name="experience"
+                  value={formData.experience}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none bg-white text-base"
+                >
+                  <option value="">Туршлага сонгоно уу</option>
+                  {experienceOptions.slice(1).map((exp, index) => (
+                    <option key={index} value={exp}>
+                      {exp}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-3">
+                  Мэргэжил
+                </label>
+                <input
+                  type="text"
+                  name="profession"
+                  value={formData.profession}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
+                  placeholder="Мэргэжлээ оруулна уу"
+                />
+              </div>
+
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-3">
+                  Профайл тухай "оруулга"
+                </label>
+                <textarea
+                  name="bio"
+                  value={formData.bio}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-base"
+                  placeholder="Өөрийнхөө тухай товч танилцуулна уу..."
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Мэргэжлийн салбар
-              </label>
-              <select
-                name="professionalField"
-                value={formData.professionalField}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none bg-white"
+            {/* Submit Button - Full Width */}
+            <div className="col-span-2 mt-8">
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white py-5 px-8 rounded-2xl hover:bg-blue-700 transition-colors font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-200"
               >
-                <option value="">Салбар сонгоно уу</option>
-                {professionalFields.map((field, index) => (
-                  <option key={index} value={field}>
-                    {field}
-                  </option>
-                ))}
-              </select>
+                Үргэлжлүүлэх
+              </button>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Туршлага
-              </label>
-              <select
-                name="experience"
-                value={formData.experience}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none bg-white"
-              >
-                <option value="">Туршлага сонгоно уу</option>
-                {experienceOptions.map((exp, index) => (
-                  <option key={index} value={exp}>
-                    {exp}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Мэргэжил
-              </label>
-              <input
-                type="text"
-                name="profession"
-                value={formData.profession}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Мэргэжлээ оруулна уу"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Профайл тухай "оруулга"
-              </label>
-              <textarea
-                name="bio"
-                value={formData.bio}
-                onChange={handleChange}
-                rows={4}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
-                placeholder="Өөрийнхөө тухай товч танилцуулна уу..."
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-4 px-4 rounded-xl hover:bg-blue-700 transition-colors font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
-            >
-              Үргэлжлүүлэх
-            </button>
           </form>
         </div>
       </div>
