@@ -402,28 +402,112 @@ const SimpleProfileForm = () => {
                       )}
                     </div>
 
-                    {/* Preview Content */}
-                    <div className="text-white/60 mb-4">
-                      <div className="text-xs mb-1">...</div>
-                      <div className="text-xs mb-4">...</div>
-
-                      <div className="bg-black/20 rounded-xl p-4 mb-4 border border-white/10">
-                        <svg
-                          className="w-8 h-8 text-white/40 mx-auto mb-2"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-
-                      <div className="text-xs mb-1">Туршлага:</div>
-                      <div className="text-xs">...</div>
+                    {/* Dynamic Name Display */}
+                    <div className="text-white/90 text-lg font-medium mb-2">
+                      {formData.showNickname && formData.nickname ? (
+                        <>
+                          {formData.nickname}
+                          {formData.lastNameInitial &&
+                            ` ${formData.lastNameInitial}.`}
+                        </>
+                      ) : (
+                        <>
+                          {formData.firstName || "Нэр"}
+                          {formData.lastNameInitial &&
+                            ` ${formData.lastNameInitial}.`}
+                        </>
+                      )}
                     </div>
+
+                    {/* Profession Display */}
+                    <div className="text-white/70 text-sm mb-4">
+                      {formData.profession || "Мэргэжил"}
+                    </div>
+
+                    {/* Professional Field */}
+                    {formData.professionalField && (
+                      <div className="text-white/60 text-xs mb-3">
+                        {
+                          professionalFields.find(
+                            (field) =>
+                              field.value === formData.professionalField
+                          )?.label
+                        }
+                      </div>
+                    )}
+
+                    {/* Profile Info Card */}
+                    <div className="bg-black/20 rounded-xl p-4 mb-4 border border-white/10">
+                      <svg
+                        className="w-8 h-8 text-white/40 mx-auto mb-2"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+
+                      {/* Bio Preview */}
+                      {formData.bio && (
+                        <p className="text-white/70 text-xs leading-relaxed mt-2">
+                          {formData.bio.length > 50
+                            ? formData.bio.substring(0, 50) + "..."
+                            : formData.bio}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Experience Display */}
+                    <div className="flex items-center justify-center gap-2 text-white/60 text-xs">
+                      <span>Туршлага:</span>
+                      <span className="text-white/80">
+                        {formData.experience
+                          ? experienceOptions.find(
+                              (exp) => exp.value === formData.experience
+                            )?.label
+                          : "..."}
+                      </span>
+                      {formData.experience && (
+                        <span className="text-yellow-400">⭐</span>
+                      )}
+                    </div>
+
+                    {/* Additional Info Dots */}
+                    {!formData.firstName &&
+                      !formData.profession &&
+                      !formData.experience && (
+                        <div className="text-white/40 text-xs space-y-2">
+                          <div>...</div>
+                          <div>...</div>
+                        </div>
+                      )}
+                  </div>
+                </div>
+
+                {/* Form Completion Progress */}
+                <div className="mt-6 text-center">
+                  <div className="text-white/50 text-xs mb-2">
+                    Форм бөглөх явц
+                  </div>
+                  <div className="w-full bg-white/20 rounded-full h-1">
+                    <div
+                      className="bg-white h-1 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${
+                          (((formData.firstName ? 1 : 0) +
+                            (formData.lastNameInitial ? 1 : 0) +
+                            (formData.professionalField ? 1 : 0) +
+                            (formData.experience ? 1 : 0) +
+                            (formData.profession ? 1 : 0) +
+                            (formData.profileImage ? 1 : 0)) /
+                            6) *
+                          100
+                        }%`,
+                      }}
+                    />
                   </div>
                 </div>
               </div>
