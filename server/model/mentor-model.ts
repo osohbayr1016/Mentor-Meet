@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { ObjectId, Schema } from "mongoose";
 
 export type MentorType = {
   _id: string;
@@ -8,14 +8,14 @@ export type MentorType = {
   firstName: string;
   lastName: string;
   nickName?: string;
-  role: string; 
+  role: string;
   image: string;
   bio: string;
   profession: string;
   education: EducationType;
   experience: string;
-  calendar: string; 
-  category: string; 
+  calendar: string;
+  category: string;
   rating: number;
   review: string;
   createdAt: Date;
@@ -32,4 +32,13 @@ export type ExperienceType = {
   work: string;
   position: string;
   careerDuration: Date;
+};
+
+export type CalendarType = {
+  availableDate: Date;
+};
+
+export type CategoryType = {
+  categoryId: ObjectId;
+  price: number;
 };
