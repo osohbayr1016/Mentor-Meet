@@ -19,10 +19,10 @@ export type MentorType = {
   profession: string;
   education: EducationType;
   experience: ExperienceType;
-  calendar: calendarType;
-  category: CategoryType;
-  rating: number;
-  review: string;
+  calendar?: calendarType;
+  category?: CategoryType;
+  rating?: number;
+  review?: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -69,11 +69,11 @@ const MentorSchema = new Schema<MentorType>({
     careerDuration: { type: String, required: true },
   },
   calendar: {
-    available: { type: Date, required: true },
+    available: { type: Date, required: false },
   },
   category: {
-    categoryId: { type: Schema.ObjectId, ref: "Categories", required: true },
-    price: { type: Number, required: true },
+    categoryId: { type: Schema.ObjectId, ref: "Categories", required: false },
+    price: { type: Number, required: false },
   },
   rating: { type: Number, default: 0 },
   role: {
