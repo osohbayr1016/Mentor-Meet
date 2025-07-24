@@ -42,7 +42,7 @@ app.get("/health", (req, res) => {
 });
 
 // API routes placeholder
-app.use("/api/mentors", (req, res) => {
+app.get("/api/mentors", (req, res) => {
   res.json({ message: "Mentors API endpoint - Coming soon!" });
 });
 
