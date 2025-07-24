@@ -225,7 +225,7 @@ const SimpleProfileForm = () => {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-4 px-4 rounded-xl hover:bg-blue-700 transition-colors font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+              className="w-full bg-blue-600 text-white py-4 px-4 rounded-xl hover:bg-blue-700 transition-colors font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 duration-200"
             >
               Үргэлжлүүлэх
             </button>
