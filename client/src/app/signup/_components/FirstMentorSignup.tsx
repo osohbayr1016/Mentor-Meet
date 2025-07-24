@@ -50,7 +50,7 @@ const FirstMentorSignup = () => {
               <p className="font-[400] text-[16px] text-white">
                 Бүртгэлтэй юу?
               </p>
-              <button className="font-[400] cursor-pointer text-[16px] text-[#2468FF]">
+              <button className="font-[400] cursor-pointer text-[16px] text-white">
                 Нэвтрэх
               </button>
             </div>
