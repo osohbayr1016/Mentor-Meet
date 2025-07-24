@@ -98,9 +98,9 @@ const SimpleProfileForm = () => {
 
       {/* Main Content */}
       <div className="relative z-10 flex items-center justify-center min-h-screen p-8">
-        <div className="w-full max-w-6xl bg-gray-800/80 backdrop-blur-3xl rounded-3xl shadow-2xl overflow-hidden">
+        <div className="w-full max-w-6xl backdrop-blur-3xl rounded-3xl shadow-2xl overflow-hidden border border-white/10">
           {/* Header */}
-          <div className="text-center py-8 border-b border-gray-700/50">
+          <div className="text-center py-8 border-b border-white/20">
             <div className="bg-gray-600 p-3 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
               <svg
                 className="w-8 h-8 text-white"
@@ -316,14 +316,14 @@ const SimpleProfileForm = () => {
             </div>
 
             {/* Right Side - Live Preview */}
-            <div className="flex-1 p-8 border-l border-gray-700/50">
+            <div className="flex-1 p-8 border-l border-white/20">
               <div className="sticky top-8">
                 <h3 className="text-white text-lg font-medium mb-6 text-center">
                   Таны мэдээлэл хэрхэн харагдах вэ?
                 </h3>
 
                 {/* Preview Card */}
-                <div className="bg-gray-700/50 backdrop-blur-xl rounded-3xl p-8 border border-gray-600/30">
+                <div className="backdrop-blur-xl rounded-3xl p-8 border border-white/20">
                   <div className="text-center">
                     {/* Profile Image Preview */}
                     <div className="w-20 h-20 bg-gray-600 rounded-2xl mx-auto mb-6 flex items-center justify-center border-2 border-gray-500">
@@ -382,16 +382,16 @@ const SimpleProfileForm = () => {
 
       {/* Bottom Navigation */}
       <div className="absolute bottom-0 left-0 right-0 z-20">
-        <div className="bg-black/60 backdrop-blur-2xl">
+        <div className="backdrop-blur-2xl border-t border-white/10">
           <div className="max-w-6xl mx-auto px-8 py-4">
             <div className="flex justify-center space-x-12">
-              <button className="px-8 py-3 text-gray-400 hover:text-white transition-colors rounded-full bg-gray-800/50">
+              <button className="px-8 py-3 text-gray-400 hover:text-white transition-colors rounded-full backdrop-blur-sm border border-white/10">
                 Нүүр хуудас
               </button>
-              <button className="px-8 py-3 text-gray-400 hover:text-white transition-colors rounded-full bg-gray-800/50">
+              <button className="px-8 py-3 text-gray-400 hover:text-white transition-colors rounded-full backdrop-blur-sm border border-white/10">
                 Менторууд
               </button>
-              <button className="px-8 py-3 bg-gray-600 text-white font-medium rounded-full">
+              <button className="px-8 py-3 bg-white/20 text-white font-medium rounded-full backdrop-blur-sm border border-white/30">
                 Бүртгүүлэх
               </button>
             </div>
