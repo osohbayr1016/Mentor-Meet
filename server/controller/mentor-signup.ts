@@ -1,12 +1,12 @@
-import { MentorType } from "../model/mentor-model";
 import { Request, Response } from "express";
+import { MentorModel } from "../model/mentor-model";
+import bcrypt from "bcrypt";
 
 export const MentorSignUp = async (req: Request, res: Response) => {
-  const { email, password, phoneNumber } = req.body;
+  const { email, password } = req.body;
   if (
     !email ||
     !password ||
-    !phoneNumber ||
     typeof email != "string" ||
     typeof password !== "string"
   ) {
