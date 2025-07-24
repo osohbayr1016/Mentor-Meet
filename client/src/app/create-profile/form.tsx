@@ -97,6 +97,7 @@ const SimpleProfileForm = () => {
       </div>
 
       {/* Main Content */}
+<<<<<<< HEAD
       <div className="relative z-10 flex items-center justify-center min-h-screen px-8 py-12">
         <div className="w-full max-w-5xl backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/10">
           {/* Header */}
@@ -130,6 +131,27 @@ const SimpleProfileForm = () => {
               <div className="h-1 w-12 rounded-full bg-white"></div>
               <div className="h-1 w-12 rounded-full bg-gray-500"></div>
             </div>
+=======
+      <div className="relative z-10 flex items-center justify-center min-h-screen p-8">
+        <div className="w-full max-w-6xl backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/10">
+          {/* Header */}
+          <div className="text-center py-8 border-b border-white/20">
+            <div className="bg-gray-600 p-3 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-8 h-8 text-white"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-white mb-2">Mentor Meet</h1>
+            <p className="text-gray-300">Профайл үүсэх боломж...</p>
+>>>>>>> 90c7f30566d6ed025bc770277760fb4622ec96f2
           </div>
 
           {/* Main Form Area */}
@@ -188,13 +210,21 @@ const SimpleProfileForm = () => {
                   <label className="block text-white text-sm font-medium mb-2">
                     Дуудаж нэр (заавал биш)
                   </label>
+<<<<<<< HEAD
                   <div className="flex gap-3">
+=======
+                  <div className="flex space-x-3">
+>>>>>>> 90c7f30566d6ed025bc770277760fb4622ec96f2
                     <input
                       type="text"
                       name="nickname"
                       value={formData.nickname}
                       onChange={handleChange}
+<<<<<<< HEAD
                       className="flex-1 px-4 py-3 bg-black/20 border border-white/30 rounded-2xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all text-white placeholder-white/60"
+=======
+                      className="flex-1 px-4 py-3  border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all text-white placeholder-gray-400"
+>>>>>>> 90c7f30566d6ed025bc770277760fb4622ec96f2
                       placeholder="ө.а, Twissu"
                     />
                     <button
