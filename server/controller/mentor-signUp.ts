@@ -10,5 +10,5 @@ export const MentorSignUp = async (req: Request, res: Response) => {
     return;
   }
 
-  const isEmailExisted = 
+
 };
