@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { MentorModel } from "../model/mentor-model";
 import bcrypt from "bcrypt";
-
 export const MentorSignUp = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   if (
