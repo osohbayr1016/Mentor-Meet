@@ -8,6 +8,7 @@ const Step3PaymentInfo: React.FC<Step3Props> = ({
   onPrev,
   onSubmit,
   message,
+  isLoading,
 }) => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -32,7 +33,7 @@ const Step3PaymentInfo: React.FC<Step3Props> = ({
   };
 
   return (
-    <div className="flex h-full">
+    <div className="flex min-h-full">
       {/* Left Side - Form */}
       <div className="w-3/5 p-5">
         {message && (
@@ -182,15 +183,32 @@ const Step3PaymentInfo: React.FC<Step3Props> = ({
             <button
               type="button"
               onClick={onPrev}
-              className="flex-1 bg-black/20 hover:bg-black/30 text-white py-2.5 rounded-xl font-medium transition-all border border-white/30 hover:border-white/50 text-xs"
+              disabled={isLoading}
+              className={`flex-1 py-2.5 rounded-xl font-medium transition-all text-xs ${
+                isLoading
+                  ? "bg-gray-600/20 border border-gray-500/30 text-gray-400 cursor-not-allowed"
+                  : "bg-black/20 hover:bg-black/30 text-white border border-white/30 hover:border-white/50"
+              }`}
             >
               Буцах
             </button>
             <button
               type="submit"
-              className="flex-1 bg-white/20 hover:bg-white/30 text-white py-2.5 rounded-xl font-medium transition-all border border-white/40 hover:border-white/60 text-xs"
+              disabled={isLoading}
+              className={`flex-1 py-2.5 rounded-xl font-medium transition-all text-xs ${
+                isLoading
+                  ? "bg-gray-600/20 border border-gray-500/30 text-gray-400 cursor-not-allowed"
+                  : "bg-white/20 hover:bg-white/30 text-white border border-white/40 hover:border-white/60"
+              }`}
             >
-              Үргэлжлүүлэх
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Бүртгэж байна...
+                </div>
+              ) : (
+                "Бүртгэх"
+              )}
             </button>
           </div>
         </form>
@@ -198,14 +216,14 @@ const Step3PaymentInfo: React.FC<Step3Props> = ({
 
       {/* Right Side - Final Preview */}
       <div className="w-2/5 p-5 border-l border-white/20">
-        <div className="h-full flex flex-col">
+        <div className="min-h-full flex flex-col">
           <h3 className="text-white text-sm font-medium mb-4 text-center">
             Төлбөрийн мэдээлэл
           </h3>
 
           {/* Payment Preview Card */}
           <div className="backdrop-blur-xl rounded-2xl p-4 border border-white/20 flex-1">
-            <div className="text-center h-full flex flex-col justify-center">
+            <div className="text-center min-h-full flex flex-col justify-center">
               {/* Profile Summary */}
               <div className="w-16 h-16 bg-black/30 rounded-xl mx-auto mb-3 flex items-center justify-center border border-white/20">
                 {formData.profileImage ? (

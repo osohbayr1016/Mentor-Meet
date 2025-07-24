@@ -10,6 +10,7 @@ const Step1BasicInfo: React.FC<Step1Props> = ({
   setFormData,
   onNext,
   message,
+  isLoading,
 }) => {
   const handleChange = (
     e: React.ChangeEvent<
@@ -39,7 +40,7 @@ const Step1BasicInfo: React.FC<Step1Props> = ({
   return (
     <div className="flex h-full">
       {/* Left Side - Form */}
-      <div className="w-3/5 p-5">
+      <div className="w-1/2 p-6 flex flex-col justify-center">
         {message && (
           <div
             className={`mb-3 p-2.5 rounded-xl text-center text-xs ${
@@ -265,150 +266,229 @@ const Step1BasicInfo: React.FC<Step1Props> = ({
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full bg-white/20 hover:bg-white/30 text-white py-2.5 rounded-xl font-medium transition-all border border-white/40 hover:border-white/60 text-xs"
+              disabled={isLoading}
+              className={`w-full py-2.5 rounded-xl font-medium transition-all text-xs ${
+                isLoading
+                  ? "bg-gray-600/20 border border-gray-500/30 text-gray-400 cursor-not-allowed"
+                  : "bg-white/20 hover:bg-white/30 text-white border border-white/40 hover:border-white/60"
+              }`}
             >
-              Үргэлжлүүлэх
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Шалгаж байна...
+                </div>
+              ) : (
+                "Үргэлжлүүлэх"
+              )}
             </button>
           </div>
         </form>
       </div>
 
-      {/* Right Side - Live Preview */}
-      <div className="w-2/5 p-5 border-l border-white/20">
-        <div className="h-full flex flex-col">
-          <h3 className="text-white text-sm font-medium mb-4 text-center">
-            Таны мэдээлэл хэрхэн харагдах вэ?
-          </h3>
-
-          {/* Preview Card */}
-          <div className="backdrop-blur-xl rounded-2xl p-4 border border-white/20 flex-1">
-            <div className="text-center h-full flex flex-col justify-center">
-              {/* Profile Image Preview */}
-              <div className="w-12 h-12 bg-black/30 rounded-xl mx-auto mb-3 flex items-center justify-center border border-white/20">
+      {/* Right Side - Professional Preview */}
+      <div className="w-1/2 p-6">
+        <div className="h-full backdrop-blur-xl bg-black/20 rounded-2xl border border-white/30 p-6 transform transition-all duration-300 hover:border-white/50">
+          {/* Profile Header */}
+          <div className="text-center mb-6">
+            {/* Profile Image with Status */}
+            <div className="relative inline-block mb-4">
+              <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-white/30 transition-all duration-300 hover:border-white/50">
                 {formData.profileImage ? (
                   <img
                     src={URL.createObjectURL(formData.profileImage)}
                     alt="Profile"
-                    className="w-full h-full object-cover rounded-xl"
+                    className="w-full h-full object-cover"
                   />
                 ) : (
-                  <svg
-                    className="w-6 h-6 text-white/60"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <div className="w-full h-full bg-black/30 flex items-center justify-center">
+                    <svg
+                      className="w-12 h-12 text-white/60"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
                 )}
               </div>
+              {/* Online Status */}
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-400 rounded-full border-2 border-black/20 flex items-center justify-center">
+                <div className="w-2 h-2 bg-white rounded-full"></div>
+              </div>
+            </div>
 
-              {/* Dynamic Name Display */}
-              <div className="text-white/90 text-sm font-medium mb-1">
+            {/* Name and Title */}
+            <div className="space-y-2">
+              <h2 className="text-xl font-semibold text-white leading-tight">
                 {formData.showNickname && formData.nickname ? (
                   <>
                     {formData.nickname}
-                    {formData.lastNameInitial &&
-                      ` ${formData.lastNameInitial}.`}
+                    {formData.lastNameInitial && (
+                      <span className="text-white/70">
+                        {" "}
+                        {formData.lastNameInitial}.
+                      </span>
+                    )}
                   </>
                 ) : (
                   <>
-                    {formData.firstName || "Нэр"}
-                    {formData.lastNameInitial &&
-                      ` ${formData.lastNameInitial}.`}
+                    {formData.firstName || (
+                      <span className="text-white/50">Таны нэр</span>
+                    )}
+                    {formData.lastNameInitial && (
+                      <span className="text-white/70">
+                        {" "}
+                        {formData.lastNameInitial}.
+                      </span>
+                    )}
                   </>
                 )}
-              </div>
+              </h2>
 
-              {/* Profession Display */}
-              <div className="text-white/70 text-xs mb-2">
-                {formData.profession || "Мэргэжил"}
+              <div className="flex items-center justify-center gap-2">
+                <div className="h-px bg-white/30 flex-1"></div>
+                <span className="text-white/70 text-sm px-2">
+                  {formData.profession || "Мэргэжил"}
+                </span>
+                <div className="h-px bg-white/30 flex-1"></div>
               </div>
+            </div>
+          </div>
 
-              {/* Professional Field */}
-              {formData.professionalField && (
-                <div className="text-white/60 text-xs mb-2">
-                  {
-                    professionalFields.find(
-                      (field) => field.value === formData.professionalField
-                    )?.label
-                  }
+          {/* Professional Info */}
+          <div className="space-y-4">
+            {/* Field & Experience */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-black/30 rounded-xl p-3 border border-white/30">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-6 h-6 bg-black/40 rounded-lg flex items-center justify-center">
+                    <svg
+                      className="w-3 h-3 text-white/70"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
+                    </svg>
+                  </div>
+                  <span className="text-white/70 text-xs font-medium">
+                    Салбар
+                  </span>
                 </div>
-              )}
+                <p className="text-white text-xs font-medium">
+                  {formData.professionalField
+                    ? professionalFields.find(
+                        (f) => f.value === formData.professionalField
+                      )?.label
+                    : "Салбар сонгоно уу"}
+                </p>
+              </div>
 
-              {/* Profile Info Card */}
-              <div className="bg-black/20 rounded-lg p-2.5 mb-2 border border-white/10">
+              <div className="bg-black/30 rounded-xl p-3 border border-white/30">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-6 h-6 bg-black/40 rounded-lg flex items-center justify-center">
+                    <svg
+                      className="w-3 h-3 text-white/70"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                  </div>
+                  <span className="text-white/70 text-xs font-medium">
+                    Туршлага
+                  </span>
+                </div>
+                <p className="text-white text-xs font-medium">
+                  {formData.experience
+                    ? experienceOptions.find(
+                        (e) => e.value === formData.experience
+                      )?.label
+                    : "Туршлага сонгоно уу"}
+                </p>
+              </div>
+            </div>
+
+            {/* Rating & Stats */}
+            <div className="bg-black/30 rounded-xl p-3 border border-white/30">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="flex space-x-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <svg
+                        key={i}
+                        className={`w-3 h-3 ${
+                          i < 4 ? "text-yellow-400" : "text-white/30"
+                        }`}
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.02 3.14a1 1 0 00.95.69h3.3c.969 0 1.371 1.24.588 1.81l-2.674 1.944a1 1 0 00-.364 1.118l1.02 3.14c.3.921-.755 1.688-1.54 1.118l-2.674-1.944a1 1 0 00-1.176 0l-2.674 1.944c-.784.57-1.838-.197-1.539-1.118l1.02-3.14a1 1 0 00-.364-1.118L2.49 8.567c-.783-.57-.38-1.81.588-1.81h3.3a1 1 0 00.951-.69l1.02-3.14z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <span className="text-white text-xs font-medium">
+                    {formData.experience
+                      ? {
+                          "1-2": "4.2",
+                          "3-5": "4.6",
+                          "5-10": "4.8",
+                          "10+": "4.9",
+                        }[formData.experience] || "4.0"
+                      : "4.0"}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <p className="text-white/70 text-xs">Sessions</p>
+                  <p className="text-white text-xs font-medium">
+                    {formData.experience
+                      ? {
+                          "1-2": "25+",
+                          "3-5": "100+",
+                          "5-10": "500+",
+                          "10+": "1000+",
+                        }[formData.experience] || "0"
+                      : "0"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              <button className="flex-1 bg-black/30 hover:bg-black/40 text-white py-2 px-3 rounded-xl font-medium transition-all duration-200 border border-white/30 hover:border-white/50">
+                <div className="flex items-center justify-center gap-1">
+                  <svg
+                    className="w-3 h-3"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+                  </svg>
+                  <span className="text-xs">Book Session</span>
+                </div>
+              </button>
+              <button className="bg-black/30 hover:bg-black/40 text-white py-2 px-3 rounded-xl font-medium transition-all duration-200 border border-white/30 hover:border-white/50">
                 <svg
-                  className="w-5 h-5 text-white/40 mx-auto mb-1"
+                  className="w-3 h-3"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
                   <path
                     fillRule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                    d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
                     clipRule="evenodd"
-                  />
+                  ></path>
                 </svg>
-
-                {/* Bio Preview */}
-                {formData.bio && (
-                  <p className="text-white/70 text-xs leading-relaxed">
-                    {formData.bio.length > 30
-                      ? formData.bio.substring(0, 30) + "..."
-                      : formData.bio}
-                  </p>
-                )}
-              </div>
-
-              {/* Experience Display */}
-              <div className="flex items-center justify-center gap-1 text-white/60 text-xs">
-                <span>Туршлага:</span>
-                <span className="text-white/80">
-                  {formData.experience
-                    ? experienceOptions.find(
-                        (exp) => exp.value === formData.experience
-                      )?.label
-                    : "..."}
-                </span>
-                {formData.experience && (
-                  <span className="text-yellow-400">⭐</span>
-                )}
-              </div>
-
-              {/* Additional Info Dots */}
-              {!formData.firstName &&
-                !formData.profession &&
-                !formData.experience && (
-                  <div className="text-white/40 text-xs space-y-1 mt-2">
-                    <div>...</div>
-                    <div>...</div>
-                  </div>
-                )}
-            </div>
-          </div>
-
-          {/* Form Completion Progress */}
-          <div className="mt-3 text-center">
-            <div className="text-white/50 text-xs mb-1">Форм бөглөх явц</div>
-            <div className="w-full bg-white/20 rounded-full h-0.5">
-              <div
-                className="bg-white h-0.5 rounded-full transition-all duration-500"
-                style={{
-                  width: `${
-                    (((formData.firstName ? 1 : 0) +
-                      (formData.lastNameInitial ? 1 : 0) +
-                      (formData.professionalField ? 1 : 0) +
-                      (formData.experience ? 1 : 0) +
-                      (formData.profession ? 1 : 0) +
-                      (formData.profileImage ? 1 : 0)) /
-                      6) *
-                    100
-                  }%`,
-                }}
-              />
+              </button>
             </div>
           </div>
         </div>

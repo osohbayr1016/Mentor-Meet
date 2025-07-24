@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import Image from "next/image";
+
+import { FormData } from "../types/FormTypes";
 import Step1BasicInfo from "./Step1BasicInfo";
 import Step2AdditionalDetails from "./Step2AdditionalDetails";
 import Step3PaymentInfo from "./Step3PaymentInfo";
-import { FormData } from "../types/FormTypes";
 
 const FormContainer = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastNameInitial: "",
@@ -40,20 +42,116 @@ const FormContainer = () => {
 
   const [message, setMessage] = useState("");
 
-  const handleNext = () => {
-    if (currentStep < 2) {
-      setCurrentStep(currentStep + 1);
+  // Validation functions for each step
+  const validateStep1 = (): boolean => {
+    const {
+      firstName,
+      lastNameInitial,
+      professionalField,
+      experience,
+      profession,
+    } = formData;
+
+    if (!firstName.trim()) {
+      setMessage("❌ Нэрээ оруулна уу");
+      return false;
+    }
+
+    if (!lastNameInitial.trim()) {
+      setMessage("❌ Овгийн эхний үсгийг оруулна уу");
+      return false;
+    }
+
+    if (!professionalField) {
+      setMessage("❌ Мэргэжлийн салбараа сонгоно уу");
+      return false;
+    }
+
+    if (!experience) {
+      setMessage("❌ Туршлагаа сонгоно уу");
+      return false;
+    }
+
+    if (!profession.trim()) {
+      setMessage("❌ Мэргэжлээ оруулна уу");
+      return false;
+    }
+
+    return true;
+  };
+
+  const validateStep3 = (): boolean => {
+    const { yearExperience, bankAccount } = formData;
+
+    if (!yearExperience) {
+      setMessage("❌ Цагийн үнийг сонгоно уу");
+      return false;
+    }
+
+    if (!bankAccount.bankName) {
+      setMessage("❌ Банкаа сонгоно уу");
+      return false;
+    }
+
+    if (!bankAccount.accountNumber.trim()) {
+      setMessage("❌ Дансны дугаараа оруулна уу");
+      return false;
+    }
+
+    if (!bankAccount.accountName.trim()) {
+      setMessage("❌ Данс эзэмшигчийн нэрээ оруулна уу");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleNext = async () => {
+    if (isLoading) return;
+
+    setIsLoading(true);
+    setMessage("");
+
+    try {
+      // Validate current step
+      if (currentStep === 0 && !validateStep1()) {
+        return;
+      }
+
+      // Clear message on successful validation
+      setMessage("");
+
+      // Navigate to next step
+      if (currentStep < 2) {
+        setCurrentStep(currentStep + 1);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handlePrev = () => {
+    if (isLoading) return;
+
+    setMessage(""); // Clear any messages when going back
+
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
 
   const handleFinalSubmit = async () => {
+    if (isLoading) return;
+
+    setIsLoading(true);
+    setMessage("");
+
     try {
+      // Validate final step
+      if (!validateStep3()) {
+        return;
+      }
+
       const response = await fetch("http://localhost:3001/api/mentors", {
         method: "POST",
         headers: {
@@ -72,11 +170,13 @@ const FormContainer = () => {
     } catch (error) {
       setMessage("❌ Алдаа гарлаа. Дахин оролдоно уу.");
       console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden pb-20">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -90,7 +190,7 @@ const FormContainer = () => {
 
       {/* Main Content */}
       <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-8">
-        <div className="w-[980px] h-[600px] backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/10">
+        <div className="w-full max-w-6xl min-h-[80vh] backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/10 flex flex-col">
           {/* Header */}
           <div className="text-center py-4 px-6 border-b border-white/20">
             {/* Logo and Title */}
@@ -137,13 +237,14 @@ const FormContainer = () => {
           </div>
 
           {/* Form Steps */}
-          <div className="h-[calc(600px-140px)]">
+          <div className="flex-1 overflow-auto">
             {currentStep === 0 && (
               <Step1BasicInfo
                 formData={formData}
                 setFormData={setFormData}
                 onNext={handleNext}
                 message={message}
+                isLoading={isLoading}
               />
             )}
             {currentStep === 1 && (
@@ -153,6 +254,7 @@ const FormContainer = () => {
                 onNext={handleNext}
                 onPrev={handlePrev}
                 message={message}
+                isLoading={isLoading}
               />
             )}
             {currentStep === 2 && (
@@ -162,35 +264,11 @@ const FormContainer = () => {
                 onPrev={handlePrev}
                 onSubmit={handleFinalSubmit}
                 message={message}
+                isLoading={isLoading}
               />
             )}
           </div>
         </div>
-      </div>
-
-      {/* Bottom Navigation */}
-      <div className="absolute bottom-0 left-0 right-0 z-20">
-        <div className="backdrop-blur-2xl border-t border-white/10">
-          <div className="max-w-5xl mx-auto px-6 py-4">
-            <div className="flex justify-center space-x-6">
-              <button className="px-6 py-2 text-white/70 hover:text-white transition-colors rounded-xl backdrop-blur-sm border border-white/20 hover:border-white/40 text-sm">
-                Нүүр хуудас
-              </button>
-              <button className="px-6 py-2 text-white/70 hover:text-white transition-colors rounded-xl backdrop-blur-sm border border-white/20 hover:border-white/40 text-sm">
-                Менторууд
-              </button>
-              <button className="px-6 py-2 bg-white/20 text-white font-medium rounded-xl backdrop-blur-sm border border-white/50 hover:border-white/70 text-sm">
-                Бүртгүүлэх
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Copyright Footer */}
-      <div className="absolute bottom-2 left-6 text-xs text-white/60 z-20">
-        <div>Copyright © 2025 Mentor Meet</div>
-        <div>All rights reserved.</div>
       </div>
     </div>
   );

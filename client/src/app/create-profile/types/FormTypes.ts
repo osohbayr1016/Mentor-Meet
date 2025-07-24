@@ -38,6 +38,7 @@ export interface StepProps {
     formData: FormData;
     setFormData: React.Dispatch<React.SetStateAction<FormData>>;
     message: string;
+    isLoading: boolean;
 }
 
 export interface Step1Props extends StepProps {

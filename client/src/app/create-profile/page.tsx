@@ -1,7 +1,7 @@
-import SimpleProfileForm from "./form";
+import FormContainer from "./components/FormContainer";
 
 const CreateProfilePage = () => {
-  return <SimpleProfileForm />;
+  return <FormContainer />;
 };
 
 export default CreateProfilePage;
