@@ -12,8 +12,8 @@ import { ObjectId, Schema } from "mongoose"
     role:string,
     createAt: Date,
     updateAt: Date,
-    meetingHistory: ObjectId[],
-    bookedHistory:ObjectId[]
+    meetingHistory: ObjectId,
+    bookedHistory:ObjectId
   }
 
 
