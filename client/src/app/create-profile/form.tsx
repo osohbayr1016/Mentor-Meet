@@ -98,7 +98,7 @@ const SimpleProfileForm = () => {
 
       {/* Main Content */}
       <div className="relative z-10 flex items-center justify-center min-h-screen p-8">
-        <div className="w-full max-w-6xl bg-gray-800/80 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden">
+        <div className="w-full max-w-6xl bg-gray-800/80 backdrop-blur-3xl rounded-3xl shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="text-center py-8 border-b border-gray-700/50">
             <div className="bg-gray-600 p-3 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
@@ -323,7 +323,7 @@ const SimpleProfileForm = () => {
                 </h3>
 
                 {/* Preview Card */}
-                <div className="bg-gray-700/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-600/30">
+                <div className="bg-gray-700/50 backdrop-blur-xl rounded-3xl p-8 border border-gray-600/30">
                   <div className="text-center">
                     {/* Profile Image Preview */}
                     <div className="w-20 h-20 bg-gray-600 rounded-2xl mx-auto mb-6 flex items-center justify-center border-2 border-gray-500">
@@ -382,7 +382,7 @@ const SimpleProfileForm = () => {
 
       {/* Bottom Navigation */}
       <div className="absolute bottom-0 left-0 right-0 z-20">
-        <div className="bg-black/60 backdrop-blur-lg">
+        <div className="bg-black/60 backdrop-blur-2xl">
           <div className="max-w-6xl mx-auto px-8 py-4">
             <div className="flex justify-center space-x-12">
               <button className="px-8 py-3 text-gray-400 hover:text-white transition-colors rounded-full bg-gray-800/50">
