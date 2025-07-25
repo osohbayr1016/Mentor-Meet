@@ -25,6 +25,7 @@ export type MentorType = {
   review?: string;
   createdAt: Date;
   updatedAt: Date;
+  otp?:string;
 };
 
 export type EducationType = {
@@ -50,23 +51,23 @@ export type CategoryType = {
 
 const MentorSchema = new Schema<MentorType>({
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
   phoneNumber: { type: String, required: false },
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  nickName: { type: String, required: true },
-  image: { type: String, required: true },
-  bio: { type: String, required: true },
-  profession: { type: String, required: true },
+  firstName: { type: String, required: false },
+  lastName: { type: String, required: false },
+  nickName: { type: String, required: false },
+  image: { type: String, required: false },
+  bio: { type: String, required: false },
+  profession: { type: String, required: false },
   education: {
-    schoolName: { type: String, required: true },
-    major: { type: String, required: true },
-    endedYear: { type: String, required: true },
+    schoolName: { type: String, required: false },
+    major: { type: String, required: false },
+    endedYear: { type: String, required: false },
   },
   experience: {
-    work: { type: String, required: true },
-    position: { type: String, required: true },
-    careerDuration: { type: String, required: true },
+    work: { type: String, required: false },
+    position: { type: String, required: false },
+    careerDuration: { type: String, required: false },
   },
   calendar: {
     available: { type: Date, required: false },
@@ -84,6 +85,8 @@ const MentorSchema = new Schema<MentorType>({
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
 });
+
+
 
 // MentorSchema.index({ categoryName: 1 }, { unique: true });
 export const MentorModel = model<MentorType>("Mentor", MentorSchema); //mentormodel bolgov
