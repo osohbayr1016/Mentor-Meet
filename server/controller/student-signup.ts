@@ -1,7 +1,7 @@
   import { Request, Response } from "express";  
 import { StudentModel } from "../model/student-model";
 import nodemailer from "nodemailer";
-import { OtpModel, Otppopulated } from "../model/Otp-model";
+import { OtpModel, OtpPopulated } from "../model/Otp-model";
 import bcrypt from "bcrypt";
 
   export const Hello = async (req: Request, res: Response) => {
@@ -61,7 +61,7 @@ export const checkOtp = async (req: Request, res: Response) => {
   try {
     const isOtpExisting = await OtpModel.findOne({
       code: code,
-    }).populate<Otppopulated>("userId");
+    }).populate<OtpPopulated>("userId");
     if (!isOtpExisting) {
       res.status(400).send("wrong code");
       return;

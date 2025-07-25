@@ -8,10 +8,10 @@ export type Otp = {
   createdAt: Date;
 };
 
-export type Otppopulated = {
+export type OtpPopulated = {
   userId: StudentType | MentorType
 
-};
+}; //OtpPopulated bolgov
 
 const Otp = new Schema<Otp>({
   code: { type: String, require: true },
