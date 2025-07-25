@@ -1,5 +1,5 @@
 
-import { model, ObjectId, Schema } from "mongoose";
+import mongoose, { model, ObjectId, Schema } from "mongoose";
 
 
 
@@ -8,10 +8,7 @@ export type StudentType = {
   email: string;
   password: string;
   phoneNumber?: number;
-  firstname: string;
-  lastname: string;
   nickname?: string;
-  role: string;
   createAt: Date;
   updateAt: Date;
   meetingHistory: ObjectId;
@@ -20,18 +17,28 @@ export type StudentType = {
 
 const StudentSchema = new Schema<StudentType>({
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true, unique: true },
+  password: { type: String, required: false, unique: true },
   phoneNumber: { type: Number, required: false },
-  firstname: { type: String, required: true },
-  lastname: { type: String, required: true },
   nickname: { type: String, required: false },
-  role: { type: String, required: true },
   createAt: { type: Date, default: Date.now },
   updateAt: { type: Date, default: Date.now },
   meetingHistory: { type: Schema.ObjectId, ref: "Meeting" },
   bookedHistory: { type: Schema.ObjectId, ref: "Booking" },
 });
 
+
+
+
+const TempUserSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  code: String,
+  isVerified: { type: Boolean, default: false },
+  password: String,
+  nickname: String,
+  phoneNumber: String,
+});
+
+export const TempUserModel = mongoose.model("TempUser", TempUserSchema);
 
 
 export const StudentModel = model<StudentType>("Student",StudentSchema)
