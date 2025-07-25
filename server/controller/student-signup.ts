@@ -1,13 +1,12 @@
-  import { Request, Response } from "express";  
+import { Request, Response } from "express";
 import { StudentModel } from "../model/student-model";
 import nodemailer from "nodemailer";
-import { OtpModel, OtpPopulated } from "../model/Otp-model";
+import { OtpModel } from "../model/Otp-model";
 import bcrypt from "bcrypt";
 
-  export const Hello = async (req: Request, res: Response) => {
+export const Hello = async (req: Request, res: Response) => {
   res.send({ message: "hello" });
 };
-
 
 export const Checkemail = async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -43,7 +42,7 @@ export const Checkemail = async (req: Request, res: Response) => {
       html: `<div style="color:red"> ${code}</div> `,
     };
 
-    await OtpModel.create({ code }); 
+    await OtpModel.create({ code });
 
     await transport.sendMail(options);
 
@@ -54,14 +53,13 @@ export const Checkemail = async (req: Request, res: Response) => {
   }
 };
 
-
 export const checkOtp = async (req: Request, res: Response) => {
   const { code } = req.body;
 
   try {
     const isOtpExisting = await OtpModel.findOne({
       code: code,
-    }).populate<OtpPopulated>("userId");
+    });
     if (!isOtpExisting) {
       res.status(400).send("wrong code");
       return;
@@ -72,8 +70,6 @@ export const checkOtp = async (req: Request, res: Response) => {
     res.status(400).send("Wrong code");
   }
 };
-
-
 
 export const updatePassword = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -87,30 +83,23 @@ export const updatePassword = async (req: Request, res: Response) => {
 
   const hashedPassword = await bcrypt.hashSync(password, 10);
 
-  await StudentModel.findOneAndUpdate({ email }, { password: hashedPassword });
+  await StudentModel.create({ email }, { password: hashedPassword });
 
   res.send({ message: "Successfully updated password" });
 };
 
-
-
-
-
-export const StudentNameNumber = async ( req: Request, res: Response) =>  {
- const { email } = req.body;
- const isEmailExisted = await StudentModel.findOne({ email });
- if (!isEmailExisted) {
+export const StudentNameNumber = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const isEmailExisted = await StudentModel.findOne({ email });
+  if (!isEmailExisted) {
     res.status(404).send({ message: "User not found" });
     return;
   }
- 
-const nickname = await StudentModel.create({
-  nickname: req.body.nickname,
-  phoneNumber: req.body.phoneNumber
-});
 
-return res.status(201).json(nickname);
+  const nickname = await StudentModel.create({
+    nickname: req.body.nickname,
+    phoneNumber: req.body.phoneNumber,
+  });
 
-
-
-}
+  return res.status(201).json(nickname);
+};

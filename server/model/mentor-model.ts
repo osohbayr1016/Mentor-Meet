@@ -25,7 +25,7 @@ export type MentorType = {
   review?: string;
   createdAt: Date;
   updatedAt: Date;
-  otp?:string;
+  otp: string;
 };
 
 export type EducationType = {
@@ -85,8 +85,6 @@ const MentorSchema = new Schema<MentorType>({
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
 });
-
-
 
 // MentorSchema.index({ categoryName: 1 }, { unique: true });
 export const MentorModel = model<MentorType>("Mentor", MentorSchema); //mentormodel bolgov
