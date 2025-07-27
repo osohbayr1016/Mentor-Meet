@@ -33,13 +33,18 @@ export const Checkemail = async (req: Request, res: Response) => {
       },
     });
 
-    const code = Math.floor(100000 + Math.random() * 90000).toString();
+    const code = Math.floor(1000 + Math.random() * 9000).toString();
 
     const options = {
       from: "jochuekimmich@gmail.com",
       to: email,
-      subject: "Hello",
-      html: `<div style="color:red"> ${code}</div> `,
+      subject: "Баталгаажуулах код",
+      text:`
+      <p>Сайн байна уу! Та өөрийн имайл хаягыг баталгаажуулж дараах (OTP) кодыг оруулна уу?:</p>
+     <div style="font-size: 32px; font-weight: bold; color: black; margin: 20px 0; letter-spacing: 5px;">
+  ${code}
+</div>
+`
     };
 
     await OtpModel.create({ code });

@@ -20,7 +20,7 @@ const Otp = new Schema<Otp>({
   email: { type: String, required: true },
   // userId: { type: Schema.ObjectId, require: true, ref: "Users" },
 
-  createdAt: { type: Date, default: Date.now }, //expires 900 bolgov
+  createdAt: { type: Date, default: Date.now }, 
   updatedAt: { type: Date, default: Date.now },
 });
 

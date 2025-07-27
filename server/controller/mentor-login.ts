@@ -15,21 +15,23 @@ export const MentorLogin = async (req: Request, res: Response) => {
       return res.status(400).send({ message: "Имайл болон нууц үг шаардлагатай!" });
     }
 
-    const user = await MentorModel.findOne({ email });
-    if (!user) {
+    const mentor = await MentorModel.findOne({ email });
+    if (!mentor) {
       return res.status(401).send({ message: "Имайл буруу байна!" });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, mentor.password);
     if (!isPasswordValid) {
       return res.status(401).send({ message: "Нууц үг буруу байна!" });
     }
 
     const secret = process.env.JWT_SECRET;
+    console.log(secret, 'login secter');
+    
     if (!secret) return res.status(500).send({ message: "JWT тохиргоо алга байна!" });
 
     const token = jwt.sign(
-      { mentorId: user._id, isMentor: user.role === "MENTOR"},
+      { mentorId: mentor._id.toString, isMentor: mentor.role === "MENTOR"},
     
       secret,
       { expiresIn: "24h" }
@@ -38,7 +40,7 @@ export const MentorLogin = async (req: Request, res: Response) => {
     return res.status(200).json({
       message: "Амжилттай нэвтэрлээ",
       token,
-      mentorId: user._id,
+      mentorId: mentor._id,
     });
 
   } catch (error: any) {

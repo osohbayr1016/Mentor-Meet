@@ -9,7 +9,7 @@ export type MentorType = {
   _id: string;
   email: string;
   password: string;
-  phoneNumber?: number;
+  phoneNumber?: string;
   firstName: string;
   lastName: string;
   nickName?: string;
@@ -25,19 +25,19 @@ export type MentorType = {
   review?: string;
   createdAt: Date;
   updatedAt: Date;
-  otp: string;
+  otp?: string;
 };
 
 export type EducationType = {
   schoolName: string;
   major: string;
-  endedYear: Date;
+  endedYear: string;
 };
 
 export type ExperienceType = {
   work: string;
   position: string;
-  careerDuration: Date;
+  careerDuration: string;
 };
 
 export type calendarType = {
@@ -84,7 +84,8 @@ const MentorSchema = new Schema<MentorType>({
   },
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
+  otp: { type :String, required: false }
 });
 
-// MentorSchema.index({ categoryName: 1 }, { unique: true });
+
 export const MentorModel = model<MentorType>("Mentor", MentorSchema); //mentormodel bolgov
