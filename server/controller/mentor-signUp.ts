@@ -6,33 +6,7 @@ import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
-// export const MentorSignUp = async (req: Request, res: Response) => {
-//   const { email, password } = req.body;
 
-//   try {
-//     if (
-//       !email ||
-//       !password ||
-//       typeof email != "string" ||
-//       typeof password !== "string"
-//     ) {
-//       res.status(400).send({ message: "Имайл, нууц үг шаардлагатай!" });
-//       return;
-//     }
-
-//     const isEmailExisted = await MentorModel.findOne({ email });
-//     if (!isEmailExisted) {
-//       const hashedPassword = await bcrypt.hashSync(password, 10);
-//       await MentorModel.create({ email, password: hashedPassword });
-//       res.send({ message: "Амжилттай бүртгэгдлээ." });
-//       return;
-//     }
-//     res.send({ message: "Хэрэглэгч бүртгэлтэй байна!" });
-//   } catch (err) {
-//     console.error({ message: "Бүртгэлд алдаа гарлаа" });
-//     return res.status(500).send({ message: "Серверт алдаа гарлаа" });
-//   }
-// };
 
 export const Checkemail = async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -48,7 +22,7 @@ export const Checkemail = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "User already existed" });
     }
 
-    const code = Math.floor(100000 + Math.random() * 90000).toString();
+    const code = Math.floor(1000 + Math.random() * 9000).toString();
 
     const transport = nodemailer.createTransport({
       service: "gmail",
@@ -109,6 +83,7 @@ export const MentorSignUp = async (req: Request, res: Response) => {
       email,
       password: hashedPassword,
     });
+    
     dotenv.config();
 
     const tokenPassword = process.env.JWT_SECRET;
@@ -132,3 +107,32 @@ export const MentorSignUp = async (req: Request, res: Response) => {
     res.status(400).send("Something went wrong");
   }
 };
+
+
+// export const MentorSignUp = async (req: Request, res: Response) => {
+//   const { email, password } = req.body;
+
+//   try {
+//     if (
+//       !email ||
+//       !password ||
+//       typeof email != "string" ||
+//       typeof password !== "string"
+//     ) {
+//       res.status(400).send({ message: "Имайл, нууц үг шаардлагатай!" });
+//       return;
+//     }
+
+//     const isEmailExisted = await MentorModel.findOne({ email });
+//     if (!isEmailExisted) {
+//       const hashedPassword = await bcrypt.hashSync(password, 10);
+//       await MentorModel.create({ email, password: hashedPassword });
+//       res.send({ message: "Амжилттай бүртгэгдлээ." });
+//       return;
+//     }
+//     res.send({ message: "Хэрэглэгч бүртгэлтэй байна!" });
+//   } catch (err) {
+//     console.error({ message: "Бүртгэлд алдаа гарлаа" });
+//     return res.status(500).send({ message: "Серверт алдаа гарлаа" });
+//   }
+// };

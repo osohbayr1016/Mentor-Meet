@@ -6,9 +6,11 @@ export const Verify = async (request: Request, response: Response) => {
 
   const { token } = request.body;
 
-  const tokenPassword = "mentor-meet";
+  // const tokenPassword = "mentor-meet";
+  const tokenPassword = process.env.JWT_SECRET
 
-  const isValid = jwt.verify(token, tokenPassword);
+
+  const isValid = jwt.verify(token, tokenPassword as string);
   try {
     if (isValid) {
       const destructToken: any = jwt.decode(token);
