@@ -8,11 +8,14 @@ export const MentorCreateProfile1 = async (
   res: Response
 ): Promise<any> => {
   const { mentorId } = res.locals;
-const { category } = req.body;
+  const { category } = req.body;
 
-if (!category?.categoryId || !mongoose.Types.ObjectId.isValid(category.categoryId)) {
-  return res.status(400).json({ message: "Зөв categoryId оруулна уу." });
-}
+  if (
+    !category?.categoryId ||
+    !mongoose.Types.ObjectId.isValid(category.categoryId)
+  ) {
+    return res.status(400).json({ message: "Зөв categoryId оруулна уу." });
+  }
   console.log("mentorId:", mentorId);
 
   try {
@@ -29,7 +32,7 @@ if (!category?.categoryId || !mongoose.Types.ObjectId.isValid(category.categoryI
     if (
       !firstName ||
       !lastName ||
-      !nickName ||  
+      !nickName ||
       !category?.categoryId ||
       !category?.price ||
       !careerDuration ||
@@ -41,18 +44,16 @@ if (!category?.categoryId || !mongoose.Types.ObjectId.isValid(category.categoryI
         .send({ message: "Мэдээлэл дутуу байна. Бүх талбарыг бөглөнө үү." });
     }
 
-      const foundCategory = await CategoryModel.findOne({
+    const foundCategory = await CategoryModel.findOne({
       _id: category.categoryId,
     });
 
     if (!foundCategory) {
-      return res
-        .status(400)
-        .json({ message: "Ийм нэртэй ангилал олдсонгүй!" });
+      return res.status(400).json({ message: "Ийм нэртэй ангилал олдсонгүй!" });
     }
 
-    const updatedMentor = await MentorModel.findOneAndUpdate(
-         {_id:mentorId}, 
+    const updatedMentor = await MentorModel.findByIdAndUpdate(
+      { _id: mentorId },
       {
         firstName,
         lastName,
@@ -82,4 +83,3 @@ if (!category?.categoryId || !mongoose.Types.ObjectId.isValid(category.categoryI
       .json({ message: "Сервер дээр алдаа гарлаа. Дахин оролдоно уу." });
   }
 };
-

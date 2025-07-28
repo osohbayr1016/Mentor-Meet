@@ -6,7 +6,7 @@ import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
-export const Checkemail = async (req: Request, res: Response) => {
+export const MentorCheckemail = async (req: Request, res: Response) => {
   const { email } = req.body;
 
   try {
@@ -77,7 +77,7 @@ export const MentorSignUp = async (req: Request, res: Response) => {
   try {
     const hashedPassword = await bcrypt.hashSync(password, 10);
 
-    await MentorModel.create({
+    await MentorModel.findByIdAndUpdate({
       email,
       password: hashedPassword,
     });
