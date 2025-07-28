@@ -1,6 +1,10 @@
 import { useAuth } from "@/app/_Components/MentorUserProvider";
 import Image from "next/image";
 
+type EmailType = {
+  email: string;
+};
+
 const FirstMentorSignup = () => {
   return (
     <div className="relative w-full h-screen">
