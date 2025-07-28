@@ -31,7 +31,7 @@ const MentorLoginPage = () => {
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:8000/mentor/login", {
+      const response = await axios.post("http://localhost:8000/mentorLogin", {
         email,
         password,
       });
