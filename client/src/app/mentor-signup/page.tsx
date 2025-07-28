@@ -71,6 +71,18 @@ const SignupPage = () => {
 
   // Step 3: Signup
   const handleSignupSubmit = async () => {
+    // Password validation
+    if (form.password !== form.confirmPassword) {
+      setError("Password not matching");
+      return;
+    }
+
+    // Additional password validation
+    if (form.password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
     setLoading(true);
     setError("");
     try {

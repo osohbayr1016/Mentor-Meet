@@ -170,10 +170,14 @@ const MentorLoginPage = () => {
                 <div className="flex gap-1 flex-col">
                   <p className="font-[500] text-[14px] text-white">Email</p>
                   <input
+                    type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Мэйл хаягаа оруулна уу..."
                     className="border-1 border-white rounded-[40px] py-[8px] px-[20px] w-full text-white bg-transparent placeholder:text-white/70"
+                    required
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                    title="Please enter a valid email address"
                   />
                 </div>
 
@@ -186,6 +190,9 @@ const MentorLoginPage = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Нууц үгээ оруулна уу..."
                     className="border-1 border-white rounded-[40px] py-[8px] px-[20px] w-full text-white bg-transparent placeholder:text-white/70"
+                    required
+                    minLength={1}
+                    title="Please enter your password"
                   />
                 </div>
 
@@ -209,9 +216,9 @@ const MentorLoginPage = () => {
                 {/* Login Button */}
                 <div className="flex w-full justify-center">
                   <button
-                    className=" border-1 border-white text-white rounded-[40px] py-[6px] px-[50px] transition-colors"
+                    className=" border-1 border-white text-white rounded-[40px] py-[6px] px-[50px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={handleLogin}
-                    disabled={loading || !email || !password}
+                    disabled={loading || !email.trim() || !password.trim()}
                   >
                     {loading ? "Түр хүлээнэ үү..." : "Нэвтрэх"}
                   </button>
@@ -272,8 +279,8 @@ const MentorLoginPage = () => {
                 )}
                 <button
                   onClick={handleForgotPassword}
-                  disabled={resetLoading || !resetEmail}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2 disabled:opacity-50"
+                  disabled={resetLoading || !resetEmail.trim()}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {resetLoading ? "Илгээж байна..." : "Код илгээх"}
                 </button>
@@ -300,8 +307,10 @@ const MentorLoginPage = () => {
                 )}
                 <button
                   onClick={handleVerifyCode}
-                  disabled={resetLoading || !resetCode}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2 disabled:opacity-50"
+                  disabled={
+                    resetLoading || !resetCode.trim() || resetCode.length !== 4
+                  }
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {resetLoading ? "Шалгаж байна..." : "Баталгаажуулах"}
                 </button>
@@ -327,8 +336,12 @@ const MentorLoginPage = () => {
                 )}
                 <button
                   onClick={handleResetPassword}
-                  disabled={resetLoading || !newPassword}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg py-2 disabled:opacity-50"
+                  disabled={
+                    resetLoading ||
+                    !newPassword.trim() ||
+                    newPassword.length < 6
+                  }
+                  className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg py-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {resetLoading ? "Хадгалж байна..." : "Нууц үг солих"}
                 </button>
