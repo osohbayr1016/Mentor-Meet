@@ -13,6 +13,11 @@ const MentorCalendar = () => {
   const [activeDatePosition, setActiveDatePosition] = useState<
     "top" | "bottom"
   >("top");
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [animatingDate, setAnimatingDate] = useState<string | null>(null);
+  const [animatingPosition, setAnimatingPosition] = useState<"top" | "bottom">(
+    "top"
+  );
 
   // Generate dates for two weeks starting from August 4th
   const week1Dates = [
@@ -53,8 +58,18 @@ const MentorCalendar = () => {
 
   const handleDateClick = (date: string, position: "top" | "bottom") => {
     if (activeDate === date) {
-      setActiveDate(null);
-      setActiveDatePosition("top");
+      // Start slide-up animation
+      setIsAnimating(true);
+      setAnimatingDate(date);
+      setAnimatingPosition(position);
+
+      // After animation completes, hide the time slots
+      setTimeout(() => {
+        setActiveDate(null);
+        setActiveDatePosition("top");
+        setIsAnimating(false);
+        setAnimatingDate(null);
+      }, 300); // Match animation duration
     } else {
       setActiveDate(date);
       setActiveDatePosition(position);
@@ -137,7 +152,7 @@ const MentorCalendar = () => {
 
             {/* Calendar Content */}
             <div className="w-full h-full flex flex-col justify-center items-center px-8">
-              <div className="w-full max-w-[500px] flex flex-col gap-[40px]">
+              <div className="w-full max-w-[500px] flex flex-col gap-[20px]">
                 {/* Week 1 */}
                 <div className="flex flex-col gap-[20px]">
                   <p className="font-[500] text-[16px] text-white text-center">
@@ -167,15 +182,33 @@ const MentorCalendar = () => {
                   </div>
 
                   {/* Time slots for Week 1 */}
-                  {activeDate && activeDatePosition === "top" && (
-                    <div className="animate-slideDown overflow-hidden">
-                      <div className="grid grid-cols-6 gap-2 mt-4">
+                  {((activeDate && activeDatePosition === "top") ||
+                    (isAnimating &&
+                      animatingDate &&
+                      animatingPosition === "top")) && (
+                    <div
+                      className={`overflow-hidden ${
+                        isAnimating &&
+                        animatingDate &&
+                        animatingPosition === "top"
+                          ? "animate-slideUp"
+                          : "animate-slideDown"
+                      }`}
+                    >
+                      <div className="grid grid-cols-6 gap-2">
                         {timeSlots.map((time) => (
                           <button
                             key={time}
-                            onClick={() => handleTimeClick(time, activeDate)}
+                            onClick={() =>
+                              handleTimeClick(
+                                time,
+                                activeDate || animatingDate || ""
+                              )
+                            }
                             className={`px-3 py-2 rounded-lg border border-white transition-colors ${
-                              selectedTimesByDate[activeDate]?.has(time)
+                              selectedTimesByDate[
+                                activeDate || animatingDate || ""
+                              ]?.has(time)
                                 ? "bg-white text-black"
                                 : "text-white hover:bg-white/10"
                             }`}
@@ -217,15 +250,33 @@ const MentorCalendar = () => {
                   </div>
 
                   {/* Time slots for Week 2 */}
-                  {activeDate && activeDatePosition === "bottom" && (
-                    <div className="animate-slideDown overflow-hidden">
-                      <div className="grid grid-cols-6 gap-2 mt-4">
+                  {((activeDate && activeDatePosition === "bottom") ||
+                    (isAnimating &&
+                      animatingDate &&
+                      animatingPosition === "bottom")) && (
+                    <div
+                      className={`overflow-hidden ${
+                        isAnimating &&
+                        animatingDate &&
+                        animatingPosition === "bottom"
+                          ? "animate-slideUp"
+                          : "animate-slideDown"
+                      }`}
+                    >
+                      <div className="grid grid-cols-6 gap-2 ">
                         {timeSlots.map((time) => (
                           <button
                             key={time}
-                            onClick={() => handleTimeClick(time, activeDate)}
+                            onClick={() =>
+                              handleTimeClick(
+                                time,
+                                activeDate || animatingDate || ""
+                              )
+                            }
                             className={`px-3 py-2 rounded-lg border border-white transition-colors ${
-                              selectedTimesByDate[activeDate]?.has(time)
+                              selectedTimesByDate[
+                                activeDate || animatingDate || ""
+                              ]?.has(time)
                                 ? "bg-white text-black"
                                 : "text-white hover:bg-white/10"
                             }`}
@@ -241,7 +292,7 @@ const MentorCalendar = () => {
             </div>
 
             {/* Continue Button */}
-            <div className="pb-[60px] flex w-full justify-center">
+            <div className="pb-[60px] flex w-full justify-center mt-8">
               <button
                 className="bg-white text-black rounded-[40px] py-[8px] px-[50px] font-medium hover:bg-gray-100 transition-colors"
                 onClick={handleContinue}
@@ -328,7 +379,7 @@ const MentorCalendar = () => {
               <div className="flex justify-center">
                 <Link href="/">
                   <button
-                    className="bg-white text-black rounded-[40px] py-[8px] px-[50px] font-medium hover:bg-gray-100 transition-colors"
+                    className="bg-white text-black mtrounded-[40px] py-[8px] px-[50px] font-medium hover:bg-gray-100 transition-colors"
                     onClick={handleCloseSuccessModal}
                   >
                     Үргэлжлүүлэх
