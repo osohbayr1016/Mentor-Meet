@@ -58,6 +58,10 @@ const ThirdStudentSignup = ({
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Нууц үгээ оруулна уу..."
                     className="border-1 border-white rounded-[40px] py-[8px] px-[20px] w-full text-[white]"
+                    required
+                    minLength={6}
+                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{6,}$"
+                    title="Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, and one number"
                   />
                   <p className="font-[500] text-[14px] text-white">
                     Confirm password
@@ -68,6 +72,10 @@ const ThirdStudentSignup = ({
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Нууц үгээ давтана уу"
                     className="border-1 border-white rounded-[40px] py-[8px] px-[20px] w-full text-[white]"
+                    required
+                    minLength={6}
+                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{6,}$"
+                    title="Please confirm your password"
                   />
                   {error && (
                     <div className="text-red-400 text-xs mt-1">{error}</div>
@@ -75,9 +83,14 @@ const ThirdStudentSignup = ({
                 </div>
                 <div className="flex w-full justify-center">
                   <button
-                    className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px]"
+                    className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px] disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={onSubmit}
-                    disabled={loading || !password || !confirmPassword}
+                    disabled={
+                      loading ||
+                      !password.trim() ||
+                      !confirmPassword.trim() ||
+                      password !== confirmPassword
+                    }
                   >
                     {loading ? "Түр хүлээнэ үү..." : "Үргэлжлүүлэх"}
                   </button>

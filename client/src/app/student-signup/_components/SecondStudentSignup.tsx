@@ -53,11 +53,16 @@ const SecondStudentSignup = ({
                 </div>
                 <div className="flex gap-1 flex-col items-center">
                   <input
-                    type="number"
+                    type="text"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     placeholder="Код оруулна уу..."
                     className="border-1 border-white rounded-[40px] py-[8px] px-[20px] w-[280px] text-[white]"
+                    required
+                    pattern="[0-9]{4}"
+                    maxLength={4}
+                    minLength={4}
+                    title="Please enter a 4-digit verification code"
                   />
                   {error && (
                     <div className="text-red-400 text-xs mt-1">{error}</div>
@@ -65,9 +70,9 @@ const SecondStudentSignup = ({
                 </div>
                 <div className="flex w-full justify-center">
                   <button
-                    className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px]"
+                    className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px] disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={onSubmit}
-                    disabled={loading || !otp}
+                    disabled={loading || !otp.trim() || otp.length !== 4}
                   >
                     {loading ? "Түр хүлээнэ үү..." : "Үргэлжлүүлэх"}
                   </button>

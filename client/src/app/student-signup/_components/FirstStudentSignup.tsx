@@ -55,10 +55,14 @@ const FirstStudentSignup = ({
                 <div className="flex gap-1 flex-col">
                   <p className="font-[500] text-[14px] text-white">Email</p>
                   <input
+                    type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Мэйл хаягаа оруулна уу..."
                     className="border-1 border-white rounded-[40px] py-[8px] px-[20px] w-full text-[white]"
+                    required
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                    title="Please enter a valid email address"
                   />
                   {error && (
                     <div className="text-red-400 text-xs mt-1">{error}</div>
@@ -66,9 +70,9 @@ const FirstStudentSignup = ({
                 </div>
                 <div className="flex w-full justify-center">
                   <button
-                    className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px]"
+                    className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px] disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={onSubmit}
-                    disabled={loading || !email}
+                    disabled={loading || !email.trim()}
                   >
                     {loading ? "Түр хүлээнэ үү..." : "Үргэлжлүүлэх"}
                   </button>

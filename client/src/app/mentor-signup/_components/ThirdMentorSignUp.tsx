@@ -59,6 +59,10 @@ const ThirdMentorSignup = ({
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Нууц үгээ оруулна уу..."
                     className="border-1 border-white rounded-[40px] py-[8px] px-[20px] w-full text-[white]"
+                    required
+                    minLength={6}
+                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{6,}$"
+                    title="Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, and one number"
                   />
                   <p className="font-[500] text-[14px] text-white">
                     Confirm password
@@ -68,8 +72,23 @@ const ThirdMentorSignup = ({
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Нууц үгээ давтана уу"
-                    className="border-1 border-white rounded-[40px] py-[8px] px-[20px] w-full text-[white]"
+                    className="border-1 border-white rounded-[40px] px-[20px] w-full text-[white]"
+                    required
+                    minLength={6}
+                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{6,}$"
+                    title="Please confirm your password"
                   />
+                  {/* Real-time password validation */}
+                  {confirmPassword && password !== confirmPassword && (
+                    <div className="text-red-400 text-xs mt-1">
+                      Password not matching
+                    </div>
+                  )}
+                  {password && password.length < 6 && (
+                    <div className="text-red-400 text-xs mt-1">
+                      Password must be at least 6 characters long
+                    </div>
+                  )}
                   {error && (
                     <div className="text-red-400 text-xs mt-1">{error}</div>
                   )}
@@ -77,9 +96,15 @@ const ThirdMentorSignup = ({
                 <div className="flex w-full justify-center">
                   <Link href="/create-profile">
                     <button
-                      className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px]"
+                      className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px] disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={onSubmit}
-                      disabled={loading || !password || !confirmPassword}
+                      disabled={
+                        loading ||
+                        !password.trim() ||
+                        !confirmPassword.trim() ||
+                        password !== confirmPassword ||
+                        password.length < 6
+                      }
                     >
                       {loading ? "Түр хүлээнэ үү..." : "Үргэлжлүүлэх"}
                     </button>

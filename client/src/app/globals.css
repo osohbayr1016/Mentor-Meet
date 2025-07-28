@@ -1,44 +1,60 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-
 @font-face {
-  font-family: 'GIP';
-  src: url('../assets/fonts/GIP-LIGHT.OTF') format('opentype');
+  font-family: "GIP";
+  src: url("../assets/fonts/GIP-LIGHT.OTF") format("opentype");
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'GIP';
-  src: url('../assets/fonts/GIP-REGULAR.OTF') format('opentype');
+  font-family: "GIP";
+  src: url("../assets/fonts/GIP-REGULAR.OTF") format("opentype");
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'GIP';
-  src: url('../assets/fonts/GIP-MEDIUM.OTF') format('opentype');
+  font-family: "GIP";
+  src: url("../assets/fonts/GIP-MEDIUM.OTF") format("opentype");
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'GIP';
-  src: url('../assets/fonts/GIP-SEMIBOLD.OTF') format('opentype');
+  font-family: "GIP";
+  src: url("../assets/fonts/GIP-SEMIBOLD.OTF") format("opentype");
   font-weight: 600;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'GIP';
-  src: url('../assets/fonts/GIP-BOLD.OTF') format('opentype');
+  font-family: "GIP";
+  src: url("../assets/fonts/GIP-BOLD.OTF") format("opentype");
   font-weight: 700;
   font-style: normal;
 }
 
-body { 
-  font-family: 'GIP';
+body {
+  font-family: "GIP";
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 200px;
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.3s ease-out forwards;
 }
 
 /* @theme inline {
