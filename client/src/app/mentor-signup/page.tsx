@@ -5,6 +5,7 @@ import FirstMentorSignup from "./_components/FirstMentorSignup";
 import SecondMentorSignup from "./_components/SecondMentorSignup";
 import ThirdMentorSignup from "./_components/ThirdMentorSignUp";
 import axios from "axios";
+import Link from "next/link";
 
 const BACKEND_URL = "http://localhost:8000";
 
@@ -131,6 +132,9 @@ const SignupPage = () => {
         <div className="flex flex-col items-center justify-center h-screen">
           <h2 className="text-2xl font-bold mb-4">Бүртгэл амжилттай!</h2>
           <p>Та амжилттай бүртгэгдлээ.</p>
+          <Link href="/create-profile">
+            <button>Profile үүсгэх</button>
+          </Link>
         </div>
       )}
     </div>
