@@ -53,7 +53,7 @@ const StudentSignupPage = () => {
     try {
       const res = await axios.post(`http://localhost:8000/checkOtp`, {
         email: form.email,
-        otp: form.otp,
+        code: form.otp,
       });
       if (
         res.data &&

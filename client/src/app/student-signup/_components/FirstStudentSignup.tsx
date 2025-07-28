@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 // import axios from "axios";
 
 // const isEmailAvailable = async (email: string) => {
@@ -78,9 +79,11 @@ const FirstStudentSignup = ({
               <p className="font-[400] text-[16px] text-white">
                 Бүртгэлтэй юу?
               </p>
-              <button className="font-[400] cursor-pointer text-[16px] text-white">
-                Нэвтрэх
-              </button>
+              <Link href="/student-login">
+                <span className="font-[400] cursor-pointer text-[16px] text-[#2468FF]">
+                  Нэвтрэх
+                </span>
+              </Link>
             </div>
           </div>
         </div>
