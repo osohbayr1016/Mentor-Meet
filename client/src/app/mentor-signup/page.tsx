@@ -50,7 +50,7 @@ const SignupPage = () => {
     try {
       const res = await axios.post(`http://localhost:8000/mentorOtp`, {
         email: form.email,
-        otp: form.otp,
+        code: form.otp,
       });
       if (
         res.data &&
