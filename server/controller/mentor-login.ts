@@ -1,18 +1,19 @@
-
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { MentorModel } from "../model/mentor-model";
 import { config } from "dotenv";
 
-config(); 
+config();
 
 export const MentorLogin = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).send({ message: "Имайл болон нууц үг шаардлагатай!" });
+      return res
+        .status(400)
+        .send({ message: "Имайл болон нууц үг шаардлагатай!" });
     }
 
     const mentor = await MentorModel.findOne({ email });
@@ -26,13 +27,14 @@ export const MentorLogin = async (req: Request, res: Response) => {
     }
 
     const secret = process.env.JWT_SECRET;
-    console.log(secret, 'login secter');
-    
-    if (!secret) return res.status(500).send({ message: "JWT тохиргоо алга байна!" });
+    console.log(secret, "login secter");
+
+    if (!secret)
+      return res.status(500).send({ message: "JWT тохиргоо алга байна!" });
 
     const token = jwt.sign(
-      { mentorId: mentor._id.toString, isMentor: mentor.role === "MENTOR"},
-    
+      { mentorId: mentor._id.toString(), isMentor: mentor.role === "MENTOR" },
+
       secret,
       { expiresIn: "24h" }
     );
@@ -42,10 +44,11 @@ export const MentorLogin = async (req: Request, res: Response) => {
       token,
       mentorId: mentor._id,
     });
-
   } catch (error: any) {
     console.error("Login error:", error.message);
-    return res.status(500).json({ message: "Серверийн алдаа!", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Серверийн алдаа!", error: error.message });
   }
 };
 

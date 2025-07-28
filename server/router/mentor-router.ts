@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
-  Checkemail,
   checkOtp,
+  MentorCheckemail,
   MentorSignUp,
 } from "../controller/mentor-register";
 import { MentorLogin } from "../controller/mentor-login";
@@ -11,9 +11,9 @@ import { MentorCreateProfile1 } from "../controller/mentor-create-profile-1";
 
 export const MentorRouter = Router();
 
-MentorRouter.post("/mentorEmail", Checkemail);
+MentorRouter.post("/mentorEmail", MentorCheckemail);
 MentorRouter.post("/mentorOtp", checkOtp);
 MentorRouter.post("/mentorSignup", MentorSignUp);
-// MentorRouter.post("/mentorProfile", [MentorTokenChecker, isMentor], MentorCreateProfile1)
-MentorRouter.post("/mentorProfile", MentorCreateProfile1);
+MentorRouter.post("/mentorProfile", MentorTokenChecker, MentorCreateProfile1);
+
 MentorRouter.post("/mentorLogin", MentorLogin);
