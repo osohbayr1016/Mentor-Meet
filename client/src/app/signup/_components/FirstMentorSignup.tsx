@@ -1,6 +1,25 @@
 import Image from "next/image";
+// import axios from "axios";
 
-const FirstMentorSignup = () => {
+// const isEmailAvailable = async (email: string) => {
+//   const response = await axios.post('https://localhost:8000/mentorEmail')
+// }
+
+interface Props {
+  email: string;
+  setEmail: (email: string) => void;
+  onSubmit: () => void;
+  loading: boolean;
+  error: string;
+}
+
+const FirstMentorSignup = ({
+  email,
+  setEmail,
+  onSubmit,
+  loading,
+  error,
+}: Props) => {
   return (
     <div className="relative w-full h-screen">
       {/* Overlay and background image */}
@@ -35,13 +54,22 @@ const FirstMentorSignup = () => {
                 <div className="flex gap-1 flex-col">
                   <p className="font-[500] text-[14px] text-white">Email</p>
                   <input
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="Мэйл хаягаа оруулна уу..."
                     className="border-1 border-white rounded-[40px] py-[8px] px-[20px] w-full text-[white]"
                   />
+                  {error && (
+                    <div className="text-red-400 text-xs mt-1">{error}</div>
+                  )}
                 </div>
                 <div className="flex w-full justify-center">
-                  <button className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px] opacity-50">
-                    Үргэлжлүүлэх
+                  <button
+                    className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px]"
+                    onClick={onSubmit}
+                    disabled={loading || !email}
+                  >
+                    {loading ? "Түр хүлээнэ үү..." : "Үргэлжлүүлэх"}
                   </button>
                 </div>
               </div>

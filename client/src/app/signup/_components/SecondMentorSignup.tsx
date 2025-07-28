@@ -1,6 +1,20 @@
 import Image from "next/image";
 
-const SecondMentorSignup = () => {
+interface Props {
+  otp: string;
+  setOtp: (otp: string) => void;
+  onSubmit: () => void;
+  loading: boolean;
+  error: string;
+}
+
+const SecondMentorSignup = ({
+  otp,
+  setOtp,
+  onSubmit,
+  loading,
+  error,
+}: Props) => {
   return (
     <div className="relative w-full h-screen">
       {/* Overlay and background image */}
@@ -40,13 +54,22 @@ const SecondMentorSignup = () => {
                 <div className="flex gap-1 flex-col items-center">
                   <input
                     type="number"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
                     placeholder="Код оруулна уу..."
                     className="border-1 border-white rounded-[40px] py-[8px] px-[20px] w-[280px] text-[white]"
                   />
+                  {error && (
+                    <div className="text-red-400 text-xs mt-1">{error}</div>
+                  )}
                 </div>
                 <div className="flex w-full justify-center">
-                  <button className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px] opacity-50">
-                    Үргэлжлүүлэх
+                  <button
+                    className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px]"
+                    onClick={onSubmit}
+                    disabled={loading || !otp}
+                  >
+                    {loading ? "Түр хүлээнэ үү..." : "Үргэлжлүүлэх"}
                   </button>
                 </div>
               </div>
