@@ -9,11 +9,8 @@ import { MentorTokenChecker } from "../middleware/token-checker";
 import { isMentor } from "../middleware/mentor-authorization";
 import { MentorCreateProfile1 } from "../controller/mentor-create-profile-1";
 import { mentorForgetPass } from "../controller/mentor-forget-Password";
-<<<<<<< HEAD
 import { MentorGetProfile } from "../controller/mentor-get-profile";
-=======
 import { findmail } from "../controller/mentor-find-forReset";
->>>>>>> 94aca2b (reset)
 
 export const MentorRouter = Router();
 
