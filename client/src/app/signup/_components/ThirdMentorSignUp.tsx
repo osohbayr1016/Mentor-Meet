@@ -1,6 +1,24 @@
 import Image from "next/image";
 
-const ThirdMentorSignup = () => {
+interface Props {
+  password: string;
+  confirmPassword: string;
+  setPassword: (password: string) => void;
+  setConfirmPassword: (confirmPassword: string) => void;
+  onSubmit: () => void;
+  loading: boolean;
+  error: string;
+}
+
+const ThirdMentorSignup = ({
+  password,
+  confirmPassword,
+  setPassword,
+  setConfirmPassword,
+  onSubmit,
+  loading,
+  error,
+}: Props) => {
   return (
     <div className="relative w-full h-screen">
       {/* Overlay and background image */}
@@ -36,6 +54,8 @@ const ThirdMentorSignup = () => {
                   <p className="font-[500] text-[14px] text-white">Password</p>
                   <input
                     type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="Нууц үгээ оруулна уу..."
                     className="border-1 border-white rounded-[40px] py-[8px] px-[20px] w-full text-[white]"
                   />
@@ -44,13 +64,22 @@ const ThirdMentorSignup = () => {
                   </p>
                   <input
                     type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Нууц үгээ давтана уу"
                     className="border-1 border-white rounded-[40px] py-[8px] px-[20px] w-full text-[white]"
                   />
+                  {error && (
+                    <div className="text-red-400 text-xs mt-1">{error}</div>
+                  )}
                 </div>
                 <div className="flex w-full justify-center">
-                  <button className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px] opacity-50">
-                    Үргэлжлүүлэх
+                  <button
+                    className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px]"
+                    onClick={onSubmit}
+                    disabled={loading || !password || !confirmPassword}
+                  >
+                    {loading ? "Түр хүлээнэ үү..." : "Үргэлжлүүлэх"}
                   </button>
                 </div>
               </div>

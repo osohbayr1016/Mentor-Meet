@@ -24,7 +24,7 @@ export default function BottomNavigation() {
                 Нүүр хуудас
               </Link>
               <Link
-                href="/signup"
+                href="/"
                 className={`px-6 py-2 transition-colors rounded-xl backdrop-blur-sm border text-sm ${
                   pathname.startsWith("/signup")
                     ? "bg-white/20 text-white border-white/50"
@@ -34,7 +34,7 @@ export default function BottomNavigation() {
                 Менторууд
               </Link>
               <Link
-                href="/create-profile"
+                href="/signup"
                 className={`px-6 py-2 font-medium rounded-xl backdrop-blur-sm border text-sm ${
                   pathname.startsWith("/create-profile")
                     ? "bg-white/30 text-white border-white/60"
