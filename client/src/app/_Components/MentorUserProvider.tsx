@@ -9,13 +9,20 @@ import {
   useState,
 } from "react";
 
-type UserData = {
-  userId: string | null;
+type MentorData = {
+  mentorId: string | null;
   isAdmin: boolean;
+  firstName: string;
+  lastName: string;
+  nickName?: string;
+  category?: string;
+  careerDuration?: string;
+  profession?: string;
+  image?: string;
 };
 
 type AuthContextType = {
-  user: UserData | null;
+  mentor: MentorData | null;
   tokenChecker: (_token: string) => Promise<void>;
 };
 
@@ -25,16 +32,37 @@ export const AuthContext = createContext<AuthContextType>(
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const router = useRouter();
-  const [user, setUser] = useState<UserData | null>(null);
+  const [mentor, setMentor] = useState<MentorData | null>(null);
 
   const tokenChecker = async (token: string) => {
     try {
       const response = await axios.post("http://localhost:8000/verify", {
         token,
       });
-      setUser({
-        userId: response.data.destructToken.userId,
-        isAdmin: response.data.destructToken.isAdmin,
+
+      const { mentorId, isAdmin } = response.data.destructToken;
+      localStorage.setItem(mentorId, "mentorId");
+      localStorage.setItem(isAdmin, "mentorToken");
+      localStorage.setItem("isAdmin", JSON.stringify(isAdmin));
+
+      const resProf = await axios.get("http://localhost:8000/mentorProfile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const profile = resProf.data;
+
+      setMentor({
+        mentorId,
+        isAdmin,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        nickName: profile.nickName,
+        category: profile.category,
+        careerDuration: profile.careerDuration,
+        profession: profile.profession,
+        image: profile.image,
       });
     } catch (err) {
       redirect("/");
@@ -42,14 +70,14 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("mentorToken");
     if (token) {
       tokenChecker(token);
     }
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, tokenChecker }}>
+    <AuthContext.Provider value={{ mentor, tokenChecker }}>
       {children}
     </AuthContext.Provider>
   );

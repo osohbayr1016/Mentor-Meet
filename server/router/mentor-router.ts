@@ -8,7 +8,11 @@ import { MentorLogin } from "../controller/mentor-login";
 import { MentorTokenChecker } from "../middleware/token-checker";
 import { isMentor } from "../middleware/mentor-authorization";
 import { MentorCreateProfile1 } from "../controller/mentor-create-profile-1";
+<<<<<<< HEAD
 import { mentorForgetPass } from "../controller/mentor-forget-Password";
+=======
+import { MentorGetProfile } from "../controller/mentor-get-profile";
+>>>>>>> e1ef23e (authProvider change)
 
 export const MentorRouter = Router();
 
@@ -16,6 +20,6 @@ MentorRouter.post("/mentorEmail", MentorCheckemail);
 MentorRouter.post("/mentorOtp", checkOtp);
 MentorRouter.post("/mentorSignup", MentorSignUp);
 MentorRouter.post("/mentorProfile", MentorTokenChecker, MentorCreateProfile1);
-
+MentorRouter.get("mentorProfile", MentorTokenChecker, MentorGetProfile);
 MentorRouter.post("/mentorLogin", MentorLogin);
 MentorRouter.put("/mentorResetPassword", mentorForgetPass);
