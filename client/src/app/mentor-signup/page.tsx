@@ -89,7 +89,7 @@ const SignupPage = () => {
       const res = await axios.post(`http://localhost:8000/mentorSignup`, {
         email: form.email,
         password: form.password,
-        confirmPassword: form.confirmPassword,
+        // confirmPassword: form.confirmPassword,
       });
       if (
         res.data &&

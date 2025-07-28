@@ -31,7 +31,7 @@ const StudentLoginPage = () => {
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:8000/student/login", {
+      const response = await axios.post("http://localhost:8000/studentlogin", {
         email,
         password,
       });
