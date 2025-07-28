@@ -10,6 +10,7 @@ import { isMentor } from "../middleware/mentor-authorization";
 import { MentorCreateProfile1 } from "../controller/mentor-create-profile-1";
 import { mentorForgetPass } from "../controller/mentor-forget-Password";
 import { MentorGetProfile } from "../controller/mentor-get-profile";
+import { findmail } from "../controller/mentor-find-forReset";
 
 export const MentorRouter = Router();
 
@@ -20,3 +21,5 @@ MentorRouter.post("/mentorProfile", MentorTokenChecker, MentorCreateProfile1);
 MentorRouter.get("mentorProfile", MentorTokenChecker, MentorGetProfile);
 MentorRouter.post("/mentorLogin", MentorLogin);
 MentorRouter.put("/mentorResetPassword", mentorForgetPass);
+MentorRouter.put("/mentorResetPassword", mentorForgetPass);
+MentorRouter.post("/findMail", findmail);
