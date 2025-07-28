@@ -3,7 +3,7 @@ import {
   Checkemail,
   checkOtp,
   MentorSignUp,
-} from "../controller/mentor-signUp";
+} from "../controller/mentor-register";
 import { MentorLogin } from "../controller/mentor-login";
 import { MentorTokenChecker } from "../middleware/token-checker";
 import { isMentor } from "../middleware/mentor-authorization";
@@ -15,5 +15,5 @@ MentorRouter.post("/mentorEmail", Checkemail);
 MentorRouter.post("/mentorOtp", checkOtp);
 MentorRouter.post("/mentorSignup", MentorSignUp);
 // MentorRouter.post("/mentorProfile", [MentorTokenChecker, isMentor], MentorCreateProfile1)
-MentorRouter.post("/mentorProfile",  MentorCreateProfile1)
+MentorRouter.post("/mentorProfile", MentorCreateProfile1);
 MentorRouter.post("/mentorLogin", MentorLogin);
