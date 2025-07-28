@@ -6,8 +6,6 @@ import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
-
-
 export const Checkemail = async (req: Request, res: Response) => {
   const { email } = req.body;
 
@@ -83,7 +81,7 @@ export const MentorSignUp = async (req: Request, res: Response) => {
       email,
       password: hashedPassword,
     });
-    
+
     dotenv.config();
 
     const tokenPassword = process.env.JWT_SECRET;
@@ -107,7 +105,6 @@ export const MentorSignUp = async (req: Request, res: Response) => {
     res.status(400).send("Something went wrong");
   }
 };
-
 
 // export const MentorSignUp = async (req: Request, res: Response) => {
 //   const { email, password } = req.body;
