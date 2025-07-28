@@ -51,7 +51,7 @@ export const Checkemail = async (req: Request, res: Response) => {
       from: "jochuekimmich@gmail.com",
       to: email,
       subject: "Баталгаажуулах код",
-      text:`
+      html:`
       <p>Сайн байна уу! Та өөрийн имайл хаягыг баталгаажуулж дараах (OTP) кодыг оруулна уу?:</p>
      <div style="font-size: 32px; font-weight: bold; color: black; margin: 20px 0; letter-spacing: 5px;">
   ${code}
@@ -158,8 +158,6 @@ export const StudentNameNumber = async (req: Request, res: Response) => {
 
 
       await TempUserModel.deleteOne({ email });
-
-
 
      if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET not defined");
     const token = jwt.sign({ userId: student._id }, process.env.JWT_SECRET);
