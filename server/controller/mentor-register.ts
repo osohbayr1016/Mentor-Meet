@@ -73,27 +73,32 @@ export const checkOtp = async (req: Request, res: Response) => {
 };
 
 export const MentorSignUp = async (req: Request, res: Response) => {
-  const { password, email } = req.body;
+  const { email, password } = req.body;
+
   try {
     const hashedPassword = await bcrypt.hashSync(password, 10);
 
-    await MentorModel.findByIdAndUpdate({
-      email,
-      password: hashedPassword,
-    });
-
     dotenv.config();
-
     const tokenPassword = process.env.JWT_SECRET;
     if (!tokenPassword) {
       throw new Error("JWT_Password not defined");
     }
     const FindUser: any = await MentorModel.findOne({ email });
 
+    if (FindUser) {
+      res.status(400).send({ message: "Already exist" });
+      return;
+    }
+
+    const user = await MentorModel.create({
+      email,
+      password: hashedPassword,
+    });
+
     const token = jwt.sign(
       {
-        userId: FindUser._id,
-        isAdmin: FindUser.role === "ADMIN" ? true : false,
+        userId: user._id,
+        isAdmin: user.role === "ADMIN" ? true : false,
       },
       tokenPassword
     );

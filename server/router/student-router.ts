@@ -14,5 +14,5 @@ StudentRouter.post("/Checkemail", Checkemail);
 StudentRouter.post("/checkOtp", checkOtp);
 StudentRouter.post("/createPassword", createPassword);
 StudentRouter.post("/StudentNameNumber", StudentNameNumber);
-StudentRouter.post("/Studentlogin", StudentLogin);
+StudentRouter.post("/studentlogin", StudentLogin);
 StudentRouter.put("/StudentForgotPassword", studentForgetPass);
