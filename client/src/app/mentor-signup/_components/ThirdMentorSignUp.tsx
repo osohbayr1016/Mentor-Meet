@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 interface Props {
   password: string;
@@ -74,13 +75,15 @@ const ThirdMentorSignup = ({
                   )}
                 </div>
                 <div className="flex w-full justify-center">
-                  <button
-                    className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px]"
-                    onClick={onSubmit}
-                    disabled={loading || !password || !confirmPassword}
-                  >
-                    {loading ? "Түр хүлээнэ үү..." : "Үргэлжлүүлэх"}
-                  </button>
+                  <Link href="/create-profile">
+                    <button
+                      className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px]"
+                      onClick={onSubmit}
+                      disabled={loading || !password || !confirmPassword}
+                    >
+                      {loading ? "Түр хүлээнэ үү..." : "Үргэлжлүүлэх"}
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>

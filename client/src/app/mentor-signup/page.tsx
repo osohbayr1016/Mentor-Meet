@@ -128,15 +128,17 @@ const SignupPage = () => {
           error={error}
         />
       )}
-      {step === 3 && (
+      {/* {step === 3 && (
         <div className="flex flex-col items-center justify-center h-screen">
           <h2 className="text-2xl font-bold mb-4">Бүртгэл амжилттай!</h2>
-          <p>Та амжилттай бүртгэгдлээ.</p>
+          <p className="pb-[18px]">Та амжилттай бүртгэгдлээ.</p>
           <Link href="/create-profile">
-            <button>Profile үүсгэх</button>
+            <button className="bg-[#2468FF] text-white rounded-[40px] py-[8px] px-[50px]">
+              Profile үүсгэх
+            </button>
           </Link>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
