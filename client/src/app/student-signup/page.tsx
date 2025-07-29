@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import FirstStudentSignup from "./_components/FirstStudentSignup";
 import SecondStudentSignup from "./_components/SecondStudentSignup";
 import ThirdStudentSignup from "./_components/ThirdStudentSignUp";
@@ -21,6 +22,26 @@ const StudentSignupPage = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [countdown, setCountdown] = useState(2);
+  const router = useRouter();
+
+  // Auto redirect after success
+  useEffect(() => {
+    if (step === 4) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            router.push("/student-login");
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [step, router]);
 
   // Step 1: Email
   const handleEmailSubmit = async () => {
@@ -175,9 +196,39 @@ const StudentSignupPage = () => {
         />
       )}
       {step === 4 && (
-        <div className="flex flex-col items-center justify-center h-screen">
-          <h2 className="text-2xl font-bold mb-4">Бүртгэл амжилттай!</h2>
-          <p>Та амжилттай бүртгэгдлээ.</p>
+        <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-green-50 to-blue-50">
+          <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-8 h-8 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">
+              Бүртгэл амжилттай!
+            </h2>
+            <p className="text-gray-600 mb-6">Та амжилттай бүртгэгдлээ.</p>
+            <div className="text-sm text-gray-500">
+              <p>
+                Та {countdown} секундын дараа нэвтрэх хуудас руу шилжих болно...
+              </p>
+              <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-green-500 h-2 rounded-full transition-all duration-1000 ease-out"
+                  style={{ width: `${((2 - countdown) / 2) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

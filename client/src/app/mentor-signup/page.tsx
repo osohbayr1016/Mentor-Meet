@@ -140,7 +140,7 @@ const SignupPage = () => {
           error={error}
         />
       )}
-      {/* {step === 3 && (
+      {step === 3 && (
         <div className="flex flex-col items-center justify-center h-screen">
           <h2 className="text-2xl font-bold mb-4">Бүртгэл амжилттай!</h2>
           <p className="pb-[18px]">Та амжилттай бүртгэгдлээ.</p>
@@ -150,7 +150,7 @@ const SignupPage = () => {
             </button>
           </Link>
         </div>
-      )} */}
+      )}
     </div>
   );
 };
