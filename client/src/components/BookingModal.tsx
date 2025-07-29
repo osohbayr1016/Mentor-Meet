@@ -1,0 +1,188 @@
+"use client";
+
+import { useState } from "react";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
+
+interface BookingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  selectedDate: string;
+  selectedTime: string;
+}
+
+interface MeetingResponse {
+  hangoutLink: string;
+  eventId: string;
+  startTime: string;
+  endTime: string;
+}
+
+export default function BookingModal({
+  isOpen,
+  onClose,
+  selectedDate,
+  selectedTime,
+}: BookingModalProps) {
+  const { data: session } = useSession();
+
+  // Check for mock user in localStorage for development
+  const mockUser =
+    typeof window !== "undefined" ? localStorage.getItem("mockUser") : null;
+  const isAuthenticated = session || mockUser;
+  const userEmail =
+    session?.user?.email || (mockUser ? JSON.parse(mockUser).email : null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [meetingLink, setMeetingLink] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  if (!isOpen) return null;
+
+  const handleMarkAvailability = async () => {
+    if (!isAuthenticated) {
+      setError("Please sign in to mark availability");
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Convert selected date and time to ISO string
+      const [hours, minutes] = selectedTime.split(":");
+      const availabilityDate = new Date(
+        `2024-08-${selectedDate.padStart(2, "0")}T${hours}:${minutes}:00.000Z`
+      );
+      const endDate = new Date(availabilityDate.getTime() + 60 * 60 * 1000); // 1 hour later
+
+      const response = await fetch("/api/mark-availability", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          start: availabilityDate.toISOString(),
+          end: endDate.toISOString(),
+          mentorEmail: userEmail,
+          date: selectedDate,
+          time: selectedTime,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMeetingLink("success"); // Use this to indicate success
+      } else {
+        setError(data.error || "Failed to mark availability");
+      }
+    } catch (error) {
+      console.error("Error marking availability:", error);
+      setError("Failed to mark availability. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCopyLink = () => {
+    if (meetingLink) {
+      navigator.clipboard.writeText(meetingLink);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="w-6/10 h-7/10 flex items-center justify-center">
+        <div className="w-full h-full border-gray-400/50 border-1 backdrop-blur-md bg-black/20 flex flex-col items-center justify-center rounded-[20px]">
+          {/* Header */}
+          <div className="flex gap-3 mb-8">
+            <Image
+              src="/image709.png"
+              alt="Mentor Meet Logo"
+              width={29}
+              height={24}
+            />
+            <p className="font-[700] text-[22px] text-white">Mentor Meet</p>
+          </div>
+
+          {/* Content */}
+          <div className="flex flex-col items-center gap-6 px-8 text-center">
+            {!meetingLink ? (
+              <>
+                <div>
+                  <h3 className="font-[600] text-[20px] text-white mb-4">
+                    Боломжит цаг тэмдэглэх
+                  </h3>
+                  <p className="text-white/80 text-sm">
+                    Огноо: 08/{selectedDate} - {selectedTime}
+                  </p>
+                </div>
+
+                {error && (
+                  <div className="text-red-400 text-sm bg-red-400/10 px-4 py-2 rounded-lg">
+                    {error}
+                  </div>
+                )}
+
+                <div className="flex gap-4">
+                  <button
+                    onClick={onClose}
+                    className="px-6 py-3 text-white border border-white/30 rounded-[40px] hover:bg-white/10 transition-colors"
+                    disabled={isLoading}
+                  >
+                    Цуцлах
+                  </button>
+                  <button
+                    onClick={handleMarkAvailability}
+                    disabled={isLoading}
+                    className="px-6 py-3 bg-white text-black rounded-[40px] hover:bg-gray-100 transition-colors disabled:opacity-50"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border border-black/30 border-t-black rounded-full animate-spin"></div>
+                        Тэмдэглэж байна...
+                      </div>
+                    ) : (
+                      "Боломжит цаг тэмдэглэх"
+                    )}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <h3 className="font-[600] text-[20px] text-white mb-4">
+                    Боломжит цаг амжилттай тэмдэглэгдлээ!
+                  </h3>
+                  <p className="text-white/80 text-sm mb-4">
+                    Таны боломжит цаг:
+                  </p>
+                  <div className="bg-white/10 p-3 rounded-lg">
+                    <p className="text-white">
+                      08/{selectedDate} - {selectedTime}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <button
+                    onClick={handleCopyLink}
+                    className="px-6 py-3 text-white border border-white/30 rounded-[40px] hover:bg-white/10 transition-colors"
+                  >
+                    Хадгалах
+                  </button>
+                  <button
+                    onClick={onClose}
+                    className="px-6 py-3 bg-white text-black rounded-[40px] hover:bg-gray-100 transition-colors"
+                  >
+                    Хаах
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

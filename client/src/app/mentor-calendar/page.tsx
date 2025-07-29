@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import BookingModal from "../../components/BookingModal";
 
 const MentorCalendar = () => {
   const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
@@ -92,8 +94,29 @@ const MentorCalendar = () => {
     }));
   };
 
+  const handleMarkAvailability = (time: string, date: string) => {
+    if (!isAuthenticated) {
+      alert("Please sign in to mark your availability");
+      return;
+    }
+
+    setSelectedBookingDate(date);
+    setSelectedBookingTime(time);
+    setShowBookingModal(true);
+  };
+
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [selectedBookingDate, setSelectedBookingDate] = useState<string>("");
+  const [selectedBookingTime, setSelectedBookingTime] = useState<string>("");
+
+  const { data: session } = useSession();
+
+  // Check for mock user in localStorage for development
+  const mockUser =
+    typeof window !== "undefined" ? localStorage.getItem("mockUser") : null;
+  const isAuthenticated = session || mockUser;
 
   const handleContinue = () => {
     // Check if at least one date has selected times
@@ -146,7 +169,7 @@ const MentorCalendar = () => {
                 <p className="font-[700] text-[22px] text-white">Mentor Meet</p>
               </div>
               <p className="font-[600] text-[20px] text-white text-center px-8">
-                Та боломжит өдрүүдээ сонгоно уу...
+                Та боломжит цагуудаа сонгоно уу...
               </p>
             </div>
 
@@ -197,24 +220,25 @@ const MentorCalendar = () => {
                     >
                       <div className="grid grid-cols-6 gap-2">
                         {timeSlots.map((time) => (
-                          <button
-                            key={time}
-                            onClick={() =>
-                              handleTimeClick(
-                                time,
-                                activeDate || animatingDate || ""
-                              )
-                            }
-                            className={`px-3 py-2 rounded-lg border border-white transition-colors ${
-                              selectedTimesByDate[
-                                activeDate || animatingDate || ""
-                              ]?.has(time)
-                                ? "bg-white text-black"
-                                : "text-white hover:bg-white/10"
-                            }`}
-                          >
-                            {time}
-                          </button>
+                          <div key={time} className="flex flex-col gap-1">
+                            <button
+                              onClick={() =>
+                                handleTimeClick(
+                                  time,
+                                  activeDate || animatingDate || ""
+                                )
+                              }
+                              className={`px-3 py-2 rounded-lg border border-white transition-colors ${
+                                selectedTimesByDate[
+                                  activeDate || animatingDate || ""
+                                ]?.has(time)
+                                  ? "bg-white text-black"
+                                  : "text-white hover:bg-white/10"
+                              }`}
+                            >
+                              {time}
+                            </button>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -265,24 +289,25 @@ const MentorCalendar = () => {
                     >
                       <div className="grid grid-cols-6 gap-2 ">
                         {timeSlots.map((time) => (
-                          <button
-                            key={time}
-                            onClick={() =>
-                              handleTimeClick(
-                                time,
-                                activeDate || animatingDate || ""
-                              )
-                            }
-                            className={`px-3 py-2 rounded-lg border border-white transition-colors ${
-                              selectedTimesByDate[
-                                activeDate || animatingDate || ""
-                              ]?.has(time)
-                                ? "bg-white text-black"
-                                : "text-white hover:bg-white/10"
-                            }`}
-                          >
-                            {time}
-                          </button>
+                          <div key={time} className="flex flex-col gap-1">
+                            <button
+                              onClick={() =>
+                                handleTimeClick(
+                                  time,
+                                  activeDate || animatingDate || ""
+                                )
+                              }
+                              className={`px-3 py-2 rounded-lg border border-white transition-colors ${
+                                selectedTimesByDate[
+                                  activeDate || animatingDate || ""
+                                ]?.has(time)
+                                  ? "bg-white text-black"
+                                  : "text-white hover:bg-white/10"
+                              }`}
+                            >
+                              {time}
+                            </button>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -433,6 +458,14 @@ const MentorCalendar = () => {
           </div>
         </div>
       )}
+
+      {/* Booking Modal */}
+      <BookingModal
+        isOpen={showBookingModal}
+        onClose={() => setShowBookingModal(false)}
+        selectedDate={selectedBookingDate}
+        selectedTime={selectedBookingTime}
+      />
 
       {/* Copyright Footer */}
       <div className="fixed bottom-2 left-6 text-xs text-white/60 z-30">
