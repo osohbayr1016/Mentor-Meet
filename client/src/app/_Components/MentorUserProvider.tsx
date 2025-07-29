@@ -42,8 +42,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
       const { mentorId, isAdmin } = response.data.destructToken;
       localStorage.setItem(mentorId, "mentorId");
-      localStorage.setItem(isAdmin, "mentorToken");
-      localStorage.setItem("isAdmin", JSON.stringify(isAdmin));
+      localStorage.setItem(isAdmin, "Admin");
+      // localStorage.setItem("isAdmin", JSON.stringify(isAdmin));
 
       const resProf = await axios.get("http://localhost:8000/mentorProfile", {
         headers: {

@@ -97,7 +97,7 @@ export const MentorSignUp = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       {
-        userId: user._id,
+        mentorId: user._id,
         isAdmin: user.role === "ADMIN" ? true : false,
       },
       tokenPassword
