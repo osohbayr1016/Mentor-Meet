@@ -21,10 +21,14 @@ const FormContainer = () => {
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
+<<<<<<< HEAD
     lastNameInitial: "",
     nickName: "",
     nickname: "",
     showNickName: false,
+=======
+    nicKname: "",
+>>>>>>> 601dae3 (student verify)
     showNickname: false,
     category: "",
     careerDuration: "",
