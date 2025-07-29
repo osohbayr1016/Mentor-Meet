@@ -379,7 +379,7 @@ const MentorCalendar = () => {
               <div className="flex justify-center">
                 <Link href="/">
                   <button
-                    className="bg-white text-black mtrounded-[40px] py-[8px] px-[50px] font-medium hover:bg-gray-100 transition-colors"
+                    className="bg-white text-black rounded-[40px] py-[8px] px-[50px] font-medium hover:bg-gray-100 transition-colors"
                     onClick={handleCloseSuccessModal}
                   >
                     Үргэлжлүүлэх
