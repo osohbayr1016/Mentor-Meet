@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useAuth } from "../../_Components/MentorUserProvider";
 
 import { type FormData } from "../types/FormTypes";
 import Step1BasicInfo from "./Step1BasicInfo";
@@ -15,7 +16,7 @@ interface Category {
 }
 
 const FormContainer = () => {
-  const { mentor, tokenChecker } = useAuth();
+  const { mentor, isLoading: authLoading, checkAuth } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -52,13 +53,12 @@ const FormContainer = () => {
 
   // Check authentication on component mount
   useEffect(() => {
-    const token = localStorage.getItem("mentorToken");
-    if (!token) {
+    if (!authLoading && !mentor) {
       // Redirect to login if not authenticated
       window.location.href = "/mentor-login";
       return;
     }
-  }, []);
+  }, [mentor, authLoading]);
 
   // Load categories when component mounts
   useEffect(() => {
@@ -196,7 +196,7 @@ const FormContainer = () => {
 
         // Get authentication token
         const token = localStorage.getItem("mentorToken");
-        if (!token) {
+        if (!token || !mentor) {
           setMessage("❌ Нэвтэрч орох шаардлагатай!");
           return;
         }
@@ -213,13 +213,13 @@ const FormContainer = () => {
             body: JSON.stringify({
               firstName: formData.firstName,
               lastName: formData.lastNameInitial,
-              nickName: formData.nickname,
+              nickName: formData.nickname || "",
               profession: formData.profession,
               careerDuration: formData.experience,
               image: "", // TODO: Handle image upload
               category: {
                 categoryId: getCategoryId(formData.professionalField),
-                price: 0, // Will be set in step 3
+                price: 0, // Default price, will be set in Step 3
               },
             }),
           }
@@ -241,7 +241,7 @@ const FormContainer = () => {
 
         // Get authentication token
         const token = localStorage.getItem("mentorToken");
-        if (!token) {
+        if (!token || !mentor) {
           setMessage("❌ Нэвтэрч орох шаардлагатай!");
           return;
         }
@@ -317,37 +317,12 @@ const FormContainer = () => {
         return;
       }
 
-<<<<<<< HEAD
-      // Get authentication token
-      const token = localStorage.getItem("mentorToken");
-      if (!token) {
-        setMessage("❌ Нэвтэрч орох шаардлагатай!");
-        return;
-      }
-
-      // Call Step 3 API
-      const response = await fetch(
-        "http://localhost:8000/mentorProfile/step3",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            category: {
-              price: parseInt(formData.yearExperience) || 0,
-            },
-            bankAccount: formData.bankAccount,
-          }),
-=======
       const response = await axios.post(
         "http://localhost:8000/mentorProfile/step1",
         {
           method: "POST",
           headers: {},
           body: JSON.stringify(formData),
->>>>>>> 7a9649c (verify)
         }
       );
 
@@ -369,6 +344,18 @@ const FormContainer = () => {
       setIsLoading(false);
     }
   };
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="w-8 h-8 border border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Нэвтрэлт шалгаж байна...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative overflow-hidden pb-20">

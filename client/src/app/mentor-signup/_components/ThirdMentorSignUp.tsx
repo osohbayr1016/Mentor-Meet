@@ -9,6 +9,7 @@ interface Props {
   onSubmit: () => void;
   loading: boolean;
   error: string;
+  autoLoggingIn?: boolean;
 }
 
 const ThirdMentorSignup = ({
@@ -19,6 +20,7 @@ const ThirdMentorSignup = ({
   onSubmit,
   loading,
   error,
+  autoLoggingIn = false,
 }: Props) => {
   return (
     <div className="relative w-full h-screen">
@@ -94,21 +96,23 @@ const ThirdMentorSignup = ({
                   )}
                 </div>
                 <div className="flex w-full justify-center">
-                  <Link href="/create-profile">
-                    <button
-                      className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px] disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={onSubmit}
-                      disabled={
-                        loading ||
-                        !password.trim() ||
-                        !confirmPassword.trim() ||
-                        password !== confirmPassword ||
-                        password.length < 6
-                      }
-                    >
-                      {loading ? "Түр хүлээнэ үү..." : "Үргэлжлүүлэх"}
-                    </button>
-                  </Link>
+                  <button
+                    className="border-1 border-white text-white rounded-[40px] py-[8px] px-[50px] disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={onSubmit}
+                    disabled={
+                      loading ||
+                      !password.trim() ||
+                      !confirmPassword.trim() ||
+                      password !== confirmPassword ||
+                      password.length < 6
+                    }
+                  >
+                    {loading
+                      ? autoLoggingIn
+                        ? "Нэвтэрч байна..."
+                        : "Түр хүлээнэ үү..."
+                      : "Үргэлжлүүлэх"}
+                  </button>
                 </div>
               </div>
             </div>
@@ -116,9 +120,11 @@ const ThirdMentorSignup = ({
               <p className="font-[400] text-[16px] text-white">
                 Бүртгэлтэй юу?
               </p>
-              <button className="font-[400] cursor-pointer text-[16px] text-[#2468FF]">
-                Нэвтрэх
-              </button>
+              <Link href="/mentor-login">
+                <span className="font-[400] cursor-pointer text-[16px] text-[#2468FF]">
+                  Нэвтрэх
+                </span>
+              </Link>
             </div>
           </div>
         </div>

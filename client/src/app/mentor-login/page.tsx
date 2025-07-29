@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { useAuth } from "../_Components/MentorUserProvider";
 
 const MentorLoginPage = () => {
   const [email, setEmail] = useState("");
@@ -18,36 +18,69 @@ const MentorLoginPage = () => {
   const [resetStep, setResetStep] = useState(1); // 1: email, 2: code, 3: new password
   const [resetLoading, setResetLoading] = useState(false);
   const [resetError, setResetError] = useState("");
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [lastLoginAttempt, setLastLoginAttempt] = useState(0);
 
   const router = useRouter();
+  const { login, mentor, isLoading: authLoading } = useAuth(); // Get login function and mentor state
 
-  const handleLogin = async () => {
+  // Redirect when login is successful and mentor data is available
+  useEffect(() => {
+    if (loginSuccess && mentor) {
+      console.log("Login successful, redirecting to home...");
+      router.push("/");
+    }
+  }, [loginSuccess, mentor, router]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!email || !password) {
       setError("Мэйл болон нууц үг оруулна уу");
       return;
     }
 
+    // Use authLoading from AuthProvider to prevent multiple requests
+    if (loading || authLoading) {
+      console.log("Login already in progress, ignoring click");
+      return;
+    }
+
+    // Debounce: prevent login attempts within 2 seconds
+    const now = Date.now();
+    if (now - lastLoginAttempt < 2000) {
+      console.log("Login attempt too soon, ignoring");
+      return;
+    }
+    setLastLoginAttempt(now);
+
     setLoading(true);
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:8000/mentorLogin", {
-        email,
-        password,
-      });
+      const result = await login(email, password);
 
-      const data = response.data as { token: string; user: any };
+      if (result.success) {
+        // Clear form
+        setEmail("");
+        setPassword("");
+        // Set success state to trigger useEffect redirect
+        setLoginSuccess(true);
+        console.log("Login successful, setting loginSuccess state");
 
-      if (data.token) {
-        // Store token in localStorage
-        localStorage.setItem("mentorToken", data.token);
-        localStorage.setItem("mentorUser", JSON.stringify(data.user));
-
-        // Redirect to home page or dashboard
-        router.push("/");
+        // Fallback redirect after 2 seconds if useEffect doesn't work
+        setTimeout(() => {
+          if (window.location.pathname === "/mentor-login") {
+            console.log("Fallback redirect executing...");
+            router.push("/");
+          }
+        }, 2000);
+      } else {
+        setError(result.message);
       }
     } catch (error: any) {
-      setError(error.response?.data?.message || "Нэвтрэхэд алдаа гарлаа");
+      console.error("Login error:", error);
+      setError("Нэвтрэхэд алдаа гарлаа");
     } finally {
       setLoading(false);
     }
@@ -63,9 +96,10 @@ const MentorLoginPage = () => {
     setResetError("");
 
     try {
-      await axios.post("http://localhost:8000/mentor/forgot-password", {
-        email: resetEmail,
-      });
+      // TODO: Implement forgot password API call
+      // await axios.post("http://localhost:8000/findMail", {
+      //   email: resetEmail,
+      // });
       setResetStep(2);
     } catch (error: any) {
       setResetError(error.response?.data?.message || "Алдаа гарлаа");
@@ -84,7 +118,7 @@ const MentorLoginPage = () => {
     setResetError("");
 
     try {
-      // For now, just move to next step. In real implementation, you might want to verify the code first
+      // TODO: Implement code verification
       setResetStep(3);
     } catch (error: any) {
       setResetError(error.response?.data?.message || "Алдаа гарлаа");
@@ -103,11 +137,12 @@ const MentorLoginPage = () => {
     setResetError("");
 
     try {
-      await axios.post("http://localhost:8000/mentor/reset-password", {
-        email: resetEmail,
-        code: resetCode,
-        newPassword,
-      });
+      // TODO: Implement password reset API call
+      // await axios.put("http://localhost:8000/mentorResetPassword", {
+      //   email: resetEmail,
+      //   code: resetCode,
+      //   newPassword,
+      // });
 
       // Reset form and close modal
       setShowForgotPassword(false);
@@ -165,7 +200,10 @@ const MentorLoginPage = () => {
 
             {/* Login Form */}
             <div className="w-full h-full flex flex-col justify-center items-center">
-              <div className="w-[300px] flex flex-col gap-[10px]">
+              <form
+                onSubmit={handleLogin}
+                className="w-[300px] flex flex-col gap-[10px]"
+              >
                 {/* Email Field */}
                 <div className="flex gap-1 flex-col">
                   <p className="font-[500] text-[14px] text-white">Email</p>
@@ -178,6 +216,7 @@ const MentorLoginPage = () => {
                     required
                     pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                     title="Please enter a valid email address"
+                    disabled={loading}
                   />
                 </div>
 
@@ -193,14 +232,17 @@ const MentorLoginPage = () => {
                     required
                     minLength={1}
                     title="Please enter your password"
+                    disabled={loading}
                   />
                 </div>
 
                 {/* Forgot Password Link */}
                 <div className="flex ">
                   <button
+                    type="button"
                     onClick={() => setShowForgotPassword(true)}
                     className="text-white/80 hover:text-white text-[14px] underline"
+                    disabled={loading}
                   >
                     Нууц үг мартсан
                   </button>
@@ -216,14 +258,14 @@ const MentorLoginPage = () => {
                 {/* Login Button */}
                 <div className="flex w-full justify-center">
                   <button
-                    className=" border-1 border-white text-white rounded-[40px] py-[6px] px-[50px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={handleLogin}
-                    disabled={loading || !email.trim() || !password.trim()}
+                    type="submit"
+                    disabled={loading || authLoading}
+                    className="border-1 border-white text-white rounded-[40px] py-[6px] px-[50px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? "Түр хүлээнэ үү..." : "Нэвтрэх"}
+                    {loading || authLoading ? "Түр хүлээнэ үү..." : "Нэвтрэх"}
                   </button>
                 </div>
-              </div>
+              </form>
             </div>
 
             {/* Registration Link */}
