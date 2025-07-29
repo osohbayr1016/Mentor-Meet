@@ -21,8 +21,8 @@ MentorRouter.post("/mentorOtp", checkOtp);
 MentorRouter.post("/mentorSignup", MentorSignUp);
 MentorRouter.post("/mentorProfile/step1", MentorTokenChecker, MentorCreateProfile1);
 MentorRouter.patch("/mentorProfile/step2", MentorTokenChecker, MentorCreateProfileStep2)
-MentorRouter.patch("mentorProfile/step3", MentorTokenChecker, MentorCreateProfileStep3)
-MentorRouter.get("mentorProfile", MentorTokenChecker, MentorGetProfile);
+MentorRouter.patch("/mentorProfile/step3", MentorTokenChecker, MentorCreateProfileStep3)
+MentorRouter.get("/mentorProfile", MentorTokenChecker, MentorGetProfile);
 MentorRouter.post("/mentorLogin", MentorLogin);
 MentorRouter.put("/mentorResetPassword", mentorForgetPass);
 MentorRouter.put("/mentorResetPassword", mentorForgetPass);
