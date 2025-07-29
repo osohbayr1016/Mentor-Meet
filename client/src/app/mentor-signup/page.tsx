@@ -14,6 +14,7 @@ const BACKEND_URL = "http://localhost:8000";
 type SignupResponse = {
   message: string;
   token: string;
+  mentorId: string;
 };
 
 type ProfileResponse = {
@@ -129,8 +130,8 @@ const SignupPage = () => {
         throw new Error((res.data as any).message || "Signup failed");
       }
 
-      // Step 2: Use the token from signup response
-      const { token, message } = res.data;
+      // Step 2: Use the token and mentorId from signup response
+      const { token, message, mentorId } = res.data;
 
       if (token) {
         console.log("Signup successful, token received:", token);
@@ -157,14 +158,14 @@ const SignupPage = () => {
             console.log("Auto-login successful with profile data");
             setStep(3);
 
-            // Auto redirect to home after 3 seconds
+            // Auto redirect to profile creation after 3 seconds
             setTimeout(() => {
-              router.push("/");
+              router.push("/create-profile");
             }, 3000);
           } else {
             // Fallback: create minimal user object
             const minimalUser = {
-              mentorId: "", // Will be updated when profile is complete
+              mentorId: mentorId || "", // Use the mentorId from signup response
               email: form.email,
               isAdmin: false,
               firstName: "",
@@ -177,7 +178,7 @@ const SignupPage = () => {
             console.log("Auto-login successful with minimal data");
             setStep(3);
             setTimeout(() => {
-              router.push("/");
+              router.push("/create-profile");
             }, 3000);
           }
         } catch (profileError: any) {
@@ -185,7 +186,7 @@ const SignupPage = () => {
 
           // Still store token and minimal user data
           const minimalUser = {
-            mentorId: "",
+            mentorId: mentorId || "",
             email: form.email,
             isAdmin: false,
             firstName: "",
@@ -197,7 +198,7 @@ const SignupPage = () => {
 
           setStep(3);
           setTimeout(() => {
-            router.push("/");
+            router.push("/create-profile");
           }, 3000);
         } finally {
           setAutoLoggingIn(false);
@@ -272,14 +273,14 @@ const SignupPage = () => {
               Бүртгэл амжилттай!
             </h2>
             <p className="pb-4 text-white/80">
-              Та амжилттай бүртгэгдэж, нэвтэрлээ.
+              Та амжилттай бүртгэгдлээ. Одоо профайлаа үүсгэх шат руу орно уу.
             </p>
             <p className="pb-6 text-white/60 text-sm">
-              3 секундын дараа нүүр хуудас руу шилжих болно...
+              3 секундын дараа профайл үүсгэх хуудас руу шилжих болно...
             </p>
-            <Link href="/">
+            <Link href="/create-profile">
               <button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full py-3 px-8 transition-colors duration-200">
-                Нүүр хуудас руу орох
+                Профайл үүсгэх
               </button>
             </Link>
           </div>

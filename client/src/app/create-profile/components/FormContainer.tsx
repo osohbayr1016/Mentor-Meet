@@ -4,11 +4,10 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "../../_Components/MentorUserProvider";
 
-import { type FormData } from "../types/FormTypes";
+import { FormData } from "../types/FormTypes";
 import Step1BasicInfo from "./Step1BasicInfo";
 import Step2AdditionalDetails from "./Step2AdditionalDetails";
 import Step3PaymentInfo from "./Step3PaymentInfo";
-import { useAuth } from "@/app/_Components/MentorUserProvider";
 
 interface Category {
   _id: string;
@@ -23,13 +22,19 @@ const FormContainer = () => {
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
+    lastNameInitial: "",
+    nickName: "",
     nickname: "",
+    showNickName: false,
     showNickname: false,
-    professionalField: "",
-    experience: "",
+    category: "",
+    careerDuration: "",
     profession: "",
     bio: "",
+    image: null,
     profileImage: null,
+    professionalField: "",
+    experience: "",
     // Step 2 fields
     description: "",
     socialLinks: {
@@ -51,11 +56,17 @@ const FormContainer = () => {
 
   const [message, setMessage] = useState("");
 
-  // Check authentication on component mount
+  // Check authentication and profile completion on component mount
   useEffect(() => {
     if (!authLoading && !mentor) {
       // Redirect to login if not authenticated
       window.location.href = "/mentor-login";
+      return;
+    }
+
+    // If mentor is authenticated and has a complete profile, redirect to home
+    if (mentor && mentor.firstName && mentor.lastName && mentor.profession) {
+      window.location.href = "/";
       return;
     }
   }, [mentor, authLoading]);
@@ -301,28 +312,34 @@ const FormContainer = () => {
     setIsLoading(true);
     setMessage("");
 
-    // const formPayload = new FormData();
-
-    // formPayload.append("firstName", formData.firstName);
-    // formPayload.append("lastName", formData.lastNameInitial);
-    // formPayload.append("nickName", formData.nickname);
-    // formPayload.append("category", formData.professionalField);
-    // formPayload.append("careerDuration", formData.experience);
-    // formPayload.append("profession", formData.profession);
-    // formPayload.append("image", formData.profileImage);
-
     try {
       // Validate all steps
       if (!validateAllSteps()) {
         return;
       }
 
-      const response = await axios.post(
-        "http://localhost:8000/mentorProfile/step1",
+      // Get authentication token
+      const token = localStorage.getItem("mentorToken");
+      if (!token || !mentor) {
+        setMessage("❌ Нэвтэрч орох шаардлагатай!");
+        return;
+      }
+
+      // Call Step 3 API
+      const response = await fetch(
+        "http://localhost:8000/mentorProfile/step3",
         {
-          method: "POST",
-          headers: {},
-          body: JSON.stringify(formData),
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            category: {
+              price: parseInt(formData.yearExperience) || 0,
+            },
+            bankAccount: formData.bankAccount,
+          }),
         }
       );
 

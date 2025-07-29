@@ -83,7 +83,7 @@ const Step2AdditionalDetails: React.FC<Step2Props> = ({
               <input
                 type="url"
                 name="website"
-                value={formData.socialLinks.website}
+                value={formData.socialLinks?.website || ""}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
@@ -285,7 +285,7 @@ const Step2AdditionalDetails: React.FC<Step2Props> = ({
                 </span>
               </div>
               <p className="text-white text-xs">
-                {formData.socialLinks.website || "Холбоос нэмнэ үү..."}
+                {formData.socialLinks?.website || "Холбоос нэмнэ үү..."}
               </p>
             </div>
 
