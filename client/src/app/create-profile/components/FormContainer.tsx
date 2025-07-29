@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 import { FormData } from "../types/FormTypes";
@@ -8,9 +8,15 @@ import Step1BasicInfo from "./Step1BasicInfo";
 import Step2AdditionalDetails from "./Step2AdditionalDetails";
 import Step3PaymentInfo from "./Step3PaymentInfo";
 
+interface Category {
+  _id: string;
+  categoryName: string;
+}
+
 const FormContainer = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastNameInitial: "",
@@ -41,6 +47,59 @@ const FormContainer = () => {
   });
 
   const [message, setMessage] = useState("");
+
+  // Check authentication on component mount
+  useEffect(() => {
+    const token = localStorage.getItem("mentorToken");
+    if (!token) {
+      // Redirect to login if not authenticated
+      window.location.href = "/mentor-login";
+      return;
+    }
+  }, []);
+
+  // Load categories when component mounts
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8000/mentor-get-category"
+        );
+        const result = await response.json();
+
+        if (response.ok && result.categories) {
+          setCategories(result.categories);
+        }
+      } catch (error) {
+        console.error("Error loading categories:", error);
+      }
+    };
+
+    loadCategories();
+  }, []);
+
+  // Map professional field to category ID
+  const getCategoryId = (professionalField: string): string => {
+    // Map frontend professional fields to backend category names
+    const fieldMapping: { [key: string]: string } = {
+      technology: "технологи",
+      education: "боловсрол",
+      healthcare: "эрүүл мэнд",
+      business: "бизнес",
+      engineering: "инженерчлэл",
+      design: "дизайн",
+      marketing: "маркетинг",
+      finance: "санхүү",
+    };
+
+    const categoryName = fieldMapping[professionalField];
+    const category = categories.find((cat) =>
+      cat.categoryName.toLowerCase().includes(categoryName?.toLowerCase() || "")
+    );
+
+    // Return category ID or default to first category
+    return category?._id || categories[0]?._id || "000000000000000000000001";
+  };
 
   // Validation functions for each step
   const validateStep1 = (): boolean => {
@@ -106,6 +165,20 @@ const FormContainer = () => {
     return true;
   };
 
+  const validateAllSteps = (): boolean => {
+    // Validate Step 1
+    if (!validateStep1()) {
+      return false;
+    }
+
+    // Validate Step 3 (Step 2 is optional)
+    if (!validateStep3()) {
+      return false;
+    }
+
+    return true;
+  };
+
   const handleNext = async () => {
     if (isLoading) return;
 
@@ -113,18 +186,98 @@ const FormContainer = () => {
     setMessage("");
 
     try {
-      // Validate current step
-      if (currentStep === 0 && !validateStep1()) {
-        return;
-      }
+      if (currentStep === 0) {
+        // Validate step 1
+        if (!validateStep1()) {
+          return;
+        }
 
-      // Clear message on successful validation
-      setMessage("");
+        // Get authentication token
+        const token = localStorage.getItem("mentorToken");
+        if (!token) {
+          setMessage("❌ Нэвтэрч орох шаардлагатай!");
+          return;
+        }
 
-      // Navigate to next step
-      if (currentStep < 2) {
-        setCurrentStep(currentStep + 1);
+        // Call Step 1 API
+        const response = await fetch(
+          "http://localhost:8000/mentorProfile/step1",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              firstName: formData.firstName,
+              lastName: formData.lastNameInitial,
+              nickName: formData.nickname,
+              profession: formData.profession,
+              careerDuration: formData.experience,
+              image: "", // TODO: Handle image upload
+              category: {
+                categoryId: getCategoryId(formData.professionalField),
+                price: 0, // Will be set in step 3
+              },
+            }),
+          }
+        );
+
+        const result = await response.json();
+
+        if (response.ok) {
+          setMessage("✅ Алхам 1 амжилттай хадгалагдлаа!");
+          setTimeout(() => {
+            setCurrentStep(1);
+            setMessage("");
+          }, 1000);
+        } else {
+          setMessage("❌ " + (result.message || "Алдаа гарлаа"));
+        }
+      } else if (currentStep === 1) {
+        // No validation needed for step 2 (optional fields)
+
+        // Get authentication token
+        const token = localStorage.getItem("mentorToken");
+        if (!token) {
+          setMessage("❌ Нэвтэрч орох шаардлагатай!");
+          return;
+        }
+
+        // Call Step 2 API
+        const response = await fetch(
+          "http://localhost:8000/mentorProfile/step2",
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              bio: formData.bio,
+              description: formData.description,
+              socialLinks: formData.socialLinks,
+              specialization: formData.specialization,
+              achievements: formData.achievements,
+            }),
+          }
+        );
+
+        const result = await response.json();
+
+        if (response.ok) {
+          setMessage("✅ Алхам 2 амжилттай хадгалагдлаа!");
+          setTimeout(() => {
+            setCurrentStep(2);
+            setMessage("");
+          }, 1000);
+        } else {
+          setMessage("❌ " + (result.message || "Алдаа гарлаа"));
+        }
       }
+    } catch (error) {
+      setMessage("❌ Алдаа гарлаа. Дахин оролдоно уу.");
+      console.error("Error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -147,25 +300,46 @@ const FormContainer = () => {
     setMessage("");
 
     try {
-      // Validate final step
-      if (!validateStep3()) {
+      // Validate all steps
+      if (!validateAllSteps()) {
         return;
       }
 
-      const response = await fetch("http://localhost:3001/api/mentors", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      // Get authentication token
+      const token = localStorage.getItem("mentorToken");
+      if (!token) {
+        setMessage("❌ Нэвтэрч орох шаардлагатай!");
+        return;
+      }
+
+      // Call Step 3 API
+      const response = await fetch(
+        "http://localhost:8000/mentorProfile/step3",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            category: {
+              price: parseInt(formData.yearExperience) || 0,
+            },
+            bankAccount: formData.bankAccount,
+          }),
+        }
+      );
 
       const result = await response.json();
 
       if (response.ok) {
         setMessage("✅ Профайл амжилттай үүсгэгдлээ!");
+        // Optionally redirect to dashboard or home page
+        setTimeout(() => {
+          window.location.href = "/"; // Or use router.push("/")
+        }, 2000);
       } else {
-        setMessage("❌ " + result.message);
+        setMessage("❌ " + (result.message || "Алдаа гарлаа"));
       }
     } catch (error) {
       setMessage("❌ Алдаа гарлаа. Дахин оролдоно уу.");
