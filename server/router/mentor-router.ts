@@ -14,6 +14,7 @@ import { findmail } from "../controller/mentor-find-forReset";
 import { MentorCreateProfileStep2 } from "../controller/mentor-create-profile-2";
 import { MentorCreateProfileStep3 } from "../controller/mentor-create-profile-3";
 import { verify } from "../controller/verify";
+import { editMentorProfile } from "../controller/mentor-edit-profile";
 
 export const MentorRouter = Router();
 
@@ -40,3 +41,4 @@ MentorRouter.post("/mentorLogin", MentorLogin);
 MentorRouter.put("/mentorResetPassword", mentorForgetPass);
 MentorRouter.post("/findMail", findmail);
 MentorRouter.post("/verify", verify);
+MentorRouter.put("/mentorEditProfile", MentorTokenChecker, editMentorProfile)
