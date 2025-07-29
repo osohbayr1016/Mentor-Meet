@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-export const verify = async (req: Request, res: Response) => {
+export const verify = async (req: Request, res: Response): Promise<any> => {
   const { token } = req.body;
 
   const TokenPassword = "Mentor-Meet";

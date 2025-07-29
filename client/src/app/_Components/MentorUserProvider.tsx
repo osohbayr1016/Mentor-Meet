@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
   const tokenChecker = async (token: string) => {
     try {
-      const response = await axios.post("http://localhost:8000/verify", {
+      const response: any = await axios.post("http://localhost:8000/verify", {
         token,
       });
 
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         },
       });
 
-      const profile = resProf.data;
+      const profile: any = resProf.data;
 
       setMentor({
         mentorId,
@@ -63,9 +63,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         careerDuration: profile.careerDuration,
         profession: profile.profession,
         image: profile.image,
+        bio: profile.bio,
       });
     } catch (err) {
-      redirect("/");
+      // redirect("/");
     }
   };
 
