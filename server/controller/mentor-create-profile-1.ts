@@ -120,19 +120,17 @@ export const MentorCreateProfile1 = async (
       bankAccount,
     } = req.body;
 
-    // if (
-    //   !firstName ||
-    //   !lastName ||
-    //   !category?.categoryId ||
-    //   !category?.price ||
-    //   !careerDuration ||
-    //   !profession ||
-    //   !image
-    // ) {
-    //   return res.status(400).send({
-    //     message: "Мэдээлэл дутуу байна. Заавал бөглөх талбаруудыг бөглөнө үү.",
-    //   });
-    // }
+    if (
+      !firstName ||
+      !lastName ||
+      !category?.categoryId ||
+      !careerDuration ||
+      !profession
+    ) {
+      return res
+        .status(400)
+        .send({ message: "Мэдээлэл дутуу байна. Бүх талбарыг бөглөнө үү." });
+    }
 
     const foundCategory = await CategoryModel.findOne({
       _id: category.categoryId,
@@ -151,21 +149,16 @@ export const MentorCreateProfile1 = async (
       {
         firstName,
         lastName,
-        nickName,
+        nickName: nickName || "",
         category: {
           categoryId: foundCategory._id,
-          price: category.price,
+          price: category.price || 0,
         },
         experience: {
           careerDuration,
         },
         profession,
-        image,
-        bio,
-        socialLinks: parsedSocialLinks,
-        specialization,
-        achievements,
-        bankAccount: parsedBankAccount,
+        image: image || "",
         updatedAt: new Date(),
       },
       { new: true, upsert: true }

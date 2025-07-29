@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 interface Props {
   otp: string;
@@ -83,9 +84,11 @@ const SecondMentorSignup = ({
               <p className="font-[400] text-[16px] text-white">
                 Бүртгэлтэй юу?
               </p>
-              <button className="font-[400] cursor-pointer text-[16px] text-[#2468FF]">
-                Нэвтрэх
-              </button>
+              <Link href="/mentor-login">
+                <span className="font-[400] cursor-pointer text-[16px] text-[#2468FF]">
+                  Нэвтрэх
+                </span>
+              </Link>
             </div>
           </div>
         </div>
