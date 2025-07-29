@@ -97,13 +97,18 @@ export const MentorSignUp = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       {
-        userId: user._id,
-        isAdmin: user.role === "ADMIN" ? true : false,
+        mentorId: user._id,
+        isMentor: true,
+        email: user.email,
       },
       tokenPassword
     );
 
-    res.send({ message: "Амжилттай бүртгэгдлээ.", token });
+    res.send({
+      message: "Амжилттай бүртгэгдлээ.",
+      token,
+      mentorId: user._id.toString()
+    });
     return;
   } catch (err) {
     console.log(err);

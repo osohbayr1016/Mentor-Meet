@@ -15,7 +15,21 @@ export const MentorGetProfile = async (req: Request, res: Response): Promise<any
       return res.status(404).send({ message: "Mentor profile is not found" });
     }
 
-    return res.status(200).send({ mentor });
+    // Map the mentor data to include mentorId
+    const mentorData = {
+      mentorId: mentor._id.toString(),
+      email: mentor.email,
+      isAdmin: mentor.role === "ADMIN",
+      firstName: mentor.firstName || "",
+      lastName: mentor.lastName || "",
+      nickName: mentor.nickName,
+      category: mentor.category?.categoryId?.toString(),
+      careerDuration: mentor.experience?.careerDuration,
+      profession: mentor.profession,
+      image: mentor.image,
+    };
+
+    return res.status(200).send({ mentor: mentorData });
   } catch (err: any) {
     console.error("Get profile error:", err.message);
     return res.status(500).json({ message: "Сервер дээр алдаа гарлаа." });
