@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
-import { FormData } from "../types/FormTypes";
+import { type FormData } from "../types/FormTypes";
 import Step1BasicInfo from "./Step1BasicInfo";
 import Step2AdditionalDetails from "./Step2AdditionalDetails";
 import Step3PaymentInfo from "./Step3PaymentInfo";
+import { useAuth } from "@/app/_Components/MentorUserProvider";
 
 interface Category {
   _id: string;
@@ -14,12 +15,13 @@ interface Category {
 }
 
 const FormContainer = () => {
+  const { mentor, tokenChecker } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
-    lastNameInitial: "",
+    lastName: "",
     nickname: "",
     showNickname: false,
     professionalField: "",
@@ -299,12 +301,23 @@ const FormContainer = () => {
     setIsLoading(true);
     setMessage("");
 
+    // const formPayload = new FormData();
+
+    // formPayload.append("firstName", formData.firstName);
+    // formPayload.append("lastName", formData.lastNameInitial);
+    // formPayload.append("nickName", formData.nickname);
+    // formPayload.append("category", formData.professionalField);
+    // formPayload.append("careerDuration", formData.experience);
+    // formPayload.append("profession", formData.profession);
+    // formPayload.append("image", formData.profileImage);
+
     try {
       // Validate all steps
       if (!validateAllSteps()) {
         return;
       }
 
+<<<<<<< HEAD
       // Get authentication token
       const token = localStorage.getItem("mentorToken");
       if (!token) {
@@ -327,6 +340,14 @@ const FormContainer = () => {
             },
             bankAccount: formData.bankAccount,
           }),
+=======
+      const response = await axios.post(
+        "http://localhost:8000/mentorProfile/step1",
+        {
+          method: "POST",
+          headers: {},
+          body: JSON.stringify(formData),
+>>>>>>> 7a9649c (verify)
         }
       );
 
