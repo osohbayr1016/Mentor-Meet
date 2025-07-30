@@ -1,6 +1,5 @@
 // import fetch from "node-fetch"
 
-
 type OpenAIResponse = {
   choices: Array<{
     message: {
