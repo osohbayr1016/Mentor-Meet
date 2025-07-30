@@ -1,0 +1,83 @@
+import { Request, Response } from "express";
+import { MessageModel } from "../model/chat-model";
+import { StudentModel } from "../model/student-model";
+import { MentorModel } from "../model/mentor-model";
+import { detectIntent } from "../  utils/detectIntent";
+import { getAiReply } from "../  utils/getAiReply";
+
+export const getMessages = async (_req: Request, res: Response) => {
+  try {
+    const messages = await MessageModel.find().sort({ createdAt: 1 });
+    res.json(messages);
+  } catch (err) {
+    res.status(500).json({ error: "Мессежүүд авах үед алдаа гарлаа." });
+  }
+};
+
+
+export const createMessage = async (req: Request, res: Response) => {
+  try {
+    const { email, message } = req.body;
+
+    if (!email || !message) {
+      return res.status(400).json({ error: "Email болон message шаардлагатай!" });
+    }
+
+    const intent = await detectIntent(message);
+
+    const allowedIntents = ["issue", "request", "help"];
+if (!allowedIntents.includes(intent)) {
+  return res.status(400).json({ error: `'${intent}' intent дэмжигдэхгүй байна.` });
+}
+
+    const student = await StudentModel.findOne({ email });
+    const mentor = await MentorModel.findOne({ email });
+
+    let senderType = "";
+    if (student) senderType = "student";
+    else if (mentor) senderType = "mentor";
+    else senderType = "unknown";
+
+    const userMsg = await MessageModel.create({
+      email,
+      message,
+      senderType,
+      intent,
+    });
+
+
+const aiReply = await getAiReply(message).catch(() => "Уучлаарай, асуултад одоогоор хариулж чадсангүй.");
+   
+
+
+if (req.query.save !== "true") {
+  return res.status(201).json({
+    messages: [
+      userMsg,
+      {
+        email: "bot@mentormeet.mn",
+        message: aiReply,
+        senderType: "bot",
+        intent: "other",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ],
+  });
+}
+   
+    const botMsg = await MessageModel.create({
+      email: "bot@mentormeet.mn",
+      message: aiReply,
+      senderType: "bot",
+      intent: "other",
+    });
+
+    res.status(201).json({
+      messages: [userMsg, botMsg],
+    });
+  } catch (err) {
+    console.error(" createMessage error:", err);
+    res.status(500).json({ error: "Мессеж хадгалах үед алдаа гарлаа." });
+  }
+};
