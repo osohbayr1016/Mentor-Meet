@@ -87,7 +87,7 @@ export const HomeChat = () => {
     <div>
       
       <div
-        className="w-[44px] h-[44px] rounded-full  flex justify-center items-center border border-[#00000040] mt-2 cursor-pointer fixed bottom-6 right-6 z-50"
+        className="w-[44px] h-[44px] rounded-full bg-transparent   flex justify-center items-center border border-[#00000040] mt-2 cursor-pointer fixed bottom-6 right-6 z-50"
         onClick={() => setOpen(true)}
       >
         <MessagesSquare className="h-[20px]" />
