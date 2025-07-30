@@ -18,7 +18,7 @@ export const getMessages = async (_req: Request, res: Response) => {
 
 export const createMessage = async (req: Request, res: Response) => {
   try {
-    const { email, message } = req.body;
+    const { email, message, studentProfile } = req.body;
 
     if (!email || !message) {
       return res
@@ -28,11 +28,11 @@ export const createMessage = async (req: Request, res: Response) => {
 
     const intent = await detectIntent(message);
 
-    const allowedIntents = ["issue", "request", "help"];
+    const allowedIntents = ["асуудал", "хүсэлт", "тусламж"];
     if (!allowedIntents.includes(intent)) {
-      return res
-        .status(400)
-        .json({ error: `'${intent}' intent дэмжигдэхгүй байна.` });
+      return res.status(400).json({
+        error: `'${intent}' intent дэмжигдэхгүй байна. Зөвшөөрөгдсөн утгууд: асуудал, хүсэлт, тусламж.`,
+      });
     }
 
     const student = await StudentModel.findOne({ email });
@@ -74,7 +74,7 @@ export const createMessage = async (req: Request, res: Response) => {
       email: "bot@mentormeet.mn",
       message: aiReply,
       senderType: "bot",
-      intent: "other",
+      intent: "бусад",
     });
 
     res.status(201).json({
@@ -82,7 +82,7 @@ export const createMessage = async (req: Request, res: Response) => {
     });
   } catch (err) {
     console.error(" createMessage error:", err);
-    res.status(500).json({ error: "Мессеж хадгалах үед алдаа гарлаа." });
+    res.status(500).json({ error: "Мессеж хадгалах үед алдаа гарлаа" });
   }
 };
 
@@ -90,10 +90,8 @@ export const chatAssistant = async (req: Request, res: Response) => {
   try {
     const { message, studentProfile } = req.body;
 
-
     const mentors = await MentorModel.find({});
 
-   
     const prompt = `
 Сурагчийн мэдээлэл:
 ${JSON.stringify(studentProfile, null, 2)}
