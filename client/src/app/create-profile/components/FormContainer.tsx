@@ -58,22 +58,6 @@ const FormContainer = () => {
   });
 
   const [message, setMessage] = useState("");
-
-  // Check authentication and profile completion on component mount
-  useEffect(() => {
-    if (!authLoading && !mentor) {
-      // Redirect to login if not authenticated
-      window.location.href = "/mentor-login";
-      return;
-    }
-
-    // If mentor is authenticated and has a complete profile, redirect to home
-    if (mentor && mentor.firstName && mentor.lastName && mentor.profession) {
-      window.location.href = "/";
-      return;
-    }
-  }, [mentor, authLoading]);
-
   // Load categories when component mounts
   useEffect(() => {
     const loadCategories = async () => {
