@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "./_Components/MentorUserProvider";
 import SessionProvider from "../components/SessionProvider";
+import { HomeChat } from "./_Components/Chat";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +32,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SessionProvider>
-          <AuthProvider>{children}</AuthProvider>
+          
+          <AuthProvider>
+            <HomeChat/>
+            {children}
+          
+          </AuthProvider>
         </SessionProvider>
       </body>
     </html>

@@ -8,6 +8,7 @@ import { getAiReply } from "../  utils/getAiReply";
 export const getMessages = async (_req: Request, res: Response) => {
   try {
     const messages = await MessageModel.find().sort({ createdAt: 1 });
+
     res.json(messages);
   } catch (err) {
     res.status(500).json({ error: "Мессежүүд авах үед алдаа гарлаа." });

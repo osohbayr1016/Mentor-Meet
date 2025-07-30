@@ -11,7 +11,7 @@ type OpenAIResponse = {
 
 export const detectIntent = async (
   message: string
-): Promise<"issue" | "request" | "help" | "other"> => {
+): Promise<" issue" | "request" | "help" | "other"> => {
   const fetch = (await import("node-fetch")).default;
 
   const prompt = `
@@ -60,5 +60,3 @@ Here are some examples:
 
   return "other";
 };
-
-
