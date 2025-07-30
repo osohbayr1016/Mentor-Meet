@@ -102,7 +102,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             console.log("Mentor data received:", mentorData);
             // Store token and user data
             localStorage.setItem("mentorToken", token);
-            localStorage.setItem("mentorUser", JSON.stringify(mentorData));
+            localStorage.setItem(
+              "mentorUser",
+              JSON.stringify(mentorData.mentorId)
+            );
 
             setMentor(mentorData);
             console.log("Mentor state updated, login complete");
