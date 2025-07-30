@@ -1,29 +1,25 @@
 import { model, ObjectId, Schema } from "mongoose";
 
-
 export type MessageType = {
-email:string
-message:string
-senderType?: string
-intent: "issue" | "request" | "help" | "other";
-createdAt: Date;
-updatedAt: Date;
-}
-
+  email: string;
+  message: string;
+  senderType?: string;
+  intent: "асуудал" | "хүсэлт" | "тусламж" | "бусад";
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 const MessageSchema = new Schema<MessageType>({
-email: { type: String, required: true },
-senderType: { type: String },
+  email: { type: String, required: true },
+  senderType: { type: String },
   message: { type: String, required: true },
-   intent: {
+  intent: {
     type: String,
-    enum: ["issue", "request", "help", "other"],
+    enum: ["асуудал", "хүсэлт", "тусламж", "бусад"],
     required: true,
   },
- createdAt: { type: Date, default: Date.now, immutable: true },
+  createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
 });
-
-
 
 export const MessageModel = model<MessageType>("Message", MessageSchema);

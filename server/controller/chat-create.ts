@@ -4,6 +4,7 @@ import { StudentModel } from "../model/student-model";
 import { MentorModel } from "../model/mentor-model";
 import { detectIntent } from "../  utils/detectIntent";
 import { getAiReply } from "../  utils/getAiReply";
+import { OpenAI } from "openai";
 
 export const getMessages = async (_req: Request, res: Response) => {
   try {
@@ -15,21 +16,24 @@ export const getMessages = async (_req: Request, res: Response) => {
   }
 };
 
-
 export const createMessage = async (req: Request, res: Response) => {
   try {
-    const { email, message } = req.body;
+    const { email, message, studentProfile } = req.body;
 
     if (!email || !message) {
-      return res.status(400).json({ error: "Email болон message шаардлагатай!" });
+      return res
+        .status(400)
+        .json({ error: "Email болон message шаардлагатай!" });
     }
 
     const intent = await detectIntent(message);
 
-    const allowedIntents = ["issue", "request", "help"];
-if (!allowedIntents.includes(intent)) {
-  return res.status(400).json({ error: `'${intent}' intent дэмжигдэхгүй байна.` });
-}
+    const allowedIntents = ["асуудал", "хүсэлт", "тусламж"];
+    if (!allowedIntents.includes(intent)) {
+      return res.status(400).json({
+        error: `'${intent}' intent дэмжигдэхгүй байна. Зөвшөөрөгдсөн утгууд: асуудал, хүсэлт, тусламж.`,
+      });
+    }
 
     const student = await StudentModel.findOne({ email });
     const mentor = await MentorModel.findOne({ email });
@@ -46,32 +50,50 @@ if (!allowedIntents.includes(intent)) {
       intent,
     });
 
+    // --- AI-р mentor matching хийх хэсэг ---
+    const mentors = await MentorModel.find({});
+    const profileText = studentProfile
+      ? JSON.stringify(studentProfile, null, 2)
+      : "Сурагчийн мэдээлэл байхгүй";
+    const prompt = `
+Сурагчийн мэдээлэл:
+${profileText}
 
-const aiReply = await getAiReply(message).catch(() => "Уучлаарай, асуултад одоогоор хариулж чадсангүй.");
-   
+Боломжит менторууд:
+${mentors
+  .map(
+    (m) =>
+      `- ${m.firstName || ""} ${m.lastName || ""}: ${m.bio} (Мэргэжил: ${
+        m.profession
+      }, Туршлага: ${m.experience?.careerDuration || ""}, Чиглэл: ${
+        m.category?.categoryId || ""
+      })`
+  )
+  .join("\n")}
 
+Сурагчийн асуулт:
+"${message}"
 
-if (req.query.save !== "true") {
-  return res.status(201).json({
-    messages: [
-      userMsg,
-      {
-        email: "bot@mentormeet.mn",
-        message: aiReply,
-        senderType: "bot",
-        intent: "other",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ],
-  });
-}
-   
+Чи Mentor Meet платформын AI туслах. Сурагчид хамгийн тохиромжтой ментор(ууд)-ыг сонгож, яагаад тохирохыг товч тайлбарла. Хариултаа зөвхөн монголоор бич.
+    `;
+
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const aiRes = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: "Чи Mentor Meet платформын туслах чатбот." },
+        { role: "user", content: prompt },
+      ],
+      temperature: 0.7,
+    });
+
+    const aiReply = aiRes.choices[0].message.content;
+
     const botMsg = await MessageModel.create({
       email: "bot@mentormeet.mn",
       message: aiReply,
       senderType: "bot",
-      intent: "other",
+      intent: "бусад",
     });
 
     res.status(201).json({
@@ -79,6 +101,50 @@ if (req.query.save !== "true") {
     });
   } catch (err) {
     console.error(" createMessage error:", err);
-    res.status(500).json({ error: "Мессеж хадгалах үед алдаа гарлаа." });
+    res.status(500).json({ error: "Мессеж хадгалах үед алдаа гарлаа" });
+  }
+};
+
+export const chatAssistant = async (req: Request, res: Response) => {
+  try {
+    const { message, studentProfile } = req.body;
+
+    const mentors = await MentorModel.find({});
+
+    const prompt = `
+Сурагчийн мэдээлэл:
+${JSON.stringify(studentProfile, null, 2)}
+
+Боломжит менторууд:
+${mentors
+  .map(
+    (m) =>
+      `- ${m.firstName || ""} ${m.lastName || ""}: ${m.bio} (Мэргэжил: ${
+        m.profession
+      }, Туршлага: ${m.experience?.careerDuration || ""}, Чиглэл: ${
+        m.category?.categoryId || ""
+      })`
+  )
+  .join("\n")}
+
+Сурагчийн асуулт:
+"${message}"
+
+Чи Mentor Meet платформын AI туслах. Сурагчид хамгийн тохиромжтой ментор(ууд)-ыг сонгож, яагаад тохирохыг товч тайлбарла. Хариултаа зөвхөн монголоор бич.
+    `;
+
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const aiRes = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: "Чи Mentor Meet платформын туслах чатбот." },
+        { role: "user", content: prompt },
+      ],
+      temperature: 0.7,
+    });
+
+    res.json({ reply: aiRes.choices[0].message.content });
+  } catch (err) {
+    res.status(500).json({ error: "AI-тай холбогдоход алдаа гарлаа." });
   }
 };
