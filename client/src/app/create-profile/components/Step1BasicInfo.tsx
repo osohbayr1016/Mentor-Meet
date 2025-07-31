@@ -8,6 +8,7 @@ import {
 const Step1BasicInfo: React.FC<Step1Props> = ({
   formData,
   setFormData,
+
   onNext,
   message,
   isLoading,

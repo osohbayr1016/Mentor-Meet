@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import Image from "next/image";
 import { useAuth } from "../../_Components/MentorUserProvider";
-import { FormData } from "../types/FormTypes";
+import { type FormData } from "../types/FormTypes";
 import Step1BasicInfo from "./Step1BasicInfo";
 import Step2AdditionalDetails from "./Step2AdditionalDetails";
 import Step3PaymentInfo from "./Step3PaymentInfo";
@@ -13,11 +13,15 @@ interface Category {
   categoryName: string;
 }
 
-const FormContainer = () => {
+const FormContainer = async () => {
   const { mentor, isLoading: authLoading, checkAuth } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  // const [file, setFile] = useState<File | null>(null);
+  // const [url, setUrl] = useState("");
+
+  const [message, setMessage] = useState("");
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
@@ -53,7 +57,40 @@ const FormContainer = () => {
     yearExperience: "",
   });
 
-  const [message, setMessage] = useState("");
+  // const uploadImage = () => {
+  //   if (!file) {
+  //     setMessage("please insert a image");
+  //   }
+  // };
+
+  // const formPayload = new FormData();
+  // // formPayload.append("file", formData.image);
+  // formPayload.append("upload_preset", "mentor-meet");
+
+  // try {
+  //   const response = await fetch(
+  //     `https://api.cloudinary.com/v1_1/dip9rajob/image/upload`,
+  //     { method: "POST", body: formPayload }
+  //   );
+
+  //   const result = await response.json();
+  //   setMessage("Image uploaded successfully!");
+  // } catch (err) {
+  //   console.error("Failed to upload image:", err);
+  //   setMessage("Failed to upload image");
+  // }
+
+  // const fileHandler = (event: ChangeEvent<HTMLInputElement>) => {
+  //   const selectedFile = event.target.files?.[0];
+
+  //   if (selectedFile) {
+  //     setFile(selectedFile);
+
+  //     const url = URL.createObjectURL(selectedFile);
+  //     setUrl(url);
+  //     console.log("Selected file:", selectedFile.name);
+  //   }
+  // };
   // Load categories when component mounts
   useEffect(() => {
     const loadCategories = async () => {
