@@ -202,7 +202,11 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       const token = localStorage.getItem("mentorToken");
       const userStr = localStorage.getItem("mentorUser");
 
+      console.log("checkAuth - Token:", token ? "exists" : "missing");
+      console.log("checkAuth - UserStr:", userStr);
+
       if (!token || !userStr) {
+        console.log("checkAuth - Missing token or user data");
         setIsLoading(false);
         return false;
       }
@@ -210,6 +214,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       // Try to parse stored user data
       try {
         const userData = JSON.parse(userStr) as MentorData;
+        console.log("checkAuth - Parsed user data:", userData);
         setMentor(userData);
         setIsLoading(false);
         return true;

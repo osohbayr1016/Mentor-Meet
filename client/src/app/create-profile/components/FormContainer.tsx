@@ -42,6 +42,7 @@ const FormContainer = () => {
     profileImage: null,
     professionalField: "",
     experience: "",
+    subcategory: "",
     // Step 2 fields
     description: "",
     socialLinks: {
@@ -242,12 +243,21 @@ const FormContainer = () => {
         const token = localStorage.getItem("mentorToken");
         console.log("Step 1 - Token:", token ? "exists" : "missing");
         console.log("Step 1 - Mentor:", mentor);
-        
-        if (!token || !mentor) {
-          console.log("Step 1 - Authentication failed - token or mentor missing");
+
+        if (!token) {
+          console.log("Step 1 - No token found");
           setMessage("❌ Нэвтэрч орох шаардлагатай!");
           return;
         }
+
+        // If we have a token but no mentor data, create a minimal mentor object
+        const mentorData = mentor || {
+          mentorId: "temp-id",
+          email: "temp@email.com",
+          isAdmin: false,
+          firstName: "",
+          lastName: "",
+        };
 
         // Call Step 1 API
         const response = await fetch(
@@ -291,12 +301,21 @@ const FormContainer = () => {
         const token = localStorage.getItem("mentorToken");
         console.log("Step 2 - Token:", token ? "exists" : "missing");
         console.log("Step 2 - Mentor:", mentor);
-        
-        if (!token || !mentor) {
-          console.log("Step 2 - Authentication failed - token or mentor missing");
+
+        if (!token) {
+          console.log("Step 2 - No token found");
           setMessage("❌ Нэвтэрч орох шаардлагатай!");
           return;
         }
+
+        // If we have a token but no mentor data, create a minimal mentor object
+        const mentorData = mentor || {
+          mentorId: "temp-id",
+          email: "temp@email.com",
+          isAdmin: false,
+          firstName: "",
+          lastName: "",
+        };
 
         // Call Step 2 API
         const response = await fetch(
