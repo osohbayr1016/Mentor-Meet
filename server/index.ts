@@ -6,6 +6,7 @@ import { MentorRouter } from "./router/mentor-router";
 import { StudentRouter } from "./router/student-router";
 import { CategoryRouter } from "./router/category-router";
 import { chatRouter } from "./router/chat-router";
+import { CalendarRouter } from "./router/calendar-router";
 
 const dataBaseConnection = async () => {
   await mongoose.connect(
@@ -32,7 +33,8 @@ if (!uri) {
 app.use(MentorRouter);
 app.use(StudentRouter);
 app.use(CategoryRouter);
-app.use(chatRouter)
+app.use(chatRouter);
+app.use("/api",CalendarRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
