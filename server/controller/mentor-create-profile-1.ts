@@ -149,29 +149,35 @@ export const MentorCreateProfile1 = async (
       typeof bankAccount === "string" ? JSON.parse(bankAccount) : bankAccount;
 
     console.log("Backend - About to update mentor with subcategory:", subcategory);
+    console.log("Backend - MentorId:", mentorId);
+
+    const updateData = {
+      firstName,
+      lastName,
+      nickName: nickName || "",
+      category: {
+        categoryId: foundCategory._id,
+        price: category.price || 0,
+      },
+      experience: {
+        careerDuration,
+      },
+      profession,
+      subcategory: subcategory || "",
+      image: image || "",
+      updatedAt: new Date(),
+    };
+
+    console.log("Backend - Update data being sent:", updateData);
 
     const updatedMentor = await MentorModel.findByIdAndUpdate(
       { _id: mentorId },
-      {
-        firstName,
-        lastName,
-        nickName: nickName || "",
-        category: {
-          categoryId: foundCategory._id,
-          price: category.price || 0,
-        },
-        experience: {
-          careerDuration,
-        },
-        profession,
-        subcategory: subcategory || "",
-        image: image || "",
-        updatedAt: new Date(),
-      },
+      updateData,
       { new: true, upsert: true }
     );
 
     console.log("Backend - Updated mentor result:", updatedMentor);
+    console.log("Backend - Subcategory in result:", updatedMentor?.subcategory);
 
     return res.status(200).send({
       message: "Менторын профайл амжилттай хадгалагдлаа.",
