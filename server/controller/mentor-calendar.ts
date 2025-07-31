@@ -2,13 +2,12 @@ import { Request, Response } from "express";
 import { MentorCalendarModel } from "../model/calendar-model";
 
 export const UpdateMentorAvailability = async (req: Request, res: Response) => {
-    
   const { mentorId } = res.locals;
   const { availabilities } = req.body;
 
   try {
-
     const existing = await MentorCalendarModel.findOne({ mentorId });
+    console.log(mentorId);
 
     if (existing) {
       existing.availabilities = availabilities;

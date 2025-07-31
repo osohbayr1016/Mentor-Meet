@@ -5,6 +5,6 @@ import { getMentorCalendar } from "../controller/mentor-get-calendar";
 
 export const CalendarRouter = Router();
 
-CalendarRouter.post("/Calendar",UpdateMentorAvailability);
+CalendarRouter.post("/Calendar", MentorTokenChecker, UpdateMentorAvailability);
 
 CalendarRouter.get("/calendar/:mentorId", getMentorCalendar);
