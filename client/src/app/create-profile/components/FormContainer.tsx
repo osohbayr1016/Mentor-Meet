@@ -19,6 +19,17 @@ interface Category {
 
 const FormContainer = () => {
   const { mentor, isLoading: authLoading, checkAuth } = useAuth();
+
+  // Force refresh mentor data if it's null but token exists
+  useEffect(() => {
+    if (!mentor && !authLoading) {
+      const token = localStorage.getItem("mentorToken");
+      if (token) {
+        console.log("FormContainer - Force refreshing auth data");
+        checkAuth();
+      }
+    }
+  }, [mentor, authLoading, checkAuth]);
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -381,10 +392,23 @@ const FormContainer = () => {
 
       // Get authentication token
       const token = localStorage.getItem("mentorToken");
-      if (!token || !mentor) {
+      console.log("Step 3 - Token:", token ? "exists" : "missing");
+      console.log("Step 3 - Mentor:", mentor);
+
+      if (!token) {
+        console.log("Step 3 - No token found");
         setMessage("❌ Нэвтэрч орох шаардлагатай!");
         return;
       }
+
+      // If we have a token but no mentor data, create a minimal mentor object
+      const mentorData = mentor || {
+        mentorId: "temp-id",
+        email: "temp@email.com",
+        isAdmin: false,
+        firstName: "",
+        lastName: "",
+      };
 
       // Call Step 3 API
       const response = await fetch(

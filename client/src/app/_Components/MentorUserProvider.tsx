@@ -231,6 +231,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   };
 
   useEffect(() => {
+    console.log("MentorUserProvider - useEffect triggered");
     checkAuth();
   }, []);
 
