@@ -21,6 +21,7 @@ export interface FormData {
   showNickName?: boolean;
   showNickname?: boolean; // Added for backward compatibility
   category: string;
+  subcategory: string; // Added subcategory field
   careerDuration: string;
   profession: string;
   bio: string;
