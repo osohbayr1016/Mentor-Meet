@@ -34,7 +34,7 @@ app.use(MentorRouter);
 app.use(StudentRouter);
 app.use(CategoryRouter);
 app.use(chatRouter);
-app.use(CalendarRouter);
+app.use("/api",CalendarRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
