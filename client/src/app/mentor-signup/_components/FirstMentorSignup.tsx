@@ -1,10 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-// import axios from "axios";
-
-// const isEmailAvailable = async (email: string) => {
-//   const response = await axios.post('https://localhost:8000/mentorEmail')
-// }
 
 interface Props {
   email: string;
