@@ -12,15 +12,22 @@ interface MentorCardProps {
     image: string;
     category?: string;
     subCategory?: string;
+    hourlyPrice?: number;
   };
   onClick?: () => void;
 }
 
 const MentorCard: React.FC<MentorCardProps> = ({ mentor, onClick }) => {
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    }
+  };
+
   return (
     <div
       className="backdrop-blur-xl border border-gray-600/50 rounded-lg p-6 hover:bg-gray-700/50 transition-colors cursor-pointer"
-      onClick={onClick}
+      onClick={handleClick}
     >
       <div className="flex items-start gap-4">
         {/* Mentor Avatar */}
@@ -58,12 +65,19 @@ const MentorCard: React.FC<MentorCardProps> = ({ mentor, onClick }) => {
             </div>
           )}
 
-          {/* Rating */}
-          <div className="flex items-center gap-1">
-            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-            <span className="text-white text-sm font-medium">
-              {mentor.rating}
-            </span>
+          {/* Rating and Price */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+              <span className="text-white text-sm font-medium">
+                {mentor.rating}
+              </span>
+            </div>
+            {mentor.hourlyPrice && (
+              <span className="text-green-400 text-sm font-medium">
+                {mentor.hourlyPrice.toLocaleString()}₮/цаг
+              </span>
+            )}
           </div>
         </div>
       </div>

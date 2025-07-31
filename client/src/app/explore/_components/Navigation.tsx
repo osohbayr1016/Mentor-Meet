@@ -20,6 +20,7 @@ import {
   Video,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
 import MentorCards from "./MentorCards";
 
@@ -315,6 +316,7 @@ interface NavigationProps {
 }
 
 const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
+  const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState(1);
   const [sliderPosition, setSliderPosition] = useState(0);
   const [sliderWidth, setSliderWidth] = useState(0);
@@ -395,7 +397,9 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
 
   const handleMentorClick = (mentor: any) => {
     console.log("Mentor clicked:", mentor);
-    // Handle mentor click - you can navigate to mentor detail page or open modal
+    console.log("Navigating to:", `/mentor/${mentor.id}`);
+    // Navigate to mentor detail page
+    router.push(`/mentor/${mentor.id}`);
   };
 
   // Get the selected category name

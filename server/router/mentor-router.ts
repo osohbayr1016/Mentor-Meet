@@ -15,6 +15,8 @@ import { MentorCreateProfileStep3 } from "../controller/mentor-create-profile-3"
 
 import { editMentorProfile } from "../controller/mentor-edit-profile";
 import { mentorVerify } from "../controller/mentor-verify";
+import { getMentorById } from "../controller/mentor-get-by-id";
+import { getAllMentors } from "../controller/mentor-get-all";
 
 export const MentorRouter = Router();
 
@@ -59,3 +61,5 @@ MentorRouter.put("/mentorResetPassword", mentorForgetPass);
 MentorRouter.post("/findMail", findmail);
 MentorRouter.put("/mentorEditProfile", MentorTokenChecker, editMentorProfile);
 MentorRouter.post("/mentorVerify", mentorVerify);
+MentorRouter.get("/mentor/:id", getMentorById);
+MentorRouter.get("/mentors", getAllMentors);

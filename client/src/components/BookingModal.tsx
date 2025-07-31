@@ -9,6 +9,9 @@ interface BookingModalProps {
   onClose: () => void;
   selectedDate: string;
   selectedTime: string;
+  totalPrice?: number;
+  selectedTimes?: string[];
+  selectedTimesByDate?: Record<string, string[]>;
 }
 
 interface MeetingResponse {
@@ -23,6 +26,9 @@ export default function BookingModal({
   onClose,
   selectedDate,
   selectedTime,
+  totalPrice = 0,
+  selectedTimes = [],
+  selectedTimesByDate = {},
 }: BookingModalProps) {
   const { data: session } = useSession();
 
@@ -111,11 +117,24 @@ export default function BookingModal({
               <>
                 <div>
                   <h3 className="font-[600] text-[20px] text-white mb-4">
-                    Боломжит цаг тэмдэглэх
+                    Захиалга баталгаажуулах
                   </h3>
-                  <p className="text-white/80 text-sm">
-                    Огноо: 08/{selectedDate} - {selectedTime}
-                  </p>
+                  <div className="space-y-2 text-white/80 text-sm">
+                    <p>Сонгосон өдрүүд:</p>
+                    {Object.entries(selectedTimesByDate).map(
+                      ([date, times]) => (
+                        <div key={date} className="ml-2">
+                          <p>
+                            08/{date}: {times.join(", ")}
+                          </p>
+                        </div>
+                      )
+                    )}
+                    <p>Нийт цаг: {selectedTimes.length} цаг</p>
+                    <p className="font-semibold text-white">
+                      Нийт үнэ: {totalPrice.toLocaleString()}₮
+                    </p>
+                  </div>
                 </div>
 
                 {error && (
@@ -140,10 +159,10 @@ export default function BookingModal({
                     {isLoading ? (
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 border border-black/30 border-t-black rounded-full animate-spin"></div>
-                        Тэмдэглэж байна...
+                        Захиалга хийж байна...
                       </div>
                     ) : (
-                      "Боломжит цаг тэмдэглэх"
+                      "Захиалга баталгаажуулах"
                     )}
                   </button>
                 </div>

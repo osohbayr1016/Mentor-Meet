@@ -177,39 +177,7 @@ const RoleSelectionPage = () => {
         </motion.div>
       </div>
 
-      {/* Bottom Navigation - Outside the modal */}
-      <div className="fixed bottom-0 left-0 right-0 z-40">
-        <div className="backdrop-blur-2xl border-t border-white/10 bg-black/20">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
-            <div className="flex justify-center space-x-3 sm:space-x-6">
-              <Link
-                href="/"
-                className="px-4 sm:px-6 py-2 transition-all duration-200 rounded-xl backdrop-blur-sm border text-xs sm:text-sm text-white/70 hover:text-white border-white/20 hover:border-white/40"
-              >
-                Нүүр хуудас
-              </Link>
-              <Link
-                href="/explore"
-                className="px-4 sm:px-6 py-2 transition-all duration-200 rounded-xl backdrop-blur-sm border text-xs sm:text-sm text-white/70 hover:text-white border-white/20 hover:border-white/40"
-              >
-                Менторууд
-              </Link>
-              <Link
-                href="/auth/signin"
-                className="px-4 sm:px-6 py-2 transition-all duration-200 rounded-xl backdrop-blur-sm border text-xs sm:text-sm text-white/70 hover:text-white border-white/20 hover:border-white/40"
-              >
-                Нэвтрэх
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Copyright Footer */}
-      <div className="fixed bottom-2 left-4 sm:left-6 text-xs text-white/60 z-30">
-        <div>Copyright © 2025 Mentor Meet</div>
-        <div>All rights reserved.</div>
-      </div>
     </div>
   );
 };
