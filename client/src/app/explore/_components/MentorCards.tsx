@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import MentorCard from "./MentorCard";
 
 interface Mentor {
@@ -10,6 +10,7 @@ interface Mentor {
   image: string;
   category?: string;
   subCategory?: string;
+  hourlyPrice?: number;
 }
 
 interface MentorCardsProps {
@@ -23,8 +24,53 @@ const MentorCards: React.FC<MentorCardsProps> = ({
   selectedSubCategory,
   onMentorClick,
 }) => {
-  // Sample mentors data - 2 mentors per subcategory
-  const sampleMentors: Mentor[] = [
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Set mounted state on client side
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Fetch mentors from API
+  useEffect(() => {
+    if (!mounted) return;
+
+    const fetchMentors = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Build query parameters
+        const params = new URLSearchParams();
+        if (selectedCategory) params.append("category", selectedCategory);
+        if (selectedSubCategory)
+          params.append("subCategory", selectedSubCategory);
+
+        const response = await fetch(`/api/get-mentors?${params.toString()}`);
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch mentors");
+        }
+
+        const data = await response.json();
+        setMentors(data);
+      } catch (err) {
+        console.error("Error fetching mentors:", err);
+        setError("Failed to load mentors");
+        // Fallback to sample data for development
+        setMentors(getSampleMentors());
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMentors();
+  }, [mounted, selectedCategory, selectedSubCategory]);
+  // Sample mentors data for fallback
+  const getSampleMentors = (): Mentor[] => [
     // Программчлал ба Технологи - Web Development
     {
       id: "1",
@@ -195,10 +241,17 @@ const MentorCards: React.FC<MentorCardsProps> = ({
     },
   ];
 
-  // Filter mentors based on category and subcategory
-  const filteredMentors = sampleMentors.filter((mentor) => {
+  // Filter mentors based on category and subcategory (if needed for additional filtering)
+  // For now, show all mentors since many don't have proper category assignments
+  const filteredMentors = mentors.filter((mentor: Mentor) => {
+    // If no category is selected, show all mentors
+    if (!selectedCategory) {
+      return true;
+    }
+
+    // If category is selected, show mentors that match or have unknown category
     const matchesCategory =
-      !selectedCategory || mentor.category === selectedCategory;
+      mentor.category === selectedCategory || mentor.category === "Тодорхойгүй";
     const matchesSubCategory =
       !selectedSubCategory || mentor.subCategory === selectedSubCategory;
     return matchesCategory && matchesSubCategory;
@@ -221,9 +274,23 @@ const MentorCards: React.FC<MentorCardsProps> = ({
 
       {/* Scrollable Mentor Cards Area */}
       <div className="flex-1 px-6 pb-6 overflow-y-auto">
-        {filteredMentors.length > 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <div className="w-8 h-8 border border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-400">Уншиж байна...</p>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <p className="text-red-400 text-lg mb-2">{error}</p>
+              <p className="text-gray-500 text-sm">Дахин оролдоно уу</p>
+            </div>
+          </div>
+        ) : filteredMentors.length > 0 ? (
           <div className="grid grid-cols-2 gap-6">
-            {filteredMentors.map((mentor) => (
+            {filteredMentors.map((mentor: Mentor) => (
               <MentorCard
                 key={mentor.id}
                 mentor={mentor}

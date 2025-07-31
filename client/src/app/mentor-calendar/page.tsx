@@ -12,7 +12,9 @@ const MentorCalendar = () => {
     Record<string, Set<string>>
   >({});
   const [activeDate, setActiveDate] = useState<string | null>(null);
-  const [activeDatePosition, setActiveDatePosition] = useState<"top" | "bottom">("top");
+  const [activeDatePosition, setActiveDatePosition] = useState<
+    "top" | "bottom"
+  >("top");
   const [isAnimating, setIsAnimating] = useState(false);
   const [animatingDate, setAnimatingDate] = useState<string | null>(null);
   const [animatingPosition, setAnimatingPosition] = useState<"top" | "bottom">(
@@ -322,53 +324,6 @@ const MentorCalendar = () => {
               >
                 Үргэлжлүүлэх
               </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 z-40">
-        <div className="backdrop-blur-2xl border-t border-white/10 bg-black/20">
-          <div className="max-w-5xl mx-auto px-6 py-4">
-            <div className="flex justify-between items-center">
-              <div className="flex space-x-6">
-                <Link
-                  href="/"
-                  className="px-6 py-2 transition-colors rounded-xl backdrop-blur-sm border text-sm text-white/70 hover:text-white border-white/20 hover:border-white/40"
-                >
-                  Нүүр хуудас
-                </Link>
-                <Link
-                  href="/"
-                  className="px-6 py-2 transition-colors rounded-xl backdrop-blur-sm border text-sm text-white/70 hover:text-white border-white/20 hover:border-white/40"
-                >
-                  Менторууд
-                </Link>
-                <Link
-                  href="/create-profile"
-                  className="px-6 py-2 font-medium rounded-xl backdrop-blur-sm border text-sm bg-white/30 text-white border-white/60"
-                >
-                  Профайл
-                </Link>
-              </div>
-              <div className="flex items-center">
-                <button className="p-2 text-white/70 hover:text-white transition-colors">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                  </svg>
-                </button>
-              </div>
             </div>
           </div>
         </div>
