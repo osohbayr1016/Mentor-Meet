@@ -240,7 +240,11 @@ const FormContainer = () => {
 
         // Get authentication token
         const token = localStorage.getItem("mentorToken");
+        console.log("Step 1 - Token:", token ? "exists" : "missing");
+        console.log("Step 1 - Mentor:", mentor);
+        
         if (!token || !mentor) {
+          console.log("Step 1 - Authentication failed - token or mentor missing");
           setMessage("❌ Нэвтэрч орох шаардлагатай!");
           return;
         }
@@ -285,7 +289,11 @@ const FormContainer = () => {
 
         // Get authentication token
         const token = localStorage.getItem("mentorToken");
+        console.log("Step 2 - Token:", token ? "exists" : "missing");
+        console.log("Step 2 - Mentor:", mentor);
+        
         if (!token || !mentor) {
+          console.log("Step 2 - Authentication failed - token or mentor missing");
           setMessage("❌ Нэвтэрч орох шаардлагатай!");
           return;
         }
