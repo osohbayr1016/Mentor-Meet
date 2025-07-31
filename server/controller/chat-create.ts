@@ -46,7 +46,7 @@ export const createMessage = async (req: Request, res: Response) => {
     const userMsg = await MessageModel.create({
       email,
       message,
-      senderType,
+      senderType, 
       intent,
     });
 
