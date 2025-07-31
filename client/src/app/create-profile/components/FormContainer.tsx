@@ -57,40 +57,40 @@ const FormContainer = async () => {
     yearExperience: "",
   });
 
-  // const uploadImage = () => {
-  //   if (!file) {
-  //     setMessage("please insert a image");
-  //   }
-  // };
+  const uploadImage = () => {
+    if (!file) {
+      setMessage("please insert a image");
+    }
+  };
 
-  // const formPayload = new FormData();
-  // // formPayload.append("file", formData.image);
-  // formPayload.append("upload_preset", "mentor-meet");
+  const formPayload = new FormData();
+  // formPayload.append("file", formData.image);
+  formPayload.append("upload_preset", "mentor-meet");
 
-  // try {
-  //   const response = await fetch(
-  //     `https://api.cloudinary.com/v1_1/dip9rajob/image/upload`,
-  //     { method: "POST", body: formPayload }
-  //   );
+  try {
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/dip9rajob/image/upload`,
+      { method: "POST", body: formPayload }
+    );
 
-  //   const result = await response.json();
-  //   setMessage("Image uploaded successfully!");
-  // } catch (err) {
-  //   console.error("Failed to upload image:", err);
-  //   setMessage("Failed to upload image");
-  // }
+    const result = await response.json();
+    setMessage("Image uploaded successfully!");
+  } catch (err) {
+    console.error("Failed to upload image:", err);
+    setMessage("Failed to upload image");
+  }
 
-  // const fileHandler = (event: ChangeEvent<HTMLInputElement>) => {
-  //   const selectedFile = event.target.files?.[0];
+  const fileHandler = (event: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
 
-  //   if (selectedFile) {
-  //     setFile(selectedFile);
+    if (selectedFile) {
+      setFile(selectedFile);
 
-  //     const url = URL.createObjectURL(selectedFile);
-  //     setUrl(url);
-  //     console.log("Selected file:", selectedFile.name);
-  //   }
-  // };
+      const url = URL.createObjectURL(selectedFile);
+      setUrl(url);
+      console.log("Selected file:", selectedFile.name);
+    }
+  };
   // Load categories when component mounts
   useEffect(() => {
     const loadCategories = async () => {
