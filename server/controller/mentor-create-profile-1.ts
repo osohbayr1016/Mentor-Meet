@@ -104,6 +104,9 @@ export const MentorCreateProfile1 = async (
   }
 
   try {
+    console.log("Backend - Received request body:", req.body);
+    console.log("Backend - Subcategory received:", req.body.subcategory);
+
     const {
       firstName,
       lastName,
@@ -145,6 +148,8 @@ export const MentorCreateProfile1 = async (
     const parsedBankAccount =
       typeof bankAccount === "string" ? JSON.parse(bankAccount) : bankAccount;
 
+    console.log("Backend - About to update mentor with subcategory:", subcategory);
+    
     const updatedMentor = await MentorModel.findByIdAndUpdate(
       { _id: mentorId },
       {
@@ -165,6 +170,8 @@ export const MentorCreateProfile1 = async (
       },
       { new: true, upsert: true }
     );
+    
+    console.log("Backend - Updated mentor result:", updatedMentor);
 
     return res.status(200).send({
       message: "Менторын профайл амжилттай хадгалагдлаа.",

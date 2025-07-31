@@ -270,6 +270,24 @@ const FormContainer = () => {
           lastName: "",
         };
 
+        // Prepare request body
+        const requestBody = {
+          firstName: formData.firstName,
+          lastName: formData.lastNameInitial,
+          nickName: formData.nickname || "",
+          profession: formData.profession,
+          subcategory: formData.subcategory,
+          careerDuration: formData.experience,
+          image: imageUrl, // Use the uploaded image URL
+          category: {
+            categoryId: getCategoryId(formData.professionalField),
+            price: 0, // Default price, will be set in Step 3
+          },
+        };
+
+        console.log("Step 1 - Request body:", requestBody);
+        console.log("Step 1 - Subcategory being sent:", formData.subcategory);
+
         // Call Step 1 API
         const response = await fetch(
           "http://localhost:8000/mentorProfile/step1",
@@ -279,19 +297,7 @@ const FormContainer = () => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({
-              firstName: formData.firstName,
-              lastName: formData.lastNameInitial,
-              nickName: formData.nickname || "",
-              profession: formData.profession,
-              subcategory: formData.subcategory,
-              careerDuration: formData.experience,
-              image: imageUrl, // Use the uploaded image URL
-              category: {
-                categoryId: getCategoryId(formData.professionalField),
-                price: 0, // Default price, will be set in Step 3
-              },
-            }),
+            body: JSON.stringify(requestBody),
           }
         );
 
