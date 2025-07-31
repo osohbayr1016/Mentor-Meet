@@ -14,7 +14,7 @@ interface Category {
   categoryName: string;
 }
 
-const FormContainer = async () => {
+const FormContainer = () => {
   const { mentor, isLoading: authLoading, checkAuth } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -76,7 +76,13 @@ const FormContainer = async () => {
       const imageUrl = await uploadImageToCloudinary(file);
 
       setUploadedImageUrl(imageUrl);
-      setMessage("✅ Зураг амжилттай хуулагдлаа!");
+
+      // Check if it's a local blob URL (fallback)
+      if (imageUrl.startsWith("blob:")) {
+        setMessage("⚠️ Зураг түр хуулагдлаа (Cloudinary холболтгүй)");
+      } else {
+        setMessage("✅ Зураг амжилттай хуулагдлаа!");
+      }
 
       return imageUrl;
     } catch (err) {

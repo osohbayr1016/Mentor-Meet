@@ -15,17 +15,29 @@ This guide will help you set up Cloudinary for image uploads in the Mentor Meet 
 2. Your cloud name is displayed in the top-left corner of the dashboard
 3. The current cloud name is: `dip9rajob`
 
-### 2. Configure Upload Preset
+### 2. Configure Upload Preset (REQUIRED)
 
-1. In your Cloudinary dashboard, go to Settings > Upload
-2. Scroll down to "Upload presets"
-3. Create a new upload preset named "mentor-meet"
-4. Set the following options:
-   - **Signing Mode**: Unsigned
-   - **Folder**: mentor-meet
-   - **Allowed formats**: image/\*
+**This step is essential to fix the "Upload preset not found" error.**
 
-### 3. Test the Setup
+1. In your Cloudinary dashboard, go to **Settings > Upload**
+2. Scroll down to **"Upload presets"** section
+3. Click **"Add upload preset"**
+4. Configure the preset with these exact settings:
+   - **Preset name**: `mentor-meet` (exactly as shown)
+   - **Signing Mode**: `Unsigned` (this is important!)
+   - **Folder**: `mentor-meet`
+   - **Allowed formats**: `image/*`
+   - **Resource type**: `Image`
+5. Click **"Save"** to create the preset
+
+### 3. Enable the Upload Preset
+
+After creating the preset:
+
+1. Make sure the preset is **enabled** (toggle should be green)
+2. The preset should appear in your list of upload presets
+
+### 4. Test the Setup
 
 1. Start your development server: `npm run dev`
 2. Navigate to the profile creation page
@@ -49,6 +61,8 @@ The application uses Cloudinary's direct upload API for client-side image upload
 
    - Make sure the upload preset "mentor-meet" exists in your Cloudinary account
    - Ensure the preset is set to "Unsigned" mode
+   - Check that the preset name is exactly "mentor-meet" (case-sensitive)
+   - Verify the preset is enabled
 
 2. **CORS errors**
 
