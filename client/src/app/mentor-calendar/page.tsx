@@ -12,9 +12,7 @@ const MentorCalendar = () => {
     Record<string, Set<string>>
   >({});
   const [activeDate, setActiveDate] = useState<string | null>(null);
-  const [activeDatePosition, setActiveDatePosition] = useState<
-    "top" | "bottom"
-  >("top");
+  const [activeDatePosition, setActiveDatePosition] = useState<"top" | "bottom">("top");
   const [isAnimating, setIsAnimating] = useState(false);
   const [animatingDate, setAnimatingDate] = useState<string | null>(null);
   const [animatingPosition, setAnimatingPosition] = useState<"top" | "bottom">(

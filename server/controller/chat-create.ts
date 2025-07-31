@@ -42,7 +42,7 @@ if (!allowedIntents.includes(intent)) {
     const userMsg = await MessageModel.create({
       email,
       message,
-      senderType,
+      senderType, 
       intent,
     });
 

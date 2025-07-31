@@ -10,7 +10,6 @@ createdAt: Date;
 updatedAt: Date;
 }
 
-
 const MessageSchema = new Schema<MessageType>({
 email: { type: String, required: true },
 senderType: { type: String },
