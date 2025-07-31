@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import { CategoryModel } from "../model/category-model";
 
 export const editMentorProfile = async (req: Request, res: Response) => {
-  const { mentorId } = res.locals; 
+  const { mentorId } = res.locals;
   const {
     firstName,
     lastName,
@@ -12,6 +12,7 @@ export const editMentorProfile = async (req: Request, res: Response) => {
     category,
     careerDuration,
     profession,
+    subcategory,
     image,
     bio,
     socialLinks,
@@ -21,20 +22,20 @@ export const editMentorProfile = async (req: Request, res: Response) => {
   } = req.body;
 
   try {
-    
-    if (!firstName || !lastName ) {
+
+    if (!firstName || !lastName) {
       return res
         .status(400)
         .json({ message: "Заавал бөглөх талбарууд дутуу байна." });
     }
 
-   
-  
-      const foundCategory = await CategoryModel.findById(category.categoryId);
-      if (!foundCategory) {
-        return res.status(404).json({ message: "Ангилал олдсонгүй." });
-      }
-  
+
+
+    const foundCategory = await CategoryModel.findById(category.categoryId);
+    if (!foundCategory) {
+      return res.status(404).json({ message: "Ангилал олдсонгүй." });
+    }
+
 
     const updatedMentor = await MentorModel.findByIdAndUpdate(
       mentorId,
@@ -43,6 +44,7 @@ export const editMentorProfile = async (req: Request, res: Response) => {
         lastName,
         nickName: nickName || "",
         profession,
+        subcategory: subcategory || "",
         bio: bio || "",
         image: image || "",
         category: "",
