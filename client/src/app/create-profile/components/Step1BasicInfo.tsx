@@ -237,36 +237,62 @@ const Step1BasicInfo: React.FC<Step1Props> = ({
                   accept="image/*"
                   className="hidden"
                   id="profileImage"
+                  disabled={isLoading}
                 />
                 <label
                   htmlFor="profileImage"
-                  className="w-full px-3 py-2 bg-black/20 border border-white/30 rounded-xl transition-all text-white/80 cursor-pointer hover:bg-black/30 flex items-center gap-2 text-xs"
+                  className={`w-full px-3 py-2 bg-black/20 border border-white/30 rounded-xl transition-all text-white/80 flex items-center gap-2 text-xs ${
+                    isLoading
+                      ? "cursor-not-allowed opacity-50"
+                      : "cursor-pointer hover:bg-black/30"
+                  }`}
                 >
-                  <svg
-                    className="w-3.5 h-3.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  <span className="flex-1">
-                    {formData.profileImage
-                      ? formData.profileImage.name
-                      : "Профайл зураг оруулах 📷"}
-                  </span>
+                  {isLoading ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span className="flex-1">Зураг хуулж байна...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                      <span className="flex-1">
+                        {formData.profileImage
+                          ? formData.profileImage.name
+                          : "Профайл зураг оруулах 📷"}
+                      </span>
+                    </>
+                  )}
                 </label>
+
+                {/* File size info */}
+                {formData.profileImage && !isLoading && (
+                  <div className="mt-1 text-xs text-white/60">
+                    {(formData.profileImage.size / 1024 / 1024).toFixed(2)} MB
+                    {formData.profileImage.size > 5 * 1024 * 1024 && (
+                      <span className="text-red-400 ml-2">
+                        ⚠️ Файл хэт том (5MB-аас бага байх ёстой)
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
