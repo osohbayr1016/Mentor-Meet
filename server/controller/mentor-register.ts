@@ -10,14 +10,21 @@ export const MentorCheckemail = async (req: Request, res: Response) => {
   const { email } = req.body;
 
   try {
-    // if (!email) {
-    //   return res.status(400).send({ message: "Имайл шаардлагатай!" });
-    // }
+    // Validate email
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Please enter a valid email address" });
+    }
 
     const user = await MentorModel.findOne({ email });
 
     if (user) {
-      return res.status(400).json({ message: "User already existed" });
+      return res.status(400).json({ message: "User already exists" });
     }
 
     const code = Math.floor(1000 + Math.random() * 9000).toString();
@@ -36,15 +43,15 @@ export const MentorCheckemail = async (req: Request, res: Response) => {
     const options = {
       from: "baabarmx@gmail.com",
       to: email,
-      subject: "Hello",
-      html: `<div style="color:red"> ${code}</div> `,
+      subject: "Mentor Meet - Email Verification",
+      html: `<div style="color:red">Your verification code is: ${code}</div>`,
     };
 
     await OtpModel.create({ code, email });
 
     await transport.sendMail(options);
 
-    return res.status(200).json({ message: "success" });
+    return res.status(200).json({ message: "Verification code sent successfully" });
   } catch (error) {
     console.error("Checkemail error:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -55,20 +62,32 @@ export const checkOtp = async (req: Request, res: Response) => {
   const { code, email } = req.body;
 
   try {
+    // Validate required fields
+    if (!code || !email) {
+      return res.status(400).json({ message: "Code and email are required" });
+    }
+
     const isOtpExisting = await OtpModel.findOne({
       code: code,
+      email: email,
     });
+    
     if (!isOtpExisting) {
-      res.status(400).send("wrong code isOtp");
-      return;
+      return res.status(400).json({ message: "Invalid verification code" });
     }
-    if (isOtpExisting.email === email) {
-      return res.status(200).send({ message: "success" });
-    } else {
-      return res.status(400).send({ message: "Wrong code err" });
-    }
+
+    // Check if OTP is expired (optional: add expiration logic)
+    // const now = new Date();
+    // const otpCreated = new Date(isOtpExisting.createdAt);
+    // const diffInMinutes = (now.getTime() - otpCreated.getTime()) / (1000 * 60);
+    // if (diffInMinutes > 10) { // 10 minutes expiration
+    //   return res.status(400).json({ message: "Verification code has expired" });
+    // }
+
+    return res.status(200).json({ message: "Verification successful" });
   } catch (err) {
-    res.status(400).send("Wrong code catch");
+    console.error("OTP check error:", err);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -76,6 +95,28 @@ export const MentorSignUp = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
+    // Validate required fields
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and password are required"
+      });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        message: "Please enter a valid email address"
+      });
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: "Password must be at least 6 characters long"
+      });
+    }
+
     const hashedPassword = await bcrypt.hashSync(password, 10);
 
     dotenv.config();
@@ -83,11 +124,11 @@ export const MentorSignUp = async (req: Request, res: Response) => {
     if (!tokenPassword) {
       throw new Error("JWT_Password not defined");
     }
+
     const FindUser: any = await MentorModel.findOne({ email });
 
     if (FindUser) {
-      res.status(400).send({ message: "Already exist" });
-      return;
+      return res.status(400).json({ message: "User already exists" });
     }
 
     const user = await MentorModel.create({
@@ -104,15 +145,16 @@ export const MentorSignUp = async (req: Request, res: Response) => {
       tokenPassword
     );
 
-    res.send({
+    return res.status(200).json({
       message: "Амжилттай бүртгэгдлээ.",
       token,
       mentorId: user._id.toString()
     });
-    return;
   } catch (err) {
-    console.log(err);
-    res.status(400).send("Something went wrong");
+    console.error("MentorSignUp error:", err);
+    return res.status(500).json({
+      message: "Internal server error"
+    });
   }
 };
 
