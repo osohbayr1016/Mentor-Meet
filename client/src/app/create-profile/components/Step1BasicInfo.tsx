@@ -13,6 +13,106 @@ const Step1BasicInfo: React.FC<Step1Props> = ({
   message,
   isLoading,
 }) => {
+  // Subcategories for each professional field
+  const subCategories = {
+    technology: [
+      "Web Development",
+      "Mobile Development",
+      "Data Science",
+      "Artificial Intelligence",
+      "Cybersecurity",
+      "DevOps",
+      "UI/UX Design",
+      "Database Management",
+      "Cloud Computing",
+      "Machine Learning",
+    ],
+    business: [
+      "Business Strategy",
+      "Project Management",
+      "Marketing",
+      "Sales",
+      "Finance",
+      "Human Resources",
+      "Operations",
+      "Leadership",
+      "Entrepreneurship",
+      "Consulting",
+    ],
+    education: [
+      "Teaching Methods",
+      "Curriculum Development",
+      "Student Assessment",
+      "Educational Technology",
+      "Special Education",
+      "Language Teaching",
+      "Online Education",
+      "Academic Writing",
+      "Research Methods",
+      "Educational Leadership",
+    ],
+    healthcare: [
+      "Clinical Practice",
+      "Medical Research",
+      "Public Health",
+      "Nursing",
+      "Pharmacy",
+      "Mental Health",
+      "Emergency Medicine",
+      "Pediatrics",
+      "Surgery",
+      "Preventive Medicine",
+    ],
+    design: [
+      "Graphic Design",
+      "Web Design",
+      "Illustration",
+      "Photography",
+      "Digital Art",
+      "Branding",
+      "Typography",
+      "Animation",
+      "3D Modeling",
+      "User Experience Design",
+    ],
+    engineering: [
+      "Software Engineering",
+      "Mechanical Engineering",
+      "Electrical Engineering",
+      "Civil Engineering",
+      "Chemical Engineering",
+      "Industrial Engineering",
+      "Biomedical Engineering",
+      "Aerospace Engineering",
+      "Computer Engineering",
+      "Environmental Engineering",
+    ],
+    marketing: [
+      "Digital Marketing",
+      "Content Marketing",
+      "Social Media Marketing",
+      "SEO/SEM",
+      "Email Marketing",
+      "Brand Marketing",
+      "Product Marketing",
+      "Event Marketing",
+      "Influencer Marketing",
+      "Marketing Analytics",
+    ],
+    finance: [
+      "Investment Banking",
+      "Corporate Finance",
+      "Financial Planning",
+      "Risk Management",
+      "Accounting",
+      "Trading",
+      "Asset Management",
+      "Financial Analysis",
+      "Tax Planning",
+      "Insurance",
+    ],
+  };
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -25,6 +125,11 @@ const Step1BasicInfo: React.FC<Step1Props> = ({
       setFormData((prev) => ({ ...prev, [name]: checked }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
+
+      // Reset subcategory when professional field changes
+      if (name === "professionalField") {
+        setFormData((prev) => ({ ...prev, subcategory: "" }));
+      }
     }
   };
 
@@ -37,6 +142,11 @@ const Step1BasicInfo: React.FC<Step1Props> = ({
     e.preventDefault();
     onNext();
   };
+
+  // Get current subcategories based on selected professional field
+  const currentSubCategories =
+    subCategories[formData.professionalField as keyof typeof subCategories] ||
+    [];
 
   return (
     <div className="flex h-full">
@@ -208,6 +318,56 @@ const Step1BasicInfo: React.FC<Step1Props> = ({
                 </div>
               </div>
             </div>
+
+            {/* Subcategory Selection */}
+            {formData.professionalField && currentSubCategories.length > 0 && (
+              <div>
+                <label
+                  htmlFor="subcategory"
+                  className="block text-white text-xs font-medium mb-1"
+                >
+                  Дэлгэрэнгүй салбар
+                </label>
+                <div className="relative">
+                  <select
+                    id="subcategory"
+                    name="subcategory"
+                    value={formData.subcategory}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 bg-black/20 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all text-white appearance-none cursor-pointer text-xs"
+                  >
+                    <option value="" className="bg-gray-800 text-white">
+                      Салбар сонгоно уу
+                    </option>
+                    {currentSubCategories.map((subCategory) => (
+                      <option
+                        key={subCategory}
+                        value={subCategory}
+                        className="bg-gray-800 text-white"
+                      >
+                        {subCategory}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-2.5 pointer-events-none">
+                    <svg
+                      className="w-3.5 h-3.5 text-white/60"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Profession */}
             <div>
@@ -425,6 +585,34 @@ const Step1BasicInfo: React.FC<Step1Props> = ({
                 </p>
               </div>
             </div>
+
+            {/* Subcategory Display */}
+            {formData.subcategory && (
+              <div className="bg-black/30 rounded-xl p-3 border border-white/30">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-6 h-6 bg-black/40 rounded-lg flex items-center justify-center">
+                    <svg
+                      className="w-3 h-3 text-white/70"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                      <path
+                        fillRule="evenodd"
+                        d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                  </div>
+                  <span className="text-white/70 text-xs font-medium">
+                    Дэлгэрэнгүй салбар
+                  </span>
+                </div>
+                <p className="text-white text-xs font-medium">
+                  {formData.subcategory}
+                </p>
+              </div>
+            )}
 
             {/* Rating & Stats */}
             <div className="bg-black/30 rounded-xl p-3 border border-white/30">
