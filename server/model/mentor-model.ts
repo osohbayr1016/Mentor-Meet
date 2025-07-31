@@ -17,6 +17,7 @@ export type MentorType = {
   image: string;
   bio: string;
   profession: string;
+  subcategory?: string;
   education: EducationType;
   experience: ExperienceType;
   calendar?: calendarType;
@@ -59,6 +60,7 @@ const MentorSchema = new Schema<MentorType>({
   image: { type: String, required: false },
   bio: { type: String, required: false },
   profession: { type: String, required: false },
+  subcategory: { type: String, required: false },
   education: {
     schoolName: { type: String, required: false },
     major: { type: String, required: false },
@@ -84,7 +86,7 @@ const MentorSchema = new Schema<MentorType>({
   },
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
-  otp: { type :String, required: false }
+  otp: { type: String, required: false }
 });
 
 
