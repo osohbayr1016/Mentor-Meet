@@ -23,7 +23,7 @@ export const MentorGetProfile = async (req: Request, res: Response): Promise<any
       firstName: mentor.firstName || "",
       lastName: mentor.lastName || "",
       nickName: mentor.nickName,
-      category: mentor.category?.categoryId?.toString(),
+      category: mentor.category?.categoryId?.toString() || null,
       careerDuration: mentor.experience?.careerDuration,
       profession: mentor.profession,
       image: mentor.image,
