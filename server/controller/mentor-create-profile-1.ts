@@ -105,6 +105,7 @@ export const MentorCreateProfile1 = async (
 
   try {
     console.log("Backend - Received request body:", req.body);
+    console.log("Backend - ProfessionalField received:", req.body.professionalField);
     console.log("Backend - Subcategory received:", req.body.subcategory);
 
     const {
@@ -114,6 +115,7 @@ export const MentorCreateProfile1 = async (
       category,
       careerDuration,
       profession,
+      professionalField,
       subcategory,
       image,
       bio,
@@ -163,6 +165,7 @@ export const MentorCreateProfile1 = async (
         careerDuration,
       },
       profession,
+      professionalField: professionalField || "",
       subcategory: subcategory || "",
       image: image || "",
       updatedAt: new Date(),
@@ -177,6 +180,7 @@ export const MentorCreateProfile1 = async (
     );
 
     console.log("Backend - Updated mentor result:", updatedMentor);
+    console.log("Backend - ProfessionalField in result:", updatedMentor?.professionalField);
     console.log("Backend - Subcategory in result:", updatedMentor?.subcategory);
 
     return res.status(200).send({

@@ -17,6 +17,7 @@ export type MentorType = {
   image: string;
   bio: string;
   profession: string;
+  professionalField?: string;
   subcategory?: string;
   education: EducationType;
   experience: ExperienceType;
@@ -60,6 +61,7 @@ const MentorSchema = new Schema<MentorType>({
   image: { type: String, required: false },
   bio: { type: String, required: false },
   profession: { type: String, required: false },
+  professionalField: { type: String, required: false },
   subcategory: { type: String, required: false },
   education: {
     schoolName: { type: String, required: false },

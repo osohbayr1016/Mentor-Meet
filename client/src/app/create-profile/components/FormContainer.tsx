@@ -276,6 +276,7 @@ const FormContainer = () => {
           lastName: formData.lastNameInitial,
           nickName: formData.nickname || "",
           profession: formData.profession,
+          professionalField: formData.professionalField,
           subcategory: formData.subcategory,
           careerDuration: formData.experience,
           image: imageUrl, // Use the uploaded image URL
@@ -286,6 +287,10 @@ const FormContainer = () => {
         };
 
         console.log("Step 1 - Request body:", requestBody);
+        console.log(
+          "Step 1 - ProfessionalField being sent:",
+          formData.professionalField
+        );
         console.log("Step 1 - Subcategory being sent:", formData.subcategory);
 
         // Call Step 1 API
