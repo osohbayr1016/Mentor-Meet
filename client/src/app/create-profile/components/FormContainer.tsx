@@ -273,6 +273,7 @@ const FormContainer = () => {
               lastName: formData.lastNameInitial,
               nickName: formData.nickname || "",
               profession: formData.profession,
+              subcategory: formData.subcategory,
               careerDuration: formData.experience,
               image: imageUrl, // Use the uploaded image URL
               category: {
