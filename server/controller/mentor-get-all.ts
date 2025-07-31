@@ -16,29 +16,28 @@ export const getAllMentors = async (req: Request, res: Response) => {
     const mentors = await MentorModel.find(filter)
       .populate("category.categoryId")
       .select(
-        "firstName lastName profession experience education bio rating image category"
+        "firstName lastName profession professionalField subcategory experience education bio rating image category"
       );
 
     // Transform the data to match the frontend interface and filter out incomplete profiles
     const transformedMentors = mentors
-      .filter((mentor) => 
-        mentor.firstName && 
-        mentor.lastName && 
-        mentor.profession && 
+      .filter((mentor) =>
+        mentor.firstName &&
+        mentor.lastName &&
+        mentor.profession &&
         mentor.experience?.careerDuration
       )
       .map((mentor) => ({
         id: mentor._id,
         name: `${mentor.firstName} ${mentor.lastName}`,
         profession: mentor.profession || "Тодорхойгүй",
-        experience: `Туршлага: ${
-          mentor.experience?.careerDuration || "Тодорхойгүй"
-        }`,
+        experience: `Туршлага: ${mentor.experience?.careerDuration || "Тодорхойгүй"
+          }`,
         rating: mentor.rating || 0,
         image: mentor.image || "/image709.png",
         category:
           (mentor.category?.categoryId as any)?.categoryName || "Тодорхойгүй",
-        subCategory: "Тодорхойгүй", // TODO: Add subcategory support
+        subCategory: mentor.subcategory || "Тодорхойгүй",
         hourlyPrice: mentor.category?.price || 0,
       }));
 
@@ -47,6 +46,13 @@ export const getAllMentors = async (req: Request, res: Response) => {
     if (category) {
       filteredMentors = transformedMentors.filter(
         (mentor) => mentor.category === category
+      );
+    }
+
+    // Filter by subcategory if provided
+    if (subCategory) {
+      filteredMentors = filteredMentors.filter(
+        (mentor) => mentor.subCategory === subCategory
       );
     }
 
