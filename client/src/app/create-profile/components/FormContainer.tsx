@@ -2,8 +2,8 @@
 
 import { useState, useEffect, ChangeEvent } from "react";
 import Image from "next/image";
-import { useAuth } from "../../_Components/MentorUserProvider";
-import { type FormData } from "../types/FormTypes";
+import { useAuth } from "../../_components/MentorUserProvider";
+import { FormData } from "../types/FormTypes";
 import Step1BasicInfo from "./Step1BasicInfo";
 import Step2AdditionalDetails from "./Step2AdditionalDetails";
 import Step3PaymentInfo from "./Step3PaymentInfo";

@@ -1,4 +1,3 @@
-
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,12 +21,10 @@ export const HomeChat = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-
     const studentToken = localStorage.getItem("studentToken");
     const mentorToken = localStorage.getItem("mentorToken");
     setToken(studentToken || mentorToken);
 
-  
     fetch("http://localhost:8000/getMessages", {
       headers: {
         Authorization: `Bearer ${studentToken || mentorToken}`,
@@ -37,11 +34,8 @@ export const HomeChat = () => {
       .then((data: Message[]) => {
         setMessages(data);
       })
-      .catch(() => {
-
-      });
+      .catch(() => {});
   }, []);
-
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -55,18 +49,21 @@ export const HomeChat = () => {
     const newMsg = {
       email: "student",
       message: input,
-      intent: "help", 
+      intent: "help",
     };
 
     try {
-      const res = await fetch("http://localhost:8000/createMessage?save=false", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newMsg),
-      });
+      const res = await fetch(
+        "http://localhost:8000/createMessage?save=false",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(newMsg),
+        }
+      );
 
       const data = await res.json();
 
@@ -75,7 +72,6 @@ export const HomeChat = () => {
         return;
       }
 
-      
       setMessages((prev) => [...prev, ...data.messages]);
       setInput("");
     } catch (error) {
@@ -85,7 +81,6 @@ export const HomeChat = () => {
 
   return (
     <div>
-      
       <div
         className="w-[44px] h-[44px] rounded-full bg-transparent  flex justify-center items-center border border-[#00000040] mt-2 cursor-pointer fixed bottom-6 right-6 z-50"
         onClick={() => setOpen(true)}
@@ -93,12 +88,15 @@ export const HomeChat = () => {
         <MessagesSquare className="h-[20px]" />
       </div>
 
-     
       <div
         className={`
           fixed bottom-20 right-6 z-50
           transition-all duration-300
-          ${open ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-10 pointer-events-none"}
+          ${
+            open
+              ? "opacity-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 translate-y-10 pointer-events-none"
+          }
         `}
       >
         <div className="w-[320px] h-[400px] bg-white rounded-[20px] p-4 flex flex-col gap-2 border-2 border-[#808080] shadow-2xl relative">
@@ -112,7 +110,6 @@ export const HomeChat = () => {
             👋 Бид танд хэрхэн туслах вэ?
           </p>
 
-          
           <div
             ref={scrollRef}
             className="flex-1 overflow-y-auto p-4 flex flex-col gap-2"
