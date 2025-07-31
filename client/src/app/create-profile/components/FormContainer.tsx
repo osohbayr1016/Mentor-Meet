@@ -41,6 +41,7 @@ const FormContainer = () => {
     image: null,
     profileImage: null,
     professionalField: "",
+    subcategory: "",
     experience: "",
     // Step 2 fields
     description: "",
