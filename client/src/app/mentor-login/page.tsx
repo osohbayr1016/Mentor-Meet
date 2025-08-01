@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../_Components/MentorUserProvider";
+import { useAuth } from "../_components/MentorUserProvider";
 
 const MentorLoginPage = () => {
   const [email, setEmail] = useState("");
