@@ -24,8 +24,6 @@ const Home = () => {
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-black/40"></div>
-        <HomeCarousel className="absolute z-10 top-82 h-fit left-1/2 -translate-x-1/2" />
-
         <div className="absolute overflow-hidden w-[980px] h-150 bg-[#333333]/60 rounded-[20px] backdrop-blur-md top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border border-white/30">
           <div className="flex gap-3 justify-center items-center mt-8">
             <Image
@@ -59,6 +57,7 @@ const Home = () => {
               />
             </div>
           </div>
+          <HomeCarousel className="z-10 h-fit left-1/2 -translate-x-1/2" />
           <div className="flex flex-row gap-5 justify-center absolute bottom-8 left-1/2 -translate-x-1/2">
             <div className="flex flex-col gap-2 w-70">
               <p className="text-base text-white font-semibold text-center">
