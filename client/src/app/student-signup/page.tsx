@@ -32,7 +32,7 @@ const StudentSignupPage = () => {
 
     try {
       const response = await fetch(
-        "http://https://mentor-meet-o3rp.onrender.com/Checkemail",
+        "https://mentor-meet-o3rp.onrender.com/Checkemail",
         {
           method: "POST",
           headers: {
@@ -68,7 +68,7 @@ const StudentSignupPage = () => {
 
     try {
       const response = await fetch(
-        "http://https://mentor-meet-o3rp.onrender.com/checkOtp",
+        "https://mentor-meet-o3rp.onrender.com/checkOtp",
         {
           method: "POST",
           headers: {
@@ -114,7 +114,7 @@ const StudentSignupPage = () => {
 
     try {
       const response = await fetch(
-        "http://https://mentor-meet-o3rp.onrender.com/createPassword",
+        "https://mentor-meet-o3rp.onrender.com/createPassword",
         {
           method: "POST",
           headers: {
@@ -155,7 +155,7 @@ const StudentSignupPage = () => {
 
     try {
       const response = await fetch(
-        "http://https://mentor-meet-o3rp.onrender.com/StudentNameNumber",
+        "https://mentor-meet-o3rp.onrender.com/StudentNameNumber",
         {
           method: "POST",
           headers: {

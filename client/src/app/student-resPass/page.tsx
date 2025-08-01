@@ -7,7 +7,7 @@ import FirstStudentForgotPassword from "./_components/FirstStudentForgotPassword
 import SecondStudentForgotPassword from "./_components/SecondStudentForgotPassword";
 import ThirdStudentForgotPassword from "./_components/ThirdStudentForgotPassword";
 
-const BACKEND_URL = "https://mentor-meet-ferb.onrender.com";
+const BACKEND_URL = "http://localhost:8000";
 
 const ForgotPasswordPage = () => {
   const [step, setStep] = useState(0);
@@ -25,12 +25,9 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(
-        `https://mentor-meet-ferb.onrender.com/findStuMail`,
-        {
-          email: form.email,
-        }
-      );
+      const res = await axios.post(`http://localhost:8000/findStuMail`, {
+        email: form.email,
+      });
       if (
         res.data &&
         typeof res.data === "object" &&
@@ -52,13 +49,10 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(
-        `https://mentor-meet-ferb.onrender.com/findOtp`,
-        {
-          email: form.email,
-          code: form.otp,
-        }
-      );
+      const res = await axios.post(`http://localhost:8000/findOtp`, {
+        email: form.email,
+        code: form.otp,
+      });
       if (
         res.data &&
         typeof res.data === "object" &&
@@ -81,7 +75,7 @@ const ForgotPasswordPage = () => {
     setError("");
     try {
       const res = await axios.put(
-        `https://mentor-meet-ferb.onrender.com/studentResetPassword`,
+        `http://localhost:8000/studentResetPassword`,
         {
           email: form.email,
           password: form.newPassword,

@@ -9,7 +9,7 @@ import axios from "axios";
 import Link from "next/link";
 import { useAuth } from "../_components/MentorUserProvider";
 
-const BACKEND_URL = "http://https://mentor-meet-o3rp.onrender.com";
+const BACKEND_URL = "https://mentor-meet-o3rp.onrender.com";
 
 type SignupResponse = {
   message: string;
@@ -52,7 +52,7 @@ const SignupPage = () => {
     setError("");
     try {
       const res = await axios.post(
-        `http://https://mentor-meet-o3rp.onrender.com/mentorEmail`,
+        `https://mentor-meet-o3rp.onrender.com/mentorEmail`,
         {
           email: form.email,
         }
@@ -79,7 +79,7 @@ const SignupPage = () => {
     setError("");
     try {
       const res = await axios.post(
-        `http://https://mentor-meet-o3rp.onrender.com/mentorOtp`,
+        `https://mentor-meet-o3rp.onrender.com/mentorOtp`,
         {
           email: form.email,
           code: form.otp,
@@ -120,7 +120,7 @@ const SignupPage = () => {
     try {
       // Step 1: Complete signup
       const res = await axios.post<SignupResponse>(
-        `http://https://mentor-meet-o3rp.onrender.com/mentorSignup`,
+        `https://mentor-meet-o3rp.onrender.com/mentorSignup`,
         {
           email: form.email,
           password: form.password,
@@ -146,7 +146,7 @@ const SignupPage = () => {
         try {
           // Fetch mentor profile data using the token
           const profileResponse = await axios.get<ProfileResponse>(
-            "http://https://mentor-meet-o3rp.onrender.com/mentorProfile",
+            "https://mentor-meet-o3rp.onrender.com/mentorProfile",
             {
               headers: {
                 Authorization: `Bearer ${token}`,

@@ -53,13 +53,13 @@ export const getAllMentors = async (req: Request, res: Response) => {
     // Transform the data to match the frontend interface and filter out incomplete profiles
     const transformedMentors = mentors
       .filter(
-        (mentor: any) =>
+        (mentor) =>
           mentor.firstName &&
           mentor.lastName &&
           mentor.profession &&
           mentor.experience?.careerDuration
       )
-      .map((mentor: any) => ({
+      .map((mentor) => ({
         id: mentor._id,
         name: `${mentor.firstName} ${mentor.lastName}`,
         profession: mentor.profession || "Тодорхойгүй",
@@ -80,7 +80,7 @@ export const getAllMentors = async (req: Request, res: Response) => {
     let filteredMentors = transformedMentors;
     if (subCategory) {
       filteredMentors = transformedMentors.filter(
-        (mentor: any) => mentor.subCategory === subCategory
+        (mentor) => mentor.subCategory === subCategory
       );
     }
 

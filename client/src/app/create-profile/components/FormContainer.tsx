@@ -98,7 +98,7 @@ const FormContainer = () => {
     const loadCategories = async () => {
       try {
         const response = await fetch(
-          "http://https://mentor-meet-o3rp.onrender.com/mentor-get-category"
+          "https://mentor-meet-o3rp.onrender.com/mentor-get-category"
         );
         const result = await response.json();
 
@@ -248,7 +248,7 @@ const FormContainer = () => {
 
         // Call Step 1 API
         const response = await fetch(
-          "http://https://mentor-meet-o3rp.onrender.com/mentorProfile/step1",
+          "https://mentor-meet-o3rp.onrender.com/mentorProfile/step1",
           {
             method: "POST",
             headers: {
@@ -293,7 +293,7 @@ const FormContainer = () => {
 
         // Call Step 2 API
         const response = await fetch(
-          "http://https://mentor-meet-o3rp.onrender.com/mentorProfile/step2",
+          "https://mentor-meet-o3rp.onrender.com/mentorProfile/step2",
           {
             method: "PATCH",
             headers: {
@@ -361,7 +361,7 @@ const FormContainer = () => {
 
       // Call Step 3 API
       const response = await fetch(
-        "http://https://mentor-meet-o3rp.onrender.com/mentorProfile/step3",
+        "https://mentor-meet-o3rp.onrender.com/mentorProfile/step3",
         {
           method: "PATCH",
           headers: {

@@ -46,7 +46,7 @@ export const createMessage = async (req: Request, res: Response) => {
     const userMsg = await MessageModel.create({
       email,
       message,
-      senderType, 
+      senderType,
       intent,
     });
 
@@ -99,7 +99,7 @@ ${JSON.stringify(studentProfile, null, 2)}
 Боломжит менторууд:
 ${mentors
   .map(
-    (m: any) =>
+    (m) =>
       `- ${m.firstName || ""} ${m.lastName || ""}: ${m.bio} (Мэргэжил: ${
         m.profession
       }, Туршлага: ${m.experience?.careerDuration || ""}, Чиглэл: ${
