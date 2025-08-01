@@ -1,9 +1,9 @@
-const { GoogleAuth } = require('google-auth-library');
-const { google } = require('googleapis');
+const { GoogleAuth } = require("google-auth-library");
+const { google } = require("googleapis");
 
 // Google Cloud configuration
 const googleCloudConfig = {
-  projectId: process.env.GOOGLE_PROJECT_ID || 'mentormeet-467407',
+  projectId: process.env.GOOGLE_PROJECT_ID || "mentormeet-467407",
   clientId: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
 };
@@ -12,18 +12,18 @@ const googleCloudConfig = {
 const auth = new GoogleAuth({
   keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS, // Path to service account key file
   scopes: [
-    'https://www.googleapis.com/auth/calendar',
-    'https://www.googleapis.com/auth/calendar.events',
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile',
+    "https://www.googleapis.com/auth/calendar",
+    "https://www.googleapis.com/auth/calendar.events",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile",
   ],
 });
 
 // Initialize Google Calendar API
-const calendar = google.calendar({ version: 'v3', auth });
+const calendar = google.calendar({ version: "v3", auth });
 
 // Initialize Google People API
-const people = google.people({ version: 'v1', auth });
+const people = google.people({ version: "v1", auth });
 
 /**
  * Create a Google Meet event
@@ -33,42 +33,40 @@ const people = google.people({ version: 'v1', auth });
  */
 async function createGoogleMeetEvent(accessToken, eventData) {
   try {
-    const { start, end, mentorEmail, menteeEmail, title, description } = eventData;
+    const { start, end, mentorEmail, menteeEmail, title, description } =
+      eventData;
 
     const event = {
-      summary: title || 'Mentor Meeting',
-      description: description || 'Meeting between mentor and mentee',
+      summary: title || "Mentor Meeting",
+      description: description || "Meeting between mentor and mentee",
       start: {
         dateTime: start,
-        timeZone: 'Asia/Ulaanbaatar',
+        timeZone: "Asia/Ulaanbaatar",
       },
       end: {
         dateTime: end,
-        timeZone: 'Asia/Ulaanbaatar',
+        timeZone: "Asia/Ulaanbaatar",
       },
-      attendees: [
-        { email: mentorEmail },
-        { email: menteeEmail },
-      ],
+      attendees: [{ email: mentorEmail }, { email: menteeEmail }],
       conferenceData: {
         createRequest: {
           requestId: `meet-${Date.now()}`,
           conferenceSolutionKey: {
-            type: 'hangoutsMeet',
+            type: "hangoutsMeet",
           },
         },
       },
       reminders: {
         useDefault: false,
         overrides: [
-          { method: 'email', minutes: 24 * 60 },
-          { method: 'popup', minutes: 10 },
+          { method: "email", minutes: 24 * 60 },
+          { method: "popup", minutes: 10 },
         ],
       },
     };
 
     const response = await calendar.events.insert({
-      calendarId: 'primary',
+      calendarId: "primary",
       resource: event,
       conferenceDataVersion: 1,
       auth: {
@@ -83,8 +81,8 @@ async function createGoogleMeetEvent(accessToken, eventData) {
       endTime: response.data.end.dateTime,
     };
   } catch (error) {
-    console.error('Error creating Google Meet event:', error);
-    throw new Error('Failed to create Google Meet event');
+    console.error("Error creating Google Meet event:", error);
+    throw new Error("Failed to create Google Meet event");
   }
 }
 
@@ -98,11 +96,11 @@ async function createGoogleMeetEvent(accessToken, eventData) {
 async function getCalendarEvents(accessToken, timeMin, timeMax) {
   try {
     const response = await calendar.events.list({
-      calendarId: 'primary',
+      calendarId: "primary",
       timeMin,
       timeMax,
       singleEvents: true,
-      orderBy: 'startTime',
+      orderBy: "startTime",
       auth: {
         access_token: accessToken,
       },
@@ -110,8 +108,8 @@ async function getCalendarEvents(accessToken, timeMin, timeMax) {
 
     return response.data.items || [];
   } catch (error) {
-    console.error('Error fetching calendar events:', error);
-    throw new Error('Failed to fetch calendar events');
+    console.error("Error fetching calendar events:", error);
+    throw new Error("Failed to fetch calendar events");
   }
 }
 
@@ -123,8 +121,8 @@ async function getCalendarEvents(accessToken, timeMin, timeMax) {
 async function getUserProfile(accessToken) {
   try {
     const response = await people.people.get({
-      resourceName: 'people/me',
-      personFields: 'names,emailAddresses,photos',
+      resourceName: "people/me",
+      personFields: "names,emailAddresses,photos",
       auth: {
         access_token: accessToken,
       },
@@ -132,8 +130,8 @@ async function getUserProfile(accessToken) {
 
     return response.data;
   } catch (error) {
-    console.error('Error fetching user profile:', error);
-    throw new Error('Failed to fetch user profile');
+    console.error("Error fetching user profile:", error);
+    throw new Error("Failed to fetch user profile");
   }
 }
 
@@ -151,7 +149,7 @@ async function hasCalendarAccess(accessToken) {
     });
     return true;
   } catch (error) {
-    console.error('User does not have calendar access:', error);
+    console.error("User does not have calendar access:", error);
     return false;
   }
 }
@@ -165,4 +163,4 @@ module.exports = {
   getCalendarEvents,
   getUserProfile,
   hasCalendarAccess,
-}; 
+};
