@@ -24,7 +24,7 @@ export const getAllMentors = async (req: Request, res: Response) => {
 
       // First, find the category by name
       const categoryDoc = await CategoryModel.findOne({
-        categoryName: category
+        categoryName: category,
       });
 
       console.log("Found category doc:", categoryDoc);
@@ -52,18 +52,20 @@ export const getAllMentors = async (req: Request, res: Response) => {
 
     // Transform the data to match the frontend interface and filter out incomplete profiles
     const transformedMentors = mentors
-      .filter((mentor) =>
-        mentor.firstName &&
-        mentor.lastName &&
-        mentor.profession &&
-        mentor.experience?.careerDuration
+      .filter(
+        (mentor: any) =>
+          mentor.firstName &&
+          mentor.lastName &&
+          mentor.profession &&
+          mentor.experience?.careerDuration
       )
-      .map((mentor) => ({
+      .map((mentor: any) => ({
         id: mentor._id,
         name: `${mentor.firstName} ${mentor.lastName}`,
         profession: mentor.profession || "Тодорхойгүй",
-        experience: `Туршлага: ${mentor.experience?.careerDuration || "Тодорхойгүй"
-          }`,
+        experience: `Туршлага: ${
+          mentor.experience?.careerDuration || "Тодорхойгүй"
+        }`,
         rating: mentor.rating || 0,
         image: mentor.image || "/image709.png",
         category:
@@ -78,7 +80,7 @@ export const getAllMentors = async (req: Request, res: Response) => {
     let filteredMentors = transformedMentors;
     if (subCategory) {
       filteredMentors = transformedMentors.filter(
-        (mentor) => mentor.subCategory === subCategory
+        (mentor: any) => mentor.subCategory === subCategory
       );
     }
 

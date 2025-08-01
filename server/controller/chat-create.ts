@@ -99,7 +99,7 @@ ${JSON.stringify(studentProfile, null, 2)}
 Боломжит менторууд:
 ${mentors
   .map(
-    (m) =>
+    (m: any) =>
       `- ${m.firstName || ""} ${m.lastName || ""}: ${m.bio} (Мэргэжил: ${
         m.profession
       }, Туршлага: ${m.experience?.careerDuration || ""}, Чиглэл: ${
