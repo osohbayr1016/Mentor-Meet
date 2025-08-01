@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 interface HomeCarouselProps {
   images?: string[];
@@ -28,9 +29,10 @@ export const HomeCarousel: React.FC<HomeCarouselProps> = ({
       <div className="carousel-track">
         {duplicatedImages.map((image, index) => (
           <div key={index} className="carousel-item">
-            <img
+            <Image
               src={image}
               alt={`Carousel image ${(index % images.length) + 1}`}
+              quality={80}
             />
           </div>
         ))}
