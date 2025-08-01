@@ -19,11 +19,7 @@ export const addSubCategories = async (req: Request, res: Response) => {
 
     const category = await CategoryModel.findById(categoryId);
 
-    if (!category) {
-      return res.status(404).json({ message: "categoryId олдсонгүй" });
-    }
-
-    const existingSubCategories = category.subCategory || [];
+    const existingSubCategories = category?.subCategory || [];
 
     const uniqueSubCategories = subCategory.filter(
       (item: string) => !existingSubCategories.includes(item)
