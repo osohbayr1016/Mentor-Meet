@@ -322,6 +322,7 @@ const MentorDetailPage = () => {
         totalPrice={totalPrice}
         selectedTimes={getAllSelectedTimes()}
         selectedTimesByDate={selectedTimesByDate}
+        MentorId={mentorId}
       />
     </div>
   );
