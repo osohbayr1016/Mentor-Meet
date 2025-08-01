@@ -7,7 +7,7 @@ import SecondMentorSignup from "./_components/SecondMentorSignup";
 import ThirdMentorSignup from "./_components/ThirdMentorSignUp";
 import axios from "axios";
 import Link from "next/link";
-import { useAuth } from "../asd/MentorUserProvider";
+import { useAuth } from "../_components/MentorUserProvider";
 
 const BACKEND_URL = "http://localhost:8000";
 

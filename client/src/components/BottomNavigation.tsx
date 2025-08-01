@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuth } from "../app/asd/MentorUserProvider";
+import { useAuth } from "../app/_components/MentorUserProvider";
 import { useEffect, useState } from "react";
 
 interface StudentData {

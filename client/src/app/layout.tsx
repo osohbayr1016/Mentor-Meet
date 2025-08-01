@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "./asd/MentorUserProvider";
+import { AuthProvider } from "./_components/MentorUserProvider";
 import SessionProvider from "../components/SessionProvider";
-import { HomeChat } from "./asd/Chat";
+import { HomeChat } from "./_components/Chat";
 import BottomNavigation from "../components/BottomNavigation";
 
 const geistSans = Geist({

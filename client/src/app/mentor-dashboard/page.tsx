@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "../asd/MentorUserProvider";
+import { useAuth } from "../_components/MentorUserProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
