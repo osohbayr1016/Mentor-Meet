@@ -8,6 +8,8 @@ import { CategoryRouter } from "./router/category-router";
 import { chatRouter } from "./router/chat-router";
 import { CalendarRouter } from "./router/calendar-router";
 
+dotenv.config();
+
 const dataBaseConnection = async () => {
   await mongoose.connect(
     "mongodb+srv://anandoctane4:uVPeDYELoaGaO46X@food-delivery.wdjmkc7.mongodb.net/mentor-meet"

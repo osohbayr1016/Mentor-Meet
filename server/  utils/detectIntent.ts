@@ -1,4 +1,8 @@
-// import fetch from "node-fetch"
+import { OpenAI } from "openai";
+import { MentorModel } from "../model/mentor-model";
+import { StudentModel } from "../model/student-model";
+
+declare const process: any;
 
 type OpenAIResponse = {
   choices: Array<{
@@ -8,86 +12,73 @@ type OpenAIResponse = {
   }>;
 };
 
-// export const detectIntent = async (
-//   message: string
-// ): Promise<" issue" | "request" | "help" | "other"> => {
-//   const fetch = (await import("node-fetch")).default;
+// MongoDB-оос mentor-уудыг авах
+const getMentorsFromDB = async () => {
+  try {
+    const mentors = await MentorModel.find({});
+    return mentors;
+  } catch (error) {
+    console.error("Mentor-уудыг авахад алдаа:", error);
+    return [];
+  }
+};
 
-//   const prompt = `
-// You are an assistant for a website called "Mentor Meet", a platform connecting students and mentors.
-// Classify the user's message strictly as one of these categories: issue, request, help, or other.
-// Respond with exactly one word ONLY: "issue", "request", "help", or "other".
-
-// Here are some examples:
-// - If the user reports a problem, respond with "issue".
-// - If the user asks for something or makes a request, respond with "request".
-// - If the user is asking for assistance or guidance, respond with "help".
-// - If the message does not fit the above categories, respond with "other".
-// `;
-
-//   const res = await fetch("https://api.openai.com/v1/chat/completions", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-//     },
-//     body: JSON.stringify({
-//       model: "gpt-3.5-turbo",
-//       messages: [
-//         {
-//           role: "system",
-//           content: prompt.trim(),
-//         },
-//         {
-//           role: "user",
-//           content: message,
-//         },
-//       ],
-//       temperature: 0,
-//     }),
-//   });
-
-//   const data = (await res.json()) as OpenAIResponse;
-
-//   const intentRaw = data.choices?.[0]?.message?.content;
-
-//   if (typeof intentRaw !== "string") return "other";
-
-//   const intent = intentRaw.toLowerCase().trim();
-
-//   if (["issue", "request", "help"].includes(intent)) return intent as any;
-
-//   return "other";
-// };
+// MongoDB-оос student-ийн мэдээллийг авах
+const getStudentFromDB = async (email: string) => {
+  try {
+    const student = await StudentModel.findOne({ email });
+    return student;
+  } catch (error) {
+    console.error("Student мэдээлэл авахад алдаа:", error);
+    return null;
+  }
+};
 
 export const detectIntent = async (
-  message: string
+  message: string,
+  userEmail?: string // хэрэглэгчийн email
 ): Promise<"асуудал" | "хүсэлт" | "тусламж" | "бусад"> => {
-  const fetch = (await import("node-fetch")).default;
+  try {
+    if (!process.env.OPENAI_API_KEY) {
+      console.error("OPENAI_API_KEY тохируулаагүй байна");
+      return "бусад";
+    }
 
-  const prompt = `
-Чи \"Mentor Meet\" платформын туслах. Хэрэглэгчийн мессежийг дараах 4 ангиллаар ангил:
-- асуудал (хэрвээ хэрэглэгч асуудал, алдаа, гомдол бичсэн бол)
-- хүсэлт (ямар нэг зүйл хүссэн, шаардаж байгаа бол)
-- тусламж (асуулт, зөвлөгөө, тусламж хүссэн бол)
-- бусад (дээрх ангилалд хамаарахгүй бол)
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-Зөвхөн нэг үгээр, зөвхөн монголоор хариул: \"асуудал\", \"хүсэлт\", \"тусламж\", эсвэл \"бусад\".
+    // MongoDB-оос өгөгдөл авах
+    const mentors = await getMentorsFromDB();
+    const student = userEmail ? await getStudentFromDB(userEmail) : null;
+
+    const prompt = `
+Чи "Mentor Meet" платформын AI туслах. Хэрэглэгчийн мессежийг дараах 4 ангиллаар ангил:
+
+- асуудал: хэрэглэгч асуудал, алдаа, гомдол, санаа зовниж байгаа бол
+- хүсэлт: ямар нэг зүйл хүссэн, шаардаж, хүсэлт гаргаж байгаа бол  
+- тусламж: асуулт, зөвлөгөө, тусламж, заавар хүссэн бол
+- бусад: дээрх ангилалд хамаарахгүй, ердийн яриа, мэндчилгээ гэх мэт
+
+${
+  student
+    ? `Хэрэглэгчийн мэдээлэл: ${student.nickname || "Unknown"}, ${
+        student.email
+      }`
+    : ""
+}
+${mentors.length > 0 ? `Боломжит менторуудын тоо: ${mentors.length}` : ""}
+
+Зөвхөн нэг үгээр, зөвхөн монголоор хариул: "асуудал", "хүсэлт", "тусламж", эсвэл "бусад".
+
 Жишээ:
-- \"Сайт ажиллахгүй байна\" → \"асуудал\"
-- \"Би шинэ нууц үг хүсэж байна\" → \"хүсэлт\"
-- \"Яаж бүртгүүлэх вэ?\" → \"тусламж\"
-- \"Сайн байна уу?\" → \"бусад\"
+- "Сайт ажиллахгүй байна" → "асуудал"
+- "Би шинэ нууц үг хүсэж байна" → "хүсэлт"  
+- "Яаж бүртгүүлэх вэ?" → "тусламж"
+- "Сайн байна уу?" → "бусад"
+- "Баяртай" → "бусад"
 `;
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo", // эсвэл "gpt-4"
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
@@ -99,15 +90,26 @@ export const detectIntent = async (
         },
       ],
       temperature: 0,
-    }),
-  });
+      max_tokens: 10,
+    });
 
-  const data = (await res.json()) as OpenAIResponse;
-  const intentRaw = data.choices?.[0]?.message?.content;
+    const intentRaw = response.choices?.[0]?.message?.content;
 
-  if (typeof intentRaw !== "string") return "бусад";
-  const intent = intentRaw.toLowerCase().trim();
+    if (typeof intentRaw !== "string") {
+      console.error("AI-аас буруу хариу ирлээ:", intentRaw);
+      return "бусад";
+    }
 
-  if (["асуудал", "хүсэлт", "тусламж"].includes(intent)) return intent as any;
-  return "бусад";
+    const intent = intentRaw.toLowerCase().trim();
+
+    if (["асуудал", "хүсэлт", "тусламж"].includes(intent)) {
+      return intent as any;
+    }
+
+    console.log(`Unknown intent: "${intent}" from message: "${message}"`);
+    return "бусад";
+  } catch (error) {
+    console.error("detectIntent алдаа:", error);
+    return "бусад";
+  }
 };
