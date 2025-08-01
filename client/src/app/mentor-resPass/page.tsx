@@ -51,10 +51,13 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(`http://localhost:8000/mentorOtp`, {
-        email: form.email,
-        code: form.otp,
-      });
+      const res = await axios.post(
+        `http://https://mentor-meet-o3rp.onrender.com/mentorOtp`,
+        {
+          email: form.email,
+          code: form.otp,
+        }
+      );
       if (
         res.data &&
         typeof res.data === "object" &&
@@ -76,11 +79,14 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.put(`http://localhost:8000/mentorResetPassword`, {
-        email: form.email,
-        password: form.newPassword,
-        //  confirmPassword: form.confirmPassword,
-      });
+      const res = await axios.put(
+        `http://https://mentor-meet-o3rp.onrender.com/mentorResetPassword`,
+        {
+          email: form.email,
+          password: form.newPassword,
+          //  confirmPassword: form.confirmPassword,
+        }
+      );
       if (
         res.data &&
         typeof res.data === "object" &&

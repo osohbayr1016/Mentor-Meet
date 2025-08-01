@@ -97,7 +97,7 @@ const MentorLoginPage = () => {
 
     try {
       // TODO: Implement forgot password API call
-      // await axios.post("http://localhost:8000/findMail", {
+      // await axios.post("http://https://mentor-meet-o3rp.onrender.com/findMail", {
       //   email: resetEmail,
       // });
       setResetStep(2);
@@ -138,7 +138,7 @@ const MentorLoginPage = () => {
 
     try {
       // TODO: Implement password reset API call
-      // await axios.put("http://localhost:8000/mentorResetPassword", {
+      // await axios.put("http://https://mentor-meet-o3rp.onrender.com/mentorResetPassword", {
       //   email: resetEmail,
       //   code: resetCode,
       //   newPassword,

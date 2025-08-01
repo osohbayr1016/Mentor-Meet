@@ -31,13 +31,16 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:8000/Checkemail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
+      const response = await fetch(
+        "http://https://mentor-meet-o3rp.onrender.com/Checkemail",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
 
       const data = await response.json();
 
@@ -64,13 +67,16 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:8000/checkOtp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, code: otp }),
-      });
+      const response = await fetch(
+        "http://https://mentor-meet-o3rp.onrender.com/checkOtp",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, code: otp }),
+        }
+      );
 
       const data = await response.json();
 
@@ -107,13 +113,16 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:8000/createPassword", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await fetch(
+        "http://https://mentor-meet-o3rp.onrender.com/createPassword",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       const data = await response.json();
 
@@ -145,13 +154,16 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:8000/StudentNameNumber", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, nickname, phoneNumber }),
-      });
+      const response = await fetch(
+        "http://https://mentor-meet-o3rp.onrender.com/StudentNameNumber",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, nickname, phoneNumber }),
+        }
+      );
 
       const data = await response.json();
 
