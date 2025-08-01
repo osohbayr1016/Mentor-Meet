@@ -144,7 +144,7 @@ const MentorDashboard = () => {
             </div>
             <button
               onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
+              className=" hover:bg-red-500/40 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
             >
               <svg
                 className="w-4 h-4"
