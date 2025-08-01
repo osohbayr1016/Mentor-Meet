@@ -6,7 +6,7 @@ import FirstMentorForgotPassword from "./_components/FirstMentorForgotPassword";
 import SecondMentorForgotPassword from "./_components/SecondMentorForgotPassword";
 import ThirdMentorForgotPassword from "./_components/ThirdMentorForgotPassword";
 
-const BACKEND_URL = "http://localhost:8000";
+const BACKEND_URL = "https://mentor-meet-ferb.onrender.com";
 
 const ForgotPasswordPage = () => {
   const [step, setStep] = useState(0);
@@ -24,9 +24,12 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(`http://localhost:8000/findMail`, {
-        email: form.email,
-      });
+      const res = await axios.post(
+        `https://mentor-meet-ferb.onrender.com/findMail`,
+        {
+          email: form.email,
+        }
+      );
       if (
         res.data &&
         typeof res.data === "object" &&
