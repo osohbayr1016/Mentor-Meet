@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.StudentRouter = void 0;
+const express_1 = require("express");
+const student_signup_1 = require("../controller/student-signup");
+const student_login_1 = require("../controller/student-login");
+const student_forgot_password_1 = require("../controller/student-forgot-password");
+const student_verify_1 = require("../controller/student-verify");
+exports.StudentRouter = (0, express_1.Router)();
+exports.StudentRouter.post("/Checkemail", student_signup_1.Checkemail);
+exports.StudentRouter.post("/checkOtp", student_signup_1.checkOtp);
+exports.StudentRouter.post("/createPassword", student_signup_1.createPassword);
+exports.StudentRouter.post("/StudentNameNumber", student_signup_1.StudentNameNumber);
+exports.StudentRouter.post("/studentlogin", student_login_1.StudentLogin);
+exports.StudentRouter.put("/StudentForgotPassword", student_forgot_password_1.studentForgetPass);
+exports.StudentRouter.put("/studentVerify", student_verify_1.studentVerify);
