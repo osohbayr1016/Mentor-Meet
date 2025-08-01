@@ -13,7 +13,7 @@ interface BookingModalProps {
   totalPrice?: number;
   selectedTimes?: string[];
   selectedTimesByDate?: Record<string, string[]>;
-  MentorId: string 
+  MentorId: string;
 }
 
 interface MeetingResponse {
@@ -31,7 +31,7 @@ export default function BookingModal({
   totalPrice = 0,
   selectedTimes = [],
   selectedTimesByDate = {},
-  MentorId
+  MentorId,
 }: BookingModalProps) {
   const { data: session } = useSession();
 
@@ -42,7 +42,7 @@ export default function BookingModal({
   const userEmail =
     session?.user?.email || (mockUser ? JSON.parse(mockUser).email : null);
   const [isLoading, setIsLoading] = useState(false);
-  const [meetingLink, setMeetingLink] = useState<string | null>(null);
+  const [meetingLinks, setMeetingLinks] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
@@ -57,31 +57,47 @@ export default function BookingModal({
     setError(null);
 
     try {
-      // Convert selected date and time to ISO string
-      const [hours, minutes] = selectedTime.split(":");
-      const availabilityDate = new Date(
-        `2024-08-${selectedDate.padStart(2, "0")}T${hours}:${minutes}:00.000Z`
-      );
-      const endDate = new Date(availabilityDate.getTime() + 60 * 60 * 1000); // 1 hour later
+      // Prepare all availability requests
+      const availabilityRequests = [];
 
+      // Process all selected times from all dates
+      for (const [date, times] of Object.entries(selectedTimesByDate)) {
+        for (const time of times) {
+          // Convert selected date and time to ISO string
+          const [hours, minutes] = time.split(":");
+          const availabilityDate = new Date(
+            `2024-08-${date.padStart(2, "0")}T${hours}:${minutes}:00.000Z`
+          );
+          const endDate = new Date(availabilityDate.getTime() + 60 * 60 * 1000); // 1 hour later
+
+          availabilityRequests.push({
+            start: availabilityDate.toISOString(),
+            end: endDate.toISOString(),
+            mentorEmail: userEmail,
+            date: date,
+            time: time,
+          });
+        }
+      }
+
+      // Send all availability requests in a single API call
       const response = await fetch("/api/mark-availability", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          start: availabilityDate.toISOString(),
-          end: endDate.toISOString(),
-          mentorEmail: userEmail,
-          date: selectedDate,
-          time: selectedTime,
+          availabilities: availabilityRequests,
         }),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        setMeetingLink("success"); // Use this to indicate success
+      if (response.ok && data.success) {
+        const createdMeetings = data.results
+          .filter((result: any) => result.success)
+          .map((result: any) => `08/${result.date} - ${result.time}`);
+        setMeetingLinks(createdMeetings);
       } else {
         setError(data.error || "Failed to mark availability");
       }
@@ -94,8 +110,9 @@ export default function BookingModal({
   };
 
   const handleCopyLink = () => {
-    if (meetingLink) {
-      navigator.clipboard.writeText(meetingLink);
+    if (meetingLinks.length > 0) {
+      const meetingText = meetingLinks.join("\n");
+      navigator.clipboard.writeText(meetingText);
     }
   };
 
@@ -116,7 +133,7 @@ export default function BookingModal({
 
           {/* Content */}
           <div className="flex flex-col items-center gap-6 px-8 text-center">
-            {!meetingLink ? (
+            {meetingLinks.length === 0 ? (
               <>
                 <div>
                   <h3 className="font-[600] text-[20px] text-white mb-4">
@@ -140,12 +157,6 @@ export default function BookingModal({
                   </div>
                 </div>
 
-                {error && (
-                  <div className="text-red-400 text-sm bg-red-400/10 px-4 py-2 rounded-lg">
-                    {error}
-                  </div>
-                )}
-
                 <div className="flex gap-4">
                   <button
                     onClick={onClose}
@@ -154,21 +165,25 @@ export default function BookingModal({
                   >
                     Цуцлах
                   </button>
-                  <Link href={`/payment/${MentorId}`}>
-                  <button
-                    onClick={handleMarkAvailability}
-                    disabled={isLoading}
-                    className="px-6 py-3 bg-white text-black rounded-[40px] hover:bg-gray-100 transition-colors disabled:opacity-50"
+                  <Link
+                    href={`/payment/${MentorId}?times=${encodeURIComponent(
+                      JSON.stringify(selectedTimesByDate)
+                    )}`}
                   >
-                    {isLoading ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border border-black/30 border-t-black rounded-full animate-spin"></div>
-                        Захиалга хийж байна...
-                      </div>
-                    ) : (
-                      "Захиалга баталгаажуулах"
-                    )}
-                  </button>
+                    <button
+                      onClick={handleMarkAvailability}
+                      disabled={isLoading}
+                      className="px-6 py-3 bg-white text-black rounded-[40px] hover:bg-gray-100 transition-colors disabled:opacity-50"
+                    >
+                      {isLoading ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border border-black/30 border-t-black rounded-full animate-spin"></div>
+                          Захиалга хийж байна...
+                        </div>
+                      ) : (
+                        "Захиалга баталгаажуулах"
+                      )}
+                    </button>
                   </Link>
                 </div>
               </>
@@ -179,12 +194,14 @@ export default function BookingModal({
                     Боломжит цаг амжилттай тэмдэглэгдлээ!
                   </h3>
                   <p className="text-white/80 text-sm mb-4">
-                    Таны боломжит цаг:
+                    Таны боломжит цагууд:
                   </p>
-                  <div className="bg-white/10 p-3 rounded-lg">
-                    <p className="text-white">
-                      08/{selectedDate} - {selectedTime}
-                    </p>
+                  <div className="bg-white/10 p-3 rounded-lg max-h-32 overflow-y-auto">
+                    {meetingLinks.map((meeting, index) => (
+                      <p key={index} className="text-white text-sm">
+                        {meeting}
+                      </p>
+                    ))}
                   </div>
                 </div>
 

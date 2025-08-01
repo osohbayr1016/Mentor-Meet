@@ -3,36 +3,74 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/auth";
 
 interface AvailabilityRequest {
-    start: string;
-    end: string;
-    mentorEmail: string;
-    date: string;
-    time: string;
+  start: string;
+  end: string;
+  mentorEmail: string;
+  date: string;
+  time: string;
+}
+
+interface MultipleAvailabilityRequest {
+  availabilities: AvailabilityRequest[];
 }
 
 export async function POST(request: NextRequest) {
-    try {
-        // Get the session to access the access token
-        const session = await getServerSession(authOptions);
+  try {
+    // Get the session to access the access token
+    const session = await getServerSession(authOptions);
 
-        if (!session?.accessToken) {
-            return NextResponse.json(
-                { error: "Authentication required" },
-                { status: 401 }
-            );
-        }
+    if (!session?.accessToken) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
 
-        const body: AvailabilityRequest = await request.json();
-        const { start, end, mentorEmail, date, time } = body;
+    const body = await request.json();
 
-        // Validate required fields
-        if (!start || !end || !mentorEmail || !date || !time) {
-            return NextResponse.json(
-                { error: "Missing required fields: start, end, mentorEmail, date, time" },
-                { status: 400 }
-            );
-        }
+    // Check if it's a single availability or multiple availabilities
+    let availabilities: AvailabilityRequest[] = [];
 
+    if (body.availabilities && Array.isArray(body.availabilities)) {
+      // Multiple availabilities
+      availabilities = body.availabilities;
+    } else if (
+      body.start &&
+      body.end &&
+      body.mentorEmail &&
+      body.date &&
+      body.time
+    ) {
+      // Single availability (backward compatibility)
+      availabilities = [body as AvailabilityRequest];
+    } else {
+      return NextResponse.json(
+        {
+          error:
+            "Invalid request format. Expected either single availability or array of availabilities",
+        },
+        { status: 400 }
+      );
+    }
+
+    const results = [];
+
+    // Process each availability
+    for (const availability of availabilities) {
+      const { start, end, mentorEmail, date, time } = availability;
+
+      // Validate required fields
+      if (!start || !end || !mentorEmail || !date || !time) {
+        results.push({
+          date,
+          time,
+          success: false,
+          error: "Missing required fields",
+        });
+        continue;
+      }
+
+      try {
         // Here you would typically save the availability to your database
         // For now, we'll just return success
         // In a real implementation, you would:
@@ -41,30 +79,45 @@ export async function POST(request: NextRequest) {
         // 3. Make this time slot available for booking by mentees
 
         console.log("Mentor availability marked:", {
-            mentorEmail,
-            date,
-            time,
-            start,
-            end
+          mentorEmail,
+          date,
+          time,
+          start,
+          end,
         });
 
-        return NextResponse.json({
-            success: true,
-            message: "Availability marked successfully",
-            availability: {
-                date,
-                time,
-                start,
-                end,
-                mentorEmail
-            }
+        results.push({
+          date,
+          time,
+          success: true,
+          message: "Availability marked successfully",
         });
-
-    } catch (error) {
-        console.error("Error marking availability:", error);
-        return NextResponse.json(
-            { error: "Failed to mark availability" },
-            { status: 500 }
-        );
+      } catch (error) {
+        console.error(`Error marking availability for ${date} ${time}:`, error);
+        results.push({
+          date,
+          time,
+          success: false,
+          error: "Failed to mark availability",
+        });
+      }
     }
-} 
+
+    const successfulResults = results.filter((r) => r.success);
+    const failedResults = results.filter((r) => !r.success);
+
+    return NextResponse.json({
+      success: successfulResults.length > 0,
+      message: `Successfully marked ${successfulResults.length} availability slots`,
+      results,
+      successfulCount: successfulResults.length,
+      failedCount: failedResults.length,
+    });
+  } catch (error) {
+    console.error("Error marking availability:", error);
+    return NextResponse.json(
+      { error: "Failed to mark availability" },
+      { status: 500 }
+    );
+  }
+}
