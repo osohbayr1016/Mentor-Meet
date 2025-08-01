@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface BookingModalProps {
   totalPrice?: number;
   selectedTimes?: string[];
   selectedTimesByDate?: Record<string, string[]>;
+  MentorId: string 
 }
 
 interface MeetingResponse {
@@ -29,6 +31,7 @@ export default function BookingModal({
   totalPrice = 0,
   selectedTimes = [],
   selectedTimesByDate = {},
+  MentorId
 }: BookingModalProps) {
   const { data: session } = useSession();
 
@@ -151,6 +154,7 @@ export default function BookingModal({
                   >
                     Цуцлах
                   </button>
+                  <Link href={`/payment/${MentorId}`}>
                   <button
                     onClick={handleMarkAvailability}
                     disabled={isLoading}
@@ -165,6 +169,7 @@ export default function BookingModal({
                       "Захиалга баталгаажуулах"
                     )}
                   </button>
+                  </Link>
                 </div>
               </>
             ) : (

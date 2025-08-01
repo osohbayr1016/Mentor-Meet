@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import BookingModal from "../../components/BookingModal";
+import BookingModal from "../../../components/BookingModal";
 import { ArrowLeft, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button"
 import {
@@ -21,27 +21,37 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import axios from "axios";
 import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
 
- type Mentor = {
- _id: string;
-    email: string;
-    password: string;
-    phoneNumber?: string;
-    firstName: string;
-    lastName: string;
-    nickName?: string;
-    image: string;
-    bio: string;
-    profession: string;
-    experience:{
-         work: string;
-  position: string;
-  careerDuration: string;
-    }
- }
-
+interface Mentor {
+  id: string;
+  email:string
+  firstName: string;
+  lastName: string;
+  profession: string;
+  experience: {
+    work: string;
+    position: string;
+    careerDuration: string;
+  };
+  education: {
+    schoolName: string;
+    major: string;
+    endedYear: string;
+  };
+  bio: string;
+  rating: number;
+  hourlyPrice: number;
+  image: string;
+  category?: {
+    categoryId: string;
+    price: number;
+  };
+}
 
 const MentorPayment = () => {
+    const params = useParams();
+   const mentorId = Array.isArray(params.id) ? params.id[0] : params.id || ""
       const [open, setOpen] = useState(false);
       const [showQr, setShowQr] = useState(false);
       const [agreed, setAgreed] = useState(false); 
@@ -55,7 +65,25 @@ const MentorPayment = () => {
     }
   }
 
+  useEffect(() => {
+    if (!mentorId) return;
 
+    const fetchMentor = async () => {
+   
+      try {
+        const res = await fetch(`/api/get-mentor/${mentorId}`);
+        if (!res.ok) {
+          throw new Error("Mentor олдсонгүй");
+        }
+        const data = await res.json();
+        setMentor(data);
+      } catch (err: any) {
+        
+      } 
+    };
+
+    fetchMentor();
+  }, [mentorId]);
   
   return (
     <div className="relative w-full h-screen">
@@ -80,15 +108,15 @@ const MentorPayment = () => {
 
  <div className="text-[16px] font-medium flex flex-col gap-3">
             <img
-              src="https://images.unsplash.com/photo-1706074740295-d7a79c079562?q=80&w=2232&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              src={mentor?.image}
               alt="mentor"
               className="rounded-[40px] h-[260px] w-[300px] p-[20px] object-cover"
             />
            <div>
-            <h2 className="text-[18px]" >Энхжин Ч.</h2>
-            <p >Эмч, Нийгмийн эрүүл мэндийн судлаач</p>
-            <p className="text-[14px] text-[#FFFFFFCC]">Салбар: Эрүүл мэнд</p>
-            <div >⭐ 4.9</div>
+            <h2 className="text-[18px]" >{mentor?.firstName} </h2>
+            <p >{mentor?.profession}</p>
+            <p className="text-[14px] text-[#FFFFFFCC]">Салбар: {mentor?.bio}</p>
+            <div >⭐ {mentor?.rating}</div>
             </div>
             </div>
           </div>
@@ -100,7 +128,7 @@ const MentorPayment = () => {
               <p><span className="text-white/60">Уулзалтын өдөр:</span> <br /> <strong>8 сарын 4, Даваа гараг</strong></p>
               <p><span className="text-white/60">Уулзалтын цаг:</span> <br /> <strong>10:00</strong></p>
               <p><span className="text-white/60">Уулзалтын үнэ:</span> <br /> <strong>₮20,000</strong></p>
-              <p><span className="text-white/60">Суралцагч:</span> <br /> <strong>maralguagurbadam@gm...</strong></p>
+              <p><span className="text-white/60">Суралцагч:</span> <br /> <strong>{mentor?.email}</strong></p>
             </div>
 
             <div className="w-[1px] h-[500px] border border-[#FFFFFF80]"></div>

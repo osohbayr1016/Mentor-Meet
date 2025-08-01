@@ -414,12 +414,13 @@ const MentorCalendar = () => {
       )}
 
       {/* Booking Modal */}
-      <BookingModal
+      {/* <BookingModal
         isOpen={showBookingModal}
         onClose={() => setShowBookingModal(false)}
         selectedDate={selectedBookingDate}
         selectedTime={selectedBookingTime}
-      />
+
+      /> */}
 
       {/* Copyright Footer */}
       <div className="fixed bottom-2 left-6 text-xs text-white/60 z-30">
