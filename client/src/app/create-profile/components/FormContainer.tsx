@@ -2,7 +2,7 @@
 
 import { useState, useEffect, ChangeEvent } from "react";
 import Image from "next/image";
-import { useAuth } from "../../_components/MentorUserProvider";
+import { useAuth } from "../../asd/MentorUserProvider";
 import { FormData } from "../types/FormTypes";
 import {
   uploadImageToCloudinary,
