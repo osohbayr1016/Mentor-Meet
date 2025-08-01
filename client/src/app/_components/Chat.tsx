@@ -25,7 +25,7 @@ export const HomeChat = () => {
     const mentorToken = localStorage.getItem("mentorToken");
     setToken(studentToken || mentorToken);
 
-    fetch("http://https://mentor-meet-o3rp.onrender.com/getMessages", {
+    fetch("https://mentor-meet-o3rp.onrender.com/getMessages", {
       headers: {
         Authorization: `Bearer ${studentToken || mentorToken}`,
       },
@@ -54,7 +54,7 @@ export const HomeChat = () => {
 
     try {
       const res = await fetch(
-        "http://https://mentor-meet-o3rp.onrender.com/createMessage?save=false",
+        "https://mentor-meet-o3rp.onrender.com/createMessage?save=false",
         {
           method: "POST",
           headers: {

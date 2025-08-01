@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const response = await fetch(
       `${
         process.env.NEXT_PUBLIC_API_URL ||
-        "http://https://mentor-meet-o3rp.onrender.com"
+        "https://mentor-meet-o3rp.onrender.com"
       }/mentors?${queryParams.toString()}`,
       {
         method: "GET",

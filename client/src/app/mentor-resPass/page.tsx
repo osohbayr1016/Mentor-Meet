@@ -6,7 +6,7 @@ import FirstMentorForgotPassword from "./_components/FirstMentorForgotPassword";
 import SecondMentorForgotPassword from "./_components/SecondMentorForgotPassword";
 import ThirdMentorForgotPassword from "./_components/ThirdMentorForgotPassword";
 
-const BACKEND_URL = "https://mentor-meet-ferb.onrender.com";
+const BACKEND_URL = "http://localhost:8000";
 
 const ForgotPasswordPage = () => {
   const [step, setStep] = useState(0);
@@ -24,12 +24,9 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(
-        `https://mentor-meet-ferb.onrender.com/findMail`,
-        {
-          email: form.email,
-        }
-      );
+      const res = await axios.post(`http://localhost:8000/findMail`, {
+        email: form.email,
+      });
       if (
         res.data &&
         typeof res.data === "object" &&
@@ -51,13 +48,10 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(
-        `http://https://mentor-meet-o3rp.onrender.com/mentorOtp`,
-        {
-          email: form.email,
-          code: form.otp,
-        }
-      );
+      const res = await axios.post(`http://localhost:8000/mentorOtp`, {
+        email: form.email,
+        code: form.otp,
+      });
       if (
         res.data &&
         typeof res.data === "object" &&
@@ -79,14 +73,11 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.put(
-        `http://https://mentor-meet-o3rp.onrender.com/mentorResetPassword`,
-        {
-          email: form.email,
-          password: form.newPassword,
-          //  confirmPassword: form.confirmPassword,
-        }
-      );
+      const res = await axios.put(`http://localhost:8000/mentorResetPassword`, {
+        email: form.email,
+        password: form.newPassword,
+        //  confirmPassword: form.confirmPassword,
+      });
       if (
         res.data &&
         typeof res.data === "object" &&

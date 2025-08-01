@@ -8,22 +8,27 @@ import { CategoryRouter } from "./router/category-router";
 import { chatRouter } from "./router/chat-router";
 import { CalendarRouter } from "./router/calendar-router";
 
-dotenv.config();
-
 const dataBaseConnection = async () => {
-  const uri =
-    process.env.MONGODB_URI ||
-    "mongodb+srv://anandoctane4:uVPeDYELoaGaO46X@food-delivery.wdjmkc7.mongodb.net/mentor-meet";
-  await mongoose.connect(uri);
+  await mongoose.connect(
+    "mongodb+srv://anandoctane4:uVPeDYELoaGaO46X@food-delivery.wdjmkc7.mongodb.net/mentor-meet"
+  );
 };
 
 dataBaseConnection();
+
+dotenv.config();
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 8000;
+const uri = process.env.MONGODB_URI;
+
+if (!uri) {
+  console.error("MONGO_URI is not defined");
+  process.exit(1);
+}
 
 app.use(MentorRouter);
 app.use(StudentRouter);

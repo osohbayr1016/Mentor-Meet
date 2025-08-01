@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { HomeCarousel } from "@/app/_components/HomeCarousel";
+import { HomeCarousel } from "./_components/HomeCarousel";
 import { ArrowRight } from "lucide-react";
 import BottomNavigation from "@/components/BottomNavigation";
 
