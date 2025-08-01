@@ -7,6 +7,11 @@ import { ArrowRight } from "lucide-react";
 import BottomNavigation from "@/components/BottomNavigation";
 
 const Home = () => {
+  const router = useRouter();
+  const CTAbuttonRouter = () => {
+    router.push("/explore");
+  };
+
   return (
     <div className="relative w-screen h-screen">
       <div className="relative w-full h-full">
@@ -40,7 +45,10 @@ const Home = () => {
               Чиглүүлэгчээ олоод зорилгынхоо төлөө хөдөл.
             </p>
           </div>
-          <div className="flex justify-between items-center py-[6px] pl-8 pr-[6px] gap-3 bg-white rounded-full w-fit mx-auto mt-5 group hover:bg-black/90 transition-all duration-400 cursor-pointer">
+          <div
+            className="flex justify-between items-center py-[6px] pl-8 pr-[6px] gap-3 bg-white rounded-full w-fit mx-auto mt-5 group hover:bg-black/90 transition-all duration-400 cursor-pointer"
+            onClick={CTAbuttonRouter}
+          >
             <p className="text-black text-base font-medium group-hover:text-white">
               Уулзалт товлох
             </p>
