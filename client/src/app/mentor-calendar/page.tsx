@@ -77,6 +77,7 @@ const MentorCalendar = () => {
       setActiveDatePosition(position);
     }
   };
+  console.log(selectedTimesByDate, "selected");
 
   const handleTimeClick = (time: string, date: string) => {
     const currentDateTimes = selectedTimesByDate[date] || new Set();

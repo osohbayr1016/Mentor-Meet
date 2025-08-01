@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import BookingModal from "./BookingModal";
+import { headers } from "next/headers";
+import axios from "axios";
 
 interface MentorCalendarProps {
   mentorId?: string;
@@ -83,12 +85,32 @@ const MentorCalendar: React.FC<MentorCalendarProps> = ({
     }
   };
 
-  const handleTimeClick = (time: string, date: string) => {
-    // Call the onTimeSelect callback if provided
-    if (onTimeSelect) {
-      onTimeSelect(date, time);
+  const handleTimeClick = async (time: string, date: string) => {
+    const token = localStorage.getItem("mentorToken");
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/Calendar",
+        { availabilities: { date, time } },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Response:", response.data);
+      console.log(time, "time");
+
+      if (onTimeSelect) {
+        onTimeSelect(date, time);
+      }
+    } catch (error) {
+      console.error("Error posting to /Calendar:", error);
     }
   };
+
+  useEffect(() => {}, []);
 
   return (
     <div className="w-full">
