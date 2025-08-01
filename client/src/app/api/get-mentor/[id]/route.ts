@@ -6,7 +6,6 @@ export async function GET(
 ) {
   const { id } = await params;
   try {
-
     if (!id) {
       return NextResponse.json(
         { error: "Mentor ID is required" },
@@ -17,7 +16,8 @@ export async function GET(
     // Call the server API
     const response = await fetch(
       `${
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        process.env.NEXT_PUBLIC_API_URL ||
+        "http://https://mentor-meet-o3rp.onrender.com"
       }/mentor/${id}`,
       {
         method: "GET",
