@@ -29,10 +29,9 @@ export const HomeCarousel: React.FC<HomeCarouselProps> = ({
       <div className="carousel-track">
         {duplicatedImages.map((image, index) => (
           <div key={index} className="carousel-item">
-            <Image
+            <img
               src={image}
               alt={`Carousel image ${(index % images.length) + 1}`}
-              quality={80}
             />
           </div>
         ))}
