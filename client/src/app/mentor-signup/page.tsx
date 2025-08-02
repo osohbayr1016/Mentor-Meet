@@ -126,7 +126,7 @@ const SignupPage = () => {
           email: form.email,
         }
       );
-      
+
       // Type the response data properly
       const responseData = res.data as { error?: boolean; message?: string };
       if (
@@ -157,7 +157,7 @@ const SignupPage = () => {
           code: form.otp,
         }
       );
-      
+
       // Type the response data properly
       const responseData = res.data as { error?: boolean; message?: string };
       if (

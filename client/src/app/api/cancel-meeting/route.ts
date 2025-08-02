@@ -41,7 +41,7 @@ export async function DELETE(request: NextRequest) {
 
     } catch (error: any) {
         console.error("Error canceling meeting:", error);
-        
+
         // Handle specific Google Calendar API errors
         if (error.code === 404) {
             return NextResponse.json(
@@ -49,7 +49,7 @@ export async function DELETE(request: NextRequest) {
                 { status: 404 }
             );
         }
-        
+
         if (error.code === 403) {
             return NextResponse.json(
                 { error: "Permission denied. You can only cancel meetings you created." },

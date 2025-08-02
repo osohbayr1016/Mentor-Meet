@@ -43,7 +43,7 @@ const FirstStudentSignup = ({
           image: session.user.image,
           accessToken: session.accessToken,
         };
-        
+
         if (onGoogleSignIn) {
           onGoogleSignIn(userData);
         }
@@ -110,7 +110,7 @@ const FirstStudentSignup = ({
                     </svg>
                     Google-р бүртгүүлэх
                   </button>
-                  
+
                   <div className="flex items-center gap-3">
                     <div className="flex-1 h-px bg-white/30"></div>
                     <span className="text-white/60 text-sm">эсвэл</span>

@@ -17,19 +17,22 @@ The Google Meet integration allows mentors and students to automatically create 
 
 1. **Automatic Meet Creation**: When a mentor marks their availability and confirms a booking, Google Meet links are automatically generated for each time slot.
 
-2. **Enhanced Booking Modal**: 
+2. **Enhanced Booking Modal**:
+
    - Shows multiple Google Meet links for multiple time slots
    - Better error handling with user-friendly messages
    - Copy functionality for meeting links
    - Direct meeting access buttons
 
 3. **Meeting Management Dashboard**:
+
    - View all upcoming and past meetings
    - Cancel meetings directly from the dashboard
    - Copy meeting links
    - Join meetings with one click
 
 4. **Calendar Integration**: Meetings are added to Google Calendar with:
+
    - Automatic Google Meet links
    - Email reminders (24 hours and 10 minutes before)
    - Attendee invitations
@@ -54,7 +57,7 @@ The Google Meet integration allows mentors and students to automatically create 
 1. Go to "APIs & Services" > "Credentials"
 2. Create OAuth 2.0 Client ID:
    - Application type: Web application
-   - Authorized redirect URIs: 
+   - Authorized redirect URIs:
      - `http://localhost:3000/api/auth/callback/google` (development)
      - `https://yourdomain.com/api/auth/callback/google` (production)
 
@@ -78,6 +81,7 @@ NEXT_PUBLIC_API_URL=https://mentor-meet-o3rp.onrender.com
 ### 4. Required Scopes
 
 The application requests the following Google OAuth scopes:
+
 - `openid` - Basic authentication
 - `email` - User email address
 - `profile` - User profile information
@@ -87,16 +91,19 @@ The application requests the following Google OAuth scopes:
 ## API Endpoints
 
 ### Meeting Creation
+
 - **Endpoint**: `POST /api/create-meeting`
 - **Purpose**: Creates a Google Calendar event with Google Meet link
 - **Authentication**: Requires valid Google OAuth session
 
 ### Get Meetings
+
 - **Endpoint**: `GET /api/get-meetings`
 - **Purpose**: Retrieves upcoming mentorship meetings from Google Calendar
 - **Authentication**: Requires valid Google OAuth session
 
 ### Cancel Meeting
+
 - **Endpoint**: `DELETE /api/cancel-meeting`
 - **Purpose**: Cancels a meeting by deleting the Google Calendar event
 - **Authentication**: Requires valid Google OAuth session
@@ -125,11 +132,13 @@ client/src/
 ### For Mentors:
 
 1. **Setup Availability**:
+
    - Go to mentor calendar
    - Select available time slots
    - Confirm availability
 
 2. **Automatic Meeting Creation**:
+
    - System creates Google Calendar events
    - Google Meet links are generated automatically
    - Email invitations sent to participants
@@ -143,6 +152,7 @@ client/src/
 ### For Students:
 
 1. **Book Sessions**:
+
    - Browse mentor availability
    - Select desired time slots
    - Complete booking process
@@ -188,10 +198,12 @@ The integration includes comprehensive error handling:
 ### Common Issues:
 
 1. **"Authentication required" errors**:
+
    - Ensure user is signed in with Google
    - Check OAuth scopes are properly configured
 
 2. **"Failed to create meeting" errors**:
+
    - Verify Google Calendar API is enabled
    - Check API quotas and limits
    - Ensure proper OAuth scopes
@@ -210,6 +222,7 @@ The integration includes comprehensive error handling:
 ## Support
 
 For technical support or questions about the Google Meet integration, please refer to:
+
 - Google Calendar API documentation
 - NextAuth.js documentation
 - The project's issue tracker

@@ -17,7 +17,9 @@ interface MeetingManagerProps {
   className?: string;
 }
 
-export default function MeetingManager({ className = "" }: MeetingManagerProps) {
+export default function MeetingManager({
+  className = "",
+}: MeetingManagerProps) {
   const { data: session } = useSession();
   const [meetings, setMeetings] = useState<MeetingData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +72,9 @@ export default function MeetingManager({ className = "" }: MeetingManagerProps) 
       });
 
       if (response.ok) {
-        setMeetings(prev => prev.filter(meeting => meeting.eventId !== eventId));
+        setMeetings((prev) =>
+          prev.filter((meeting) => meeting.eventId !== eventId)
+        );
         setError(null);
       } else {
         setError("Уулзалт цуцлахад алдаа гарлаа");
@@ -105,7 +109,9 @@ export default function MeetingManager({ className = "" }: MeetingManagerProps) 
   if (!session) {
     return (
       <div className={`p-6 bg-white rounded-lg shadow-md ${className}`}>
-        <p className="text-gray-600 text-center">Уулзалтууд харахын тулд нэвтэрнэ үү</p>
+        <p className="text-gray-600 text-center">
+          Уулзалтууд харахын тулд нэвтэрнэ үү
+        </p>
       </div>
     );
   }
@@ -138,8 +144,18 @@ export default function MeetingManager({ className = "" }: MeetingManagerProps) 
 
       {meetings.length === 0 && !isLoading ? (
         <div className="text-center py-8 text-gray-500">
-          <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          <svg
+            className="w-16 h-16 mx-auto mb-4 text-gray-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
           </svg>
           <p>Төлөвлөгдсөн уулзалт байхгүй байна</p>
         </div>
@@ -163,11 +179,15 @@ export default function MeetingManager({ className = "" }: MeetingManagerProps) 
                     {formatDate(meeting.startTime)}
                   </p>
                   {meeting.description && (
-                    <p className="text-gray-500 text-sm mt-2">{meeting.description}</p>
+                    <p className="text-gray-500 text-sm mt-2">
+                      {meeting.description}
+                    </p>
                   )}
                   {meeting.attendees && meeting.attendees.length > 0 && (
                     <div className="mt-2">
-                      <span className="text-sm text-gray-600">Оролцогчид: </span>
+                      <span className="text-sm text-gray-600">
+                        Оролцогчид:{" "}
+                      </span>
                       {meeting.attendees.map((attendee, index) => (
                         <span key={index} className="text-sm text-gray-800">
                           {attendee.email}
@@ -181,7 +201,9 @@ export default function MeetingManager({ className = "" }: MeetingManagerProps) 
                   {isUpcoming(meeting.startTime) && (
                     <>
                       <button
-                        onClick={() => window.open(meeting.hangoutLink, "_blank")}
+                        onClick={() =>
+                          window.open(meeting.hangoutLink, "_blank")
+                        }
                         className="px-3 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors"
                       >
                         Нээх
@@ -195,12 +217,24 @@ export default function MeetingManager({ className = "" }: MeetingManagerProps) 
                     </>
                   )}
                   <button
-                    onClick={() => navigator.clipboard.writeText(meeting.hangoutLink)}
+                    onClick={() =>
+                      navigator.clipboard.writeText(meeting.hangoutLink)
+                    }
                     className="px-3 py-2 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 transition-colors"
                     title="Холболт хуулах"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
                     </svg>
                   </button>
                 </div>
