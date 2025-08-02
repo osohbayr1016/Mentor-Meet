@@ -4,6 +4,7 @@ import { useAuth } from "../_components/MentorUserProvider";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import MeetingManager from "../../components/MeetingManager";
 
 interface MentorProfile {
   id: string;
@@ -217,17 +218,25 @@ const MentorDashboard = () => {
               {/* Calendar Card */}
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
                 <h3 className="text-white font-semibold text-lg mb-4">
-                  Хуваарь
+                  Хуваарь ба Уулзалтууд
                 </h3>
                 <p className="text-white/80 mb-4">
-                  Таны цагийн хуваарийг удирдах
+                  Таны цагийн хуваарь ба Google Meet уулзалтуудыг удирдах
                 </p>
-                <button
-                  onClick={() => router.push("/mentor-calendar")}
-                  className="bg-white text-black px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-100 transition-colors"
-                >
-                  Хуваарь харах
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => router.push("/mentor-calendar")}
+                    className="bg-white text-black px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-100 transition-colors"
+                  >
+                    Хуваарь
+                  </button>
+                  <button
+                    onClick={() => router.push("/meetings")}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    Уулзалтууд
+                  </button>
+                </div>
               </div>
 
               {/* Statistics Card */}
@@ -255,6 +264,16 @@ const MentorDashboard = () => {
               </h3>
               <div className="text-white/80">
                 <p>Одоогоор үйл ажиллагаа байхгүй байна.</p>
+              </div>
+            </div>
+
+            {/* Google Meet Meetings Manager */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+              <h3 className="text-white font-semibold text-lg mb-4">
+                Миний Google Meet Уулзалтууд
+              </h3>
+              <div className="bg-white rounded-lg">
+                <MeetingManager className="bg-transparent shadow-none" />
               </div>
             </div>
           </div>

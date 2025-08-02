@@ -44,6 +44,7 @@ export default function BookingModal({
   const [isLoading, setIsLoading] = useState(false);
   const [meetingLinks, setMeetingLinks] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -100,48 +101,84 @@ export default function BookingModal({
         setMeetingLinks(createdMeetings);
         
         // Create Google Meet meetings for each successful availability
-        const meetingPromises = availabilityRequests.map(async (request) => {
-          const meetingResponse = await fetch("/api/create-meeting", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              start: request.start,
-              end: request.end,
-              mentorEmail: userEmail,
-              menteeEmail: "student@example.com", // Replace with actual student email
-              title: "Mentorship Session",
-              description: `Mentorship session on ${request.date} at ${request.time}`,
-            }),
+        // Create Google Meet meetings for each successful availability
+        try {
+          const meetingPromises = availabilityRequests.map(async (request) => {
+            try {
+              const meetingResponse = await fetch("/api/create-meeting", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  start: request.start,
+                  end: request.end,
+                  mentorEmail: userEmail,
+                  menteeEmail: "student@example.com", // Replace with actual student email
+                  title: "Mentorship Session",
+                  description: `Mentorship session on ${request.date} at ${request.time}`,
+                }),
+              });
+              
+              if (meetingResponse.ok) {
+                const meetingData = await meetingResponse.json();
+                return {
+                  link: meetingData.hangoutLink,
+                  eventId: meetingData.eventId,
+                  date: request.date,
+                  time: request.time,
+                  startTime: meetingData.startTime,
+                  endTime: meetingData.endTime,
+                };
+              } else {
+                console.error(`Failed to create meeting for ${request.date} at ${request.time}`);
+                return null;
+              }
+            } catch (meetingError) {
+              console.error(`Error creating meeting for ${request.date} at ${request.time}:`, meetingError);
+              return null;
+            }
           });
           
-          if (meetingResponse.ok) {
-            const meetingData = await meetingResponse.json();
-            return meetingData.hangoutLink;
+          const meetingResults = await Promise.all(meetingPromises);
+          const validMeetings = meetingResults.filter(meeting => meeting !== null);
+          const meetingLinks = validMeetings.map(meeting => meeting?.link).filter(Boolean);
+          
+          setMeetingLinks(meetingLinks);
+          
+          if (validMeetings.length > 0) {
+            setSuccessMessage(
+              `${validMeetings.length} Google Meet холбооуд амжилттай үүсгэгдлээ!`
+            );
+          } else {
+            setError("Google Meet холбоо үүсгэхэд алдаа гарлаа. Дахин оролдоно уу.");
           }
-          return null;
-        });
-        
-        const meetingLinks = await Promise.all(meetingPromises);
-        const validMeetingLinks = meetingLinks.filter(link => link !== null);
-        setMeetingLinks(validMeetingLinks);
+        } catch (meetingError) {
+          console.error("Error creating Google Meet links:", meetingError);
+          setError("Google Meet холбоо үүсгэхэд алдаа гарлаа. Дахин оролдоно уу.");
+        }
       } else {
         const data = await availabilityResponse.json();
-        setError(data.error || "Failed to mark availability");
+        setError(data.error || "Боломжит цаг тэмдэглэхэд алдаа гарлаа. Дахин оролдоно уу.");
       }
     } catch (error) {
       console.error("Error marking availability:", error);
-      setError("Failed to mark availability. Please try again.");
+      setError("Алдаа гарлаа. Дахин оролдоно уу.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     if (meetingLinks.length > 0) {
-      const meetingText = meetingLinks.join("\n");
-      navigator.clipboard.writeText(meetingText);
+      try {
+        const meetingText = meetingLinks.join("\n");
+        await navigator.clipboard.writeText(meetingText);
+        setSuccessMessage("Холболтууд амжилттай хуулагдлаа!");
+        setTimeout(() => setSuccessMessage(null), 2000);
+      } catch (error) {
+        setError("Холболт хуулахад алдаа гарлаа.");
+      }
     }
   };
 
@@ -159,6 +196,18 @@ export default function BookingModal({
             />
             <p className="font-[700] text-[22px] text-white">Mentor Meet</p>
           </div>
+
+          {/* Error/Success Messages */}
+          {error && (
+            <div className="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-2 rounded-lg text-sm mb-4">
+              {error}
+            </div>
+          )}
+          {successMessage && (
+            <div className="bg-green-500/20 border border-green-500/30 text-green-200 px-4 py-2 rounded-lg text-sm mb-4">
+              {successMessage}
+            </div>
+          )}
 
           {/* Content */}
           <div className="flex flex-col items-center gap-6 px-8 text-center">
@@ -223,13 +272,21 @@ export default function BookingModal({
                     Захиалга амжилттай хийгдлээ!
                   </h3>
                   <p className="text-white/80 text-sm mb-4">
-                    Google Meet холболтууд:
+                    Google Meet холболтууд ({meetingLinks.length}):
                   </p>
-                  <div className="bg-white/10 p-3 rounded-lg max-h-32 overflow-y-auto">
+                  <div className="bg-white/10 p-3 rounded-lg max-h-32 overflow-y-auto space-y-2">
                     {meetingLinks.map((meeting, index) => (
-                      <p key={index} className="text-white text-sm break-all mb-2">
-                        {meeting}
-                      </p>
+                      <div key={index} className="bg-white/5 p-2 rounded border">
+                        <p className="text-white text-xs break-all">
+                          {meeting}
+                        </p>
+                        <button
+                          onClick={() => window.open(meeting, '_blank')}
+                          className="text-blue-300 hover:text-blue-200 text-xs mt-1 underline"
+                        >
+                          Нээх
+                        </button>
+                      </div>
                     ))}
                   </div>
                   <p className="text-white/60 text-xs mt-2">
@@ -240,8 +297,11 @@ export default function BookingModal({
                 <div className="flex gap-4">
                   <button
                     onClick={handleCopyLink}
-                    className="px-6 py-3 text-white border border-white/30 rounded-[40px] hover:bg-white/10 transition-colors"
+                    className="px-6 py-3 text-white border border-white/30 rounded-[40px] hover:bg-white/10 transition-colors flex items-center gap-2"
                   >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
                     Холболт хуулах
                   </button>
                   <button
