@@ -32,6 +32,12 @@ if (!uri) {
   process.exit(1);
 }
 
+// ✅ Add this route to handle GET /
+app.get("/", (req, res) => {
+  res.send("Mentor Meet backend is running.");
+});
+
+// Routers
 app.use(MentorRouter);
 app.use(StudentRouter);
 app.use(CategoryRouter);
