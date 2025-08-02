@@ -4,6 +4,10 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import FirstStudentSignup from "./_components/FirstStudentSignup";
+import SecondStudentSignup from "./_components/SecondStudentSignup";
+import ThirdStudentSignUp from "./_components/ThirdStudentSignUp";
+import FourthStudentSignup from "./_components/FourthStudentSignup";
 
 type SignupStep = "email" | "otp" | "password" | "profile";
 
@@ -12,6 +16,7 @@ const StudentSignupPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const [googleUserData, setGoogleUserData] = useState<any>(null);
 
   // Form data
   const [email, setEmail] = useState("");
@@ -20,6 +25,77 @@ const StudentSignupPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [nickname, setNickname] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+
+  // Handle Google OAuth sign-in
+  const handleGoogleSignIn = async (userData: any) => {
+    setLoading(true);
+    setError("");
+
+    try {
+      // Check if student already exists with this email
+      const checkResponse = await fetch("http://localhost:8000/Checkemail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: userData.email }),
+      });
+
+      const checkData = await checkResponse.json();
+
+      if (checkResponse.ok) {
+        // Student doesn't exist, create new student with Google data
+        const signupResponse = await fetch(
+          "http://localhost:8000/StudentNameNumber",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: userData.email,
+              nickname: userData.name?.split(" ")[0] || "Student",
+              phoneNumber: "", // Will be filled in profile step
+              googleAuth: true,
+              googleData: {
+                name: userData.name,
+                image: userData.image,
+                accessToken: userData.accessToken,
+              },
+            }),
+          }
+        );
+
+        const signupData = await signupResponse.json();
+
+        if (signupResponse.ok) {
+          // Auto-login successful
+          const studentData = {
+            email: userData.email,
+            nickname: userData.name?.split(" ")[0] || "Student",
+            phoneNumber: "",
+            image: userData.image,
+          };
+
+          localStorage.setItem("studentUser", JSON.stringify(studentData));
+
+          setGoogleUserData(userData);
+          setEmail(userData.email);
+          setCurrentStep("profile"); // Skip to profile step
+        } else {
+          setError(signupData.message || "Google-р бүртгүүлэхэд алдаа гарлаа");
+        }
+      } else {
+        // Student already exists, try to login
+        setError("Энэ имэйл хаягтай хэрэглэгч аль хэдийн бүртгэгдсэн байна.");
+      }
+    } catch (error: any) {
+      console.error("Google sign-in error:", error);
+      setError("Google-р бүртгүүлэхэд алдаа гарлаа");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleEmailSubmit = async () => {
     if (!email.trim()) {
@@ -185,132 +261,52 @@ const StudentSignupPage = () => {
     switch (currentStep) {
       case "email":
         return (
-          <div className="text-center">
-            <h2 className="font-[600] text-[24px] text-white mb-4">
-              Имэйл хаягаа оруулна уу
-            </h2>
-            <p className="text-white/80 text-sm mb-8">
-              Бүртгэл үүсгэхийн тулд имэйл хаягаа оруулна уу
-            </p>
-            <div className="mb-6">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Имэйл хаяг"
-                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-[40px] text-white placeholder-white/50 focus:outline-none focus:border-white/50"
-              />
-            </div>
-            {error && <div className="text-red-400 text-sm mb-4">{error}</div>}
-            <button
-              onClick={handleEmailSubmit}
-              disabled={loading}
-              className="w-full bg-white text-black px-6 py-3 rounded-[40px] hover:bg-gray-100 transition-colors disabled:opacity-50"
-            >
-              {loading ? "Илгээж байна..." : "Үргэлжлүүлэх"}
-            </button>
-          </div>
+          <FirstStudentSignup
+            email={email}
+            setEmail={setEmail}
+            onSubmit={handleEmailSubmit}
+            loading={loading}
+            error={error}
+            onGoogleSignIn={handleGoogleSignIn}
+          />
         );
 
       case "otp":
         return (
-          <div className="text-center">
-            <h2 className="font-[600] text-[24px] text-white mb-4">
-              OTP код оруулна уу
-            </h2>
-            <p className="text-white/80 text-sm mb-8">
-              {email} хаяг руу илгээсэн кодыг оруулна уу
-            </p>
-            <div className="mb-6">
-              <input
-                type="text"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="OTP код"
-                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-[40px] text-white placeholder-white/50 focus:outline-none focus:border-white/50"
-              />
-            </div>
-            {error && <div className="text-red-400 text-sm mb-4">{error}</div>}
-            <button
-              onClick={handleOtpSubmit}
-              disabled={loading}
-              className="w-full bg-white text-black px-6 py-3 rounded-[40px] hover:bg-gray-100 transition-colors disabled:opacity-50"
-            >
-              {loading ? "Шалгаж байна..." : "Баталгаажуулах"}
-            </button>
-          </div>
+          <SecondStudentSignup
+            otp={otp}
+            setOtp={setOtp}
+            onSubmit={handleOtpSubmit}
+            loading={loading}
+            error={error}
+          />
         );
 
       case "password":
         return (
-          <div className="text-center">
-            <h2 className="font-[600] text-[24px] text-white mb-4">
-              Нууц үг үүсгэнэ үү
-            </h2>
-            <p className="text-white/80 text-sm mb-8">
-              Хамгийн багадаа 6 тэмдэгт байх ёстой
-            </p>
-            <div className="space-y-4 mb-6">
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Нууц үг"
-                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-[40px] text-white placeholder-white/50 focus:outline-none focus:border-white/50"
-              />
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Нууц үг давтах"
-                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-[40px] text-white placeholder-white/50 focus:outline-none focus:border-white/50"
-              />
-            </div>
-            {error && <div className="text-red-400 text-sm mb-4">{error}</div>}
-            <button
-              onClick={handlePasswordSubmit}
-              disabled={loading}
-              className="w-full bg-white text-black px-6 py-3 rounded-[40px] hover:bg-gray-100 transition-colors disabled:opacity-50"
-            >
-              {loading ? "Үүсгэж байна..." : "Үргэлжлүүлэх"}
-            </button>
-          </div>
+          <ThirdStudentSignUp
+            password={password}
+            confirmPassword={confirmPassword}
+            setPassword={setPassword}
+            setConfirmPassword={setConfirmPassword}
+            onSubmit={handlePasswordSubmit}
+            loading={loading}
+            error={error}
+          />
         );
 
       case "profile":
         return (
-          <div className="text-center">
-            <h2 className="font-[600] text-[24px] text-white mb-4">
-              Профайл мэдээлэл
-            </h2>
-            <p className="text-white/80 text-sm mb-8">
-              Өөрийн мэдээллээ оруулна уу
-            </p>
-            <div className="space-y-4 mb-6">
-              <input
-                type="text"
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-                placeholder="Хоч нэр"
-                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-[40px] text-white placeholder-white/50 focus:outline-none focus:border-white/50"
-              />
-              <input
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="Утасны дугаар"
-                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-[40px] text-white placeholder-white/50 focus:outline-none focus:border-white/50"
-              />
-            </div>
-            {error && <div className="text-red-400 text-sm mb-4">{error}</div>}
-            <button
-              onClick={handleProfileSubmit}
-              disabled={loading}
-              className="w-full bg-white text-black px-6 py-3 rounded-[40px] hover:bg-gray-100 transition-colors disabled:opacity-50"
-            >
-              {loading ? "Хадгалж байна..." : "Бүртгэл дуусгах"}
-            </button>
-          </div>
+          <FourthStudentSignup
+            nickname={nickname}
+            phoneNumber={phoneNumber}
+            setNickname={setNickname}
+            setPhoneNumber={setPhoneNumber}
+            onSubmit={handleProfileSubmit}
+            loading={loading}
+            error={error}
+            googleUserData={googleUserData}
+          />
         );
     }
   };

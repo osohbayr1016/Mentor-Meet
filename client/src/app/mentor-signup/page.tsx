@@ -45,6 +45,75 @@ const SignupPage = () => {
   const [loading, setLoading] = useState(false);
   const [autoLoggingIn, setAutoLoggingIn] = useState(false);
   const [error, setError] = useState("");
+  const [googleUserData, setGoogleUserData] = useState<any>(null);
+
+  // Handle Google OAuth sign-in
+  const handleGoogleSignIn = async (userData: any) => {
+    setLoading(true);
+    setError("");
+
+    try {
+      // Check if mentor already exists with this email
+      const checkResponse = await axios.post(`${BACKEND_URL}/mentorEmail`, {
+        email: userData.email,
+      });
+
+      // Type the response data properly
+      const checkData = checkResponse.data as {
+        error?: boolean;
+        message?: string;
+      };
+
+      if (checkData.error) {
+        // Mentor doesn't exist, create new mentor with Google data
+        const signupResponse = await axios.post<SignupResponse>(
+          `${BACKEND_URL}/mentorSignup`,
+          {
+            email: userData.email,
+            password: "", // No password for Google OAuth users
+            googleAuth: true,
+            googleData: {
+              name: userData.name,
+              image: userData.image,
+              accessToken: userData.accessToken,
+            },
+          }
+        );
+
+        if (signupResponse.data.token) {
+          // Auto-login successful
+          const mentorData = {
+            mentorId: signupResponse.data.mentorId,
+            email: userData.email,
+            isAdmin: false,
+            firstName: userData.name?.split(" ")[0] || "",
+            lastName: userData.name?.split(" ").slice(1).join(" ") || "",
+            image: userData.image,
+          };
+
+          localStorage.setItem("mentorToken", signupResponse.data.token);
+          localStorage.setItem("mentorUser", JSON.stringify(mentorData));
+
+          setGoogleUserData(userData);
+          setStep(3); // Skip to success step
+
+          setTimeout(() => {
+            router.push("/create-profile");
+          }, 3000);
+        }
+      } else {
+        // Mentor already exists, try to login
+        setError("Энэ имэйл хаягтай хэрэглэгч аль хэдийн бүртгэгдсэн байна.");
+      }
+    } catch (error: any) {
+      console.error("Google sign-in error:", error);
+      setError(
+        error.response?.data?.message || "Google-р бүртгүүлэхэд алдаа гарлаа"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Step 1: Email
   const handleEmailSubmit = async () => {
@@ -57,13 +126,16 @@ const SignupPage = () => {
           email: form.email,
         }
       );
+      
+      // Type the response data properly
+      const responseData = res.data as { error?: boolean; message?: string };
       if (
-        res.data &&
-        typeof res.data === "object" &&
-        "error" in res.data &&
-        res.data.error
+        responseData &&
+        typeof responseData === "object" &&
+        "error" in responseData &&
+        responseData.error
       ) {
-        throw new Error((res.data as any).message || "Email check failed");
+        throw new Error((responseData as any).message || "Email check failed");
       }
       setStep(1);
     } catch (e: any) {
@@ -85,13 +157,16 @@ const SignupPage = () => {
           code: form.otp,
         }
       );
+      
+      // Type the response data properly
+      const responseData = res.data as { error?: boolean; message?: string };
       if (
-        res.data &&
-        typeof res.data === "object" &&
-        "error" in res.data &&
-        res.data.error
+        responseData &&
+        typeof responseData === "object" &&
+        "error" in responseData &&
+        responseData.error
       ) {
-        throw new Error((res.data as any).message || "OTP check failed");
+        throw new Error((responseData as any).message || "OTP check failed");
       }
       setStep(2);
     } catch (e: any) {
@@ -127,17 +202,23 @@ const SignupPage = () => {
         }
       );
 
+      // Type the response data properly
+      const responseData = res.data as SignupResponse & {
+        error?: boolean;
+        message?: string;
+      };
+
       if (
-        res.data &&
-        typeof res.data === "object" &&
-        "error" in res.data &&
-        res.data.error
+        responseData &&
+        typeof responseData === "object" &&
+        "error" in responseData &&
+        responseData.error
       ) {
-        throw new Error((res.data as any).message || "Signup failed");
+        throw new Error((responseData as any).message || "Signup failed");
       }
 
       // Step 2: Use the token and mentorId from signup response
-      const { token, message, mentorId } = res.data;
+      const { token, message, mentorId } = responseData;
 
       if (token) {
         console.log("Signup successful, token received:", token);
@@ -232,6 +313,7 @@ const SignupPage = () => {
           onSubmit={handleEmailSubmit}
           loading={loading}
           error={error}
+          onGoogleSignIn={handleGoogleSignIn}
         />
       )}
       {step === 1 && (
@@ -279,7 +361,9 @@ const SignupPage = () => {
               Бүртгэл амжилттай!
             </h2>
             <p className="pb-4 text-white/80">
-              Та амжилттай бүртгэгдлээ. Одоо профайлаа үүсгэх шат руу орно уу.
+              {googleUserData
+                ? "Google-р амжилттай бүртгэгдлээ. Одоо профайлаа үүсгэх шат руу орно уу."
+                : "Та амжилттай бүртгэгдлээ. Одоо профайлаа үүсгэх шат руу орно уу."}
             </p>
             <p className="pb-6 text-white/60 text-sm">
               3 секундын дараа профайл үүсгэх хуудас руу шилжих болно...

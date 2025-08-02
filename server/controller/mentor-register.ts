@@ -112,16 +112,29 @@ export const checkOtp = async (req: Request, res: Response) => {
 };
 
 export const MentorSignUp = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { email, password, googleAuth, googleData } = req.body;
 
   try {
-    console.log("MentorSignUp request body:", { email, password: password ? "***" : "undefined" });
+    console.log("MentorSignUp request body:", {
+      email,
+      password: password ? "***" : "undefined",
+      googleAuth,
+      googleData: googleData ? "EXISTS" : "undefined"
+    });
 
     // Validate required fields
-    if (!email || !password) {
-      console.log("Validation failed: missing email or password");
+    if (!email) {
+      console.log("Validation failed: missing email");
       return res.status(400).json({
-        message: "Email and password are required"
+        message: "Email is required"
+      });
+    }
+
+    // For Google OAuth users, password is optional
+    if (!googleAuth && !password) {
+      console.log("Validation failed: missing password for non-Google auth");
+      return res.status(400).json({
+        message: "Password is required"
       });
     }
 
@@ -134,17 +147,13 @@ export const MentorSignUp = async (req: Request, res: Response) => {
       });
     }
 
-    // Validate password length
-    if (password.length < 6) {
+    // Validate password length for non-Google auth users
+    if (!googleAuth && password && password.length < 6) {
       console.log("Validation failed: password too short");
       return res.status(400).json({
         message: "Password must be at least 6 characters long"
       });
     }
-
-    console.log("Starting password hashing...");
-    const hashedPassword = await bcrypt.hashSync(password, 10);
-    console.log("Password hashed successfully");
 
     console.log("Loading environment variables...");
     dotenv.config();
@@ -164,10 +173,36 @@ export const MentorSignUp = async (req: Request, res: Response) => {
     }
 
     console.log("Creating new user...");
-    const user = await MentorModel.create({
+
+    // Prepare user data
+    const userData: any = {
       email,
-      password: hashedPassword,
-    });
+    };
+
+    // Handle password for traditional signup
+    if (!googleAuth && password) {
+      console.log("Starting password hashing...");
+      const hashedPassword = await bcrypt.hashSync(password, 10);
+      console.log("Password hashed successfully");
+      userData.password = hashedPassword;
+    }
+
+    // Handle Google OAuth data
+    if (googleAuth && googleData) {
+      console.log("Processing Google OAuth data...");
+      if (googleData.name) {
+        const nameParts = googleData.name.split(" ");
+        userData.firstName = nameParts[0] || "";
+        userData.lastName = nameParts.slice(1).join(" ") || "";
+      }
+      if (googleData.image) {
+        userData.image = googleData.image;
+      }
+      // For Google OAuth users, we don't set a password
+      userData.googleAuth = true;
+    }
+
+    const user = await MentorModel.create(userData);
     console.log("User created successfully:", user._id);
 
     console.log("Generating JWT token...");

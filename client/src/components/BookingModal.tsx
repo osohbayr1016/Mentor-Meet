@@ -80,8 +80,8 @@ export default function BookingModal({
         }
       }
 
-      // Send all availability requests in a single API call
-      const response = await fetch("/api/mark-availability", {
+      // First, mark availability
+      const availabilityResponse = await fetch("/api/mark-availability", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,14 +91,43 @@ export default function BookingModal({
         }),
       });
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      const data = await availabilityResponse.json();
+      
+      if (availabilityResponse.ok && data.success) {
         const createdMeetings = data.results
           .filter((result: any) => result.success)
           .map((result: any) => `08/${result.date} - ${result.time}`);
         setMeetingLinks(createdMeetings);
+        
+        // Create Google Meet meetings for each successful availability
+        const meetingPromises = availabilityRequests.map(async (request) => {
+          const meetingResponse = await fetch("/api/create-meeting", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              start: request.start,
+              end: request.end,
+              mentorEmail: userEmail,
+              menteeEmail: "student@example.com", // Replace with actual student email
+              title: "Mentorship Session",
+              description: `Mentorship session on ${request.date} at ${request.time}`,
+            }),
+          });
+          
+          if (meetingResponse.ok) {
+            const meetingData = await meetingResponse.json();
+            return meetingData.hangoutLink;
+          }
+          return null;
+        });
+        
+        const meetingLinks = await Promise.all(meetingPromises);
+        const validMeetingLinks = meetingLinks.filter(link => link !== null);
+        setMeetingLinks(validMeetingLinks);
       } else {
+        const data = await availabilityResponse.json();
         setError(data.error || "Failed to mark availability");
       }
     } catch (error) {
@@ -191,18 +220,21 @@ export default function BookingModal({
               <>
                 <div>
                   <h3 className="font-[600] text-[20px] text-white mb-4">
-                    Боломжит цаг амжилттай тэмдэглэгдлээ!
+                    Захиалга амжилттай хийгдлээ!
                   </h3>
                   <p className="text-white/80 text-sm mb-4">
-                    Таны боломжит цагууд:
+                    Google Meet холболтууд:
                   </p>
                   <div className="bg-white/10 p-3 rounded-lg max-h-32 overflow-y-auto">
                     {meetingLinks.map((meeting, index) => (
-                      <p key={index} className="text-white text-sm">
+                      <p key={index} className="text-white text-sm break-all mb-2">
                         {meeting}
                       </p>
                     ))}
                   </div>
+                  <p className="text-white/60 text-xs mt-2">
+                    08/{selectedDate} - {selectedTime}
+                  </p>
                 </div>
 
                 <div className="flex gap-4">
@@ -210,7 +242,7 @@ export default function BookingModal({
                     onClick={handleCopyLink}
                     className="px-6 py-3 text-white border border-white/30 rounded-[40px] hover:bg-white/10 transition-colors"
                   >
-                    Хадгалах
+                    Холболт хуулах
                   </button>
                   <button
                     onClick={onClose}

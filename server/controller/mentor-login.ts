@@ -8,12 +8,19 @@ config();
 
 export const MentorLogin = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, googleAuth } = req.body;
 
-    if (!email || !password) {
+    if (!email) {
       return res
         .status(400)
-        .send({ message: "Имайл болон нууц үг шаардлагатай!" });
+        .send({ message: "Имайл шаардлагатай!" });
+    }
+
+    // For traditional login, password is required
+    if (!googleAuth && !password) {
+      return res
+        .status(400)
+        .send({ message: "Нууц үг шаардлагатай!" });
     }
 
     const mentor = await MentorModel.findOne({ email });
@@ -21,9 +28,21 @@ export const MentorLogin = async (req: Request, res: Response) => {
       return res.status(401).send({ message: "Имайл буруу байна!" });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, mentor.password);
-    if (!isPasswordValid) {
-      return res.status(401).send({ message: "Нууц үг буруу байна!" });
+    // For Google OAuth users, skip password validation
+    if (!googleAuth) {
+      if (!mentor.password) {
+        return res.status(401).send({ message: "Энэ хэрэглэгч Google-р бүртгэгдсэн байна!" });
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, mentor.password);
+      if (!isPasswordValid) {
+        return res.status(401).send({ message: "Нууц үг буруу байна!" });
+      }
+    } else {
+      // For Google OAuth users, verify they have googleAuth enabled
+      if (!mentor.googleAuth) {
+        return res.status(401).send({ message: "Энэ хэрэглэгч Google-р бүртгэгдээгүй байна!" });
+      }
     }
 
     const secret = process.env.JWT_SECRET;
@@ -34,7 +53,6 @@ export const MentorLogin = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       { mentorId: mentor._id.toString(), isMentor: mentor.role === "MENTOR" },
-
       secret,
       { expiresIn: "24h" }
     );

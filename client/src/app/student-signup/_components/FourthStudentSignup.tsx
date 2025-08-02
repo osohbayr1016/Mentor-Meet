@@ -8,6 +8,7 @@ interface Props {
   onSubmit: () => void;
   loading: boolean;
   error: string;
+  googleUserData?: any;
 }
 
 const FourthStudentSignup = ({
@@ -18,6 +19,7 @@ const FourthStudentSignup = ({
   onSubmit,
   loading,
   error,
+  googleUserData,
 }: Props) => {
   return (
     <div className="relative w-full h-screen">
@@ -50,6 +52,17 @@ const FourthStudentSignup = ({
             </div>
             <div className="w-full h-full flex flex-col justify-center items-center">
               <div className="w-[300px] flex flex-col gap-[32px]">
+                {googleUserData && (
+                  <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-3 mb-4">
+                    <p className="text-green-400 text-sm">
+                      ✅ Google-р амжилттай бүртгэгдлээ
+                    </p>
+                    <p className="text-white/80 text-xs">
+                      {googleUserData.email}
+                    </p>
+                  </div>
+                )}
+
                 <div className="flex flex-col gap-2">
                   <p className="font-[500] text-[14px] text-white">Nickname</p>
                   <input

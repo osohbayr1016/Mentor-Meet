@@ -39,15 +39,30 @@ export const authOptions: NextAuthOptions = {
             session.expiresAt = token.expiresAt;
             return session;
         },
+        async signIn({ account, profile }) {
+            // Add debugging for OAuth issues
+            console.log("SignIn callback:", { account, profile });
+            return true;
+        },
     },
     pages: {
         signIn: "/auth/signin",
+        error: "/auth/error", // Add error page
     },
     session: {
         strategy: "jwt",
     },
     // Add this for development - allows unverified apps
     debug: process.env.NODE_ENV === "development",
+    // Add error handling
+    events: {
+        async signIn({ user, account, profile, isNewUser }) {
+            console.log("SignIn event:", { user, account, profile, isNewUser });
+        },
+        async signOut({ session, token }) {
+            console.log("SignOut event:", { session, token });
+        },
+    },
 };
 
 declare module "next-auth" {

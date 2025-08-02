@@ -6,13 +6,14 @@ import mongoose, { model, ObjectId, Schema } from "mongoose";
 export type StudentType = {
   _id: string;
   email: string;
-  password: string;
+  password?: string; // Made optional for Google OAuth users
   phoneNumber?: number;
   nickname?: string;
   createAt: Date;
   updateAt: Date;
   meetingHistory: ObjectId;
   bookedHistory: ObjectId;
+  googleAuth?: boolean; // New field for Google OAuth users
 };
 
 const StudentSchema = new Schema<StudentType>({
@@ -24,6 +25,7 @@ const StudentSchema = new Schema<StudentType>({
   updateAt: { type: Date, default: Date.now },
   meetingHistory: { type: Schema.ObjectId, ref: "Meeting" },
   bookedHistory: { type: Schema.ObjectId, ref: "Booking" },
+  googleAuth: { type: Boolean, default: false },
 });
 
 
@@ -41,4 +43,4 @@ const TempUserSchema = new mongoose.Schema({
 export const TempUserModel = mongoose.model("TempUser", TempUserSchema);
 
 
-export const StudentModel = model<StudentType>("Student",StudentSchema)
+export const StudentModel = model<StudentType>("Student", StudentSchema)

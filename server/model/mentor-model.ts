@@ -8,7 +8,7 @@ export enum UserRoleEnum {
 export type MentorType = {
   _id: string;
   email: string;
-  password: string;
+  password?: string; // Made optional for Google OAuth users
   phoneNumber?: string;
   firstName: string;
   lastName: string;
@@ -27,6 +27,7 @@ export type MentorType = {
   createdAt: Date;
   updatedAt: Date;
   otp?: string;
+  googleAuth?: boolean; // New field for Google OAuth users
 };
 
 export type EducationType = {
@@ -52,7 +53,7 @@ export type CategoryType = {
 
 const MentorSchema = new Schema<MentorType>({
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: { type: String, required: false },
   phoneNumber: { type: String, required: false },
   firstName: { type: String, required: false },
   lastName: { type: String, required: false },
@@ -86,7 +87,8 @@ const MentorSchema = new Schema<MentorType>({
   },
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
-  otp: { type: String, required: false }
+  otp: { type: String, required: false },
+  googleAuth: { type: Boolean, default: false }
 });
 
 
