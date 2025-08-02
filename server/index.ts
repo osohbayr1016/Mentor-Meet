@@ -8,6 +8,7 @@ import { CategoryRouter } from "./router/category-router";
 import { chatRouter } from "./router/chat-router";
 import { CalendarRouter } from "./router/calendar-router";
 
+// dotenv.config() хамгийн эхэнд байх ёстой
 dotenv.config();
 
 const dataBaseConnection = async () => {
@@ -18,7 +19,6 @@ const dataBaseConnection = async () => {
 
 dataBaseConnection();
 
-dotenv.config();
 const app = express();
 
 app.use(cors());
