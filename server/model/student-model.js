@@ -44,6 +44,7 @@ const StudentSchema = new mongoose_1.Schema({
     updateAt: { type: Date, default: Date.now },
     meetingHistory: { type: mongoose_1.Schema.ObjectId, ref: "Meeting" },
     bookedHistory: { type: mongoose_1.Schema.ObjectId, ref: "Booking" },
+    googleAuth: { type: Boolean, default: false },
 });
 const TempUserSchema = new mongoose_1.default.Schema({
     email: { type: String, required: true, unique: true },

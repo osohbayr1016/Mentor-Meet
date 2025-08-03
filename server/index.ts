@@ -32,11 +32,11 @@ if (!uri) {
   process.exit(1);
 }
 
-app.use(MentorRouter);
-app.use(StudentRouter);
-app.use(CategoryRouter);
-app.use(chatRouter);
-app.use(CalendarRouter);
+app.use("/api", MentorRouter);
+app.use("/api", StudentRouter);
+app.use("/api", CategoryRouter);
+app.use("/api", chatRouter);
+app.use("/api", CalendarRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
