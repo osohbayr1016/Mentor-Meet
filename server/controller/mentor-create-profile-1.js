@@ -3,6 +3,15 @@
 // import { MentorModel } from "../model/mentor-model";
 // import mongoose from "mongoose";
 // import { CategoryModel } from "../model/category-model";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -11,7 +20,7 @@ exports.MentorCreateProfile1 = void 0;
 const mentor_model_1 = require("../model/mentor-model");
 const mongoose_1 = __importDefault(require("mongoose"));
 const category_model_1 = require("../model/category-model");
-const MentorCreateProfile1 = async (req, res) => {
+const MentorCreateProfile1 = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { mentorId } = res.locals;
     const { category } = req.body;
     if (!(category === null || category === void 0 ? void 0 : category.categoryId) ||
@@ -29,7 +38,7 @@ const MentorCreateProfile1 = async (req, res) => {
                 .status(400)
                 .send({ message: "Мэдээлэл дутуу байна. Бүх талбарыг бөглөнө үү." });
         }
-        const foundCategory = await category_model_1.CategoryModel.findOne({
+        const foundCategory = yield category_model_1.CategoryModel.findOne({
             _id: category.categoryId,
         });
         if (!foundCategory) {
@@ -37,7 +46,7 @@ const MentorCreateProfile1 = async (req, res) => {
         }
         const parsedSocialLinks = typeof socialLinks === "string" ? JSON.parse(socialLinks) : socialLinks;
         const parsedBankAccount = typeof bankAccount === "string" ? JSON.parse(bankAccount) : bankAccount;
-        const updatedMentor = await mentor_model_1.MentorModel.findByIdAndUpdate({ _id: mentorId }, {
+        const updatedMentor = yield mentor_model_1.MentorModel.findByIdAndUpdate({ _id: mentorId }, {
             firstName,
             lastName,
             nickName: nickName || "",
@@ -64,5 +73,5 @@ const MentorCreateProfile1 = async (req, res) => {
             .status(500)
             .json({ message: "Сервер дээр алдаа гарлаа. Дахин оролдоно уу." });
     }
-};
+});
 exports.MentorCreateProfile1 = MentorCreateProfile1;

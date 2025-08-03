@@ -9,7 +9,7 @@ var UserRoleEnum;
 })(UserRoleEnum || (exports.UserRoleEnum = UserRoleEnum = {}));
 const MentorSchema = new mongoose_1.Schema({
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String, required: false },
     phoneNumber: { type: String, required: false },
     firstName: { type: String, required: false },
     lastName: { type: String, required: false },
@@ -43,6 +43,7 @@ const MentorSchema = new mongoose_1.Schema({
     },
     createdAt: { type: Date, default: Date.now, immutable: true },
     updatedAt: { type: Date, default: Date.now },
-    otp: { type: String, required: false }
+    otp: { type: String, required: false },
+    googleAuth: { type: Boolean, default: false }
 });
 exports.MentorModel = (0, mongoose_1.model)("Mentor", MentorSchema); //mentormodel bolgov

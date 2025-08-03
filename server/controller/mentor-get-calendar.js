@@ -1,11 +1,20 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getMentorCalendar = void 0;
 const calendar_model_1 = require("../model/calendar-model");
-const getMentorCalendar = async (req, res) => {
+const getMentorCalendar = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { mentorId } = req.params;
     try {
-        const calendar = await calendar_model_1.MentorCalendarModel.findOne({ mentorId });
+        const calendar = yield calendar_model_1.MentorCalendarModel.findOne({ mentorId });
         if (!calendar) {
             return res.status(404).json({ message: "Олдсонгүй" });
         }
@@ -15,5 +24,5 @@ const getMentorCalendar = async (req, res) => {
         console.error("Get availability error:", error);
         return res.status(500).json({ message: "Серверийн алдаа" });
     }
-};
+});
 exports.getMentorCalendar = getMentorCalendar;

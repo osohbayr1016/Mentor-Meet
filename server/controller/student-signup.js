@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9,24 +18,24 @@ const nodemailer_1 = __importDefault(require("nodemailer"));
 const Otp_model_1 = require("../model/Otp-model");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const Hello = async (_req, res) => {
+const Hello = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send({ message: "hello" });
-};
+});
 exports.Hello = Hello;
-const Checkemail = async (req, res) => {
+const Checkemail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
     try {
         if (!email) {
             return res.status(400).json({ message: "Email is required" });
         }
-        const user = await student_model_1.StudentModel.findOne({ email });
+        const user = yield student_model_1.StudentModel.findOne({ email });
         if (user) {
             res.status(400).json({ message: "User already existed" });
             return;
         }
-        const tempUserExists = await student_model_1.TempUserModel.findOne({ email });
+        const tempUserExists = yield student_model_1.TempUserModel.findOne({ email });
         if (tempUserExists) {
-            await student_model_1.TempUserModel.deleteOne({ email });
+            yield student_model_1.TempUserModel.deleteOne({ email });
         }
         const transport = nodemailer_1.default.createTransport({
             service: "gmail",
@@ -39,7 +48,7 @@ const Checkemail = async (req, res) => {
             },
         });
         const code = Math.floor(1000 + Math.random() * 9000).toString();
-        await student_model_1.TempUserModel.create({ email, code });
+        yield student_model_1.TempUserModel.create({ email, code });
         const options = {
             from: "jochuekimmich@gmail.com",
             to: email,
@@ -51,50 +60,50 @@ const Checkemail = async (req, res) => {
 </div>
 `
         };
-        await Otp_model_1.OtpModel.create({ email, code });
-        await transport.sendMail(options);
+        yield Otp_model_1.OtpModel.create({ email, code });
+        yield transport.sendMail(options);
         return res.status(200).json({ message: "Email OK" });
     }
     catch (error) {
         console.error("Checkemail error:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
-};
+});
 exports.Checkemail = Checkemail;
-const checkOtp = async (req, res) => {
+const checkOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, code } = req.body;
     try {
-        const isOtpExisting = await Otp_model_1.OtpModel.findOne({
+        const isOtpExisting = yield Otp_model_1.OtpModel.findOne({
             code: code,
         });
         if (!isOtpExisting) {
             res.status(400).send("wrong code");
             return;
         }
-        const tempUser = await student_model_1.TempUserModel.findOne({ email, code });
+        const tempUser = yield student_model_1.TempUserModel.findOne({ email, code });
         if (!tempUser) {
             res.status(400).json({ message: "Wrong OTP code" });
             return;
         }
         tempUser.isVerified = true;
-        await tempUser.save();
+        yield tempUser.save();
         res.status(200).send({ message: "success", isOtpExisting });
     }
     catch (err) {
         res.status(400).send("Wrong code");
     }
-};
+});
 exports.checkOtp = checkOtp;
-const createPassword = async (req, res) => {
+const createPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     try {
-        const tempUser = await student_model_1.TempUserModel.findOne({ email, isVerified: true });
+        const tempUser = yield student_model_1.TempUserModel.findOne({ email, isVerified: true });
         if (!tempUser) {
             return res.status(400).json({ message: "Email not verified or invalid" });
         }
-        const hashedPassword = await bcrypt_1.default.hash(password, 10);
+        const hashedPassword = yield bcrypt_1.default.hash(password, 10);
         tempUser.password = hashedPassword;
-        await tempUser.save();
+        yield tempUser.save();
         res.send({ message: "Successfully updated password" });
         return;
     }
@@ -102,37 +111,72 @@ const createPassword = async (req, res) => {
         console.error("Error updating password:", error);
         return res.status(500).send({ message: "Internal server error" });
     }
-};
+});
 exports.createPassword = createPassword;
-const StudentNameNumber = async (req, res) => {
-    const { email, nickname, phoneNumber } = req.body;
+const StudentNameNumber = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, nickname, phoneNumber, googleAuth, googleData } = req.body;
     try {
-        const tempUser = await student_model_1.TempUserModel.findOne({ email, isVerified: true, password: { $exists: true } });
+        // For Google OAuth users, skip temp user verification
+        if (googleAuth) {
+            console.log("Processing Google OAuth student signup:", { email, nickname, phoneNumber });
+            // Check if student already exists
+            const existingStudent = yield student_model_1.StudentModel.findOne({ email });
+            if (existingStudent) {
+                return res.status(400).json({ message: "User already exists" });
+            }
+            // Create student directly with Google data
+            const student = yield student_model_1.StudentModel.create({
+                email,
+                nickname,
+                phoneNumber,
+                googleAuth: true,
+                // No password for Google OAuth users
+            });
+            if (!process.env.JWT_SECRET)
+                throw new Error("JWT_SECRET not defined");
+            const token = jsonwebtoken_1.default.sign({ userId: student._id }, process.env.JWT_SECRET);
+            return res.status(200).json({
+                message: "Successfully created student with Google OAuth",
+                user: {
+                    _id: student._id,
+                    email: student.email,
+                    nickname: student.nickname,
+                    phoneNumber: student.phoneNumber,
+                },
+                token
+            });
+        }
+        // Traditional signup flow
+        const tempUser = yield student_model_1.TempUserModel.findOne({ email, isVerified: true, password: { $exists: true } });
         if (!tempUser) {
             return res.status(400).json({ message: "Email not verified or password not set" });
         }
         tempUser.nickname = nickname;
         tempUser.phoneNumber = phoneNumber;
-        await tempUser.save();
-        const existingStudent = await student_model_1.StudentModel.findOne({ email });
+        yield tempUser.save();
+        const existingStudent = yield student_model_1.StudentModel.findOne({ email });
         if (existingStudent) {
             return res.status(400).json({ message: "User already exists in main collection" });
         }
-        const student = await student_model_1.StudentModel.create({
+        const student = yield student_model_1.StudentModel.create({
             email: tempUser.email,
             password: tempUser.password,
             nickname: tempUser.nickname,
             phoneNumber: tempUser.phoneNumber,
         });
-        await student_model_1.TempUserModel.deleteOne({ email });
+        yield student_model_1.TempUserModel.deleteOne({ email });
         if (!process.env.JWT_SECRET)
             throw new Error("JWT_SECRET not defined");
         const token = jsonwebtoken_1.default.sign({ userId: student._id }, process.env.JWT_SECRET);
-        return res.status(200).json({ message: "Successfully updated name and number", tempUser, token });
+        return res.status(200).json({
+            message: "Successfully updated name and number",
+            tempUser,
+            token
+        });
     }
     catch (error) {
         console.error("StudentNameNumber error:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
-};
+});
 exports.StudentNameNumber = StudentNameNumber;

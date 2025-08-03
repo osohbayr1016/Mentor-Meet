@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -10,7 +19,7 @@ const Otp_model_1 = require("../model/Otp-model");
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const MentorCheckemail = async (req, res) => {
+const MentorCheckemail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
     try {
         console.log("MentorCheckemail request body:", { email });
@@ -26,7 +35,7 @@ const MentorCheckemail = async (req, res) => {
             return res.status(400).json({ message: "Please enter a valid email address" });
         }
         console.log("Checking if user already exists...");
-        const user = await mentor_model_1.MentorModel.findOne({ email });
+        const user = yield mentor_model_1.MentorModel.findOne({ email });
         if (user) {
             console.log("User already exists:", email);
             return res.status(400).json({ message: "User already exists" });
@@ -52,10 +61,10 @@ const MentorCheckemail = async (req, res) => {
             html: `<div style="color:red">Your verification code is: ${code}</div>`,
         };
         console.log("Creating OTP record in database...");
-        await Otp_model_1.OtpModel.create({ code, email });
+        yield Otp_model_1.OtpModel.create({ code, email });
         console.log("OTP record created successfully");
         console.log("Sending email...");
-        await transport.sendMail(options);
+        yield transport.sendMail(options);
         console.log("Email sent successfully");
         return res.status(200).json({ message: "Verification code sent successfully" });
     }
@@ -70,16 +79,16 @@ const MentorCheckemail = async (req, res) => {
             details: process.env.NODE_ENV === 'development' ? error === null || error === void 0 ? void 0 : error.message : undefined
         });
     }
-};
+});
 exports.MentorCheckemail = MentorCheckemail;
-const checkOtp = async (req, res) => {
+const checkOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { code, email } = req.body;
     try {
         // Validate required fields
         if (!code || !email) {
             return res.status(400).json({ message: "Code and email are required" });
         }
-        const isOtpExisting = await Otp_model_1.OtpModel.findOne({
+        const isOtpExisting = yield Otp_model_1.OtpModel.findOne({
             code: code,
             email: email,
         });
@@ -99,17 +108,29 @@ const checkOtp = async (req, res) => {
         console.error("OTP check error:", err);
         return res.status(500).json({ message: "Internal server error" });
     }
-};
+});
 exports.checkOtp = checkOtp;
-const MentorSignUp = async (req, res) => {
-    const { email, password } = req.body;
+const MentorSignUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, password, googleAuth, googleData } = req.body;
     try {
-        console.log("MentorSignUp request body:", { email, password: password ? "***" : "undefined" });
+        console.log("MentorSignUp request body:", {
+            email,
+            password: password ? "***" : "undefined",
+            googleAuth,
+            googleData: googleData ? "EXISTS" : "undefined"
+        });
         // Validate required fields
-        if (!email || !password) {
-            console.log("Validation failed: missing email or password");
+        if (!email) {
+            console.log("Validation failed: missing email");
             return res.status(400).json({
-                message: "Email and password are required"
+                message: "Email is required"
+            });
+        }
+        // For Google OAuth users, password is optional
+        if (!googleAuth && !password) {
+            console.log("Validation failed: missing password for non-Google auth");
+            return res.status(400).json({
+                message: "Password is required"
             });
         }
         // Validate email format
@@ -120,16 +141,13 @@ const MentorSignUp = async (req, res) => {
                 message: "Please enter a valid email address"
             });
         }
-        // Validate password length
-        if (password.length < 6) {
+        // Validate password length for non-Google auth users
+        if (!googleAuth && password && password.length < 6) {
             console.log("Validation failed: password too short");
             return res.status(400).json({
                 message: "Password must be at least 6 characters long"
             });
         }
-        console.log("Starting password hashing...");
-        const hashedPassword = await bcrypt_1.default.hashSync(password, 10);
-        console.log("Password hashed successfully");
         console.log("Loading environment variables...");
         dotenv_1.default.config();
         const tokenPassword = process.env.JWT_SECRET;
@@ -139,16 +157,38 @@ const MentorSignUp = async (req, res) => {
         }
         console.log("JWT_SECRET loaded successfully");
         console.log("Checking if user already exists...");
-        const FindUser = await mentor_model_1.MentorModel.findOne({ email });
+        const FindUser = yield mentor_model_1.MentorModel.findOne({ email });
         if (FindUser) {
             console.log("User already exists:", email);
             return res.status(400).json({ message: "User already exists" });
         }
         console.log("Creating new user...");
-        const user = await mentor_model_1.MentorModel.create({
+        // Prepare user data
+        const userData = {
             email,
-            password: hashedPassword,
-        });
+        };
+        // Handle password for traditional signup
+        if (!googleAuth && password) {
+            console.log("Starting password hashing...");
+            const hashedPassword = yield bcrypt_1.default.hashSync(password, 10);
+            console.log("Password hashed successfully");
+            userData.password = hashedPassword;
+        }
+        // Handle Google OAuth data
+        if (googleAuth && googleData) {
+            console.log("Processing Google OAuth data...");
+            if (googleData.name) {
+                const nameParts = googleData.name.split(" ");
+                userData.firstName = nameParts[0] || "";
+                userData.lastName = nameParts.slice(1).join(" ") || "";
+            }
+            if (googleData.image) {
+                userData.image = googleData.image;
+            }
+            // For Google OAuth users, we don't set a password
+            userData.googleAuth = true;
+        }
+        const user = yield mentor_model_1.MentorModel.create(userData);
         console.log("User created successfully:", user._id);
         console.log("Generating JWT token...");
         const token = jsonwebtoken_1.default.sign({
@@ -175,7 +215,7 @@ const MentorSignUp = async (req, res) => {
             details: process.env.NODE_ENV === 'development' ? err === null || err === void 0 ? void 0 : err.message : undefined
         });
     }
-};
+});
 exports.MentorSignUp = MentorSignUp;
 // export const MentorSignUp = async (req: Request, res: Response) => {
 //   const { email, password } = req.body;

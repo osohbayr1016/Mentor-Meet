@@ -1,9 +1,18 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAllMentors = void 0;
 const mentor_model_1 = require("../model/mentor-model");
 const category_model_1 = require("../model/category-model");
-const getAllMentors = async (req, res) => {
+const getAllMentors = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log("Raw URL:", req.url);
         console.log("Raw query string:", req.query);
@@ -19,7 +28,7 @@ const getAllMentors = async (req, res) => {
             console.log("Looking for category:", category);
             console.log("Category string:", JSON.stringify(category));
             // First, find the category by name
-            const categoryDoc = await category_model_1.CategoryModel.findOne({
+            const categoryDoc = yield category_model_1.CategoryModel.findOne({
                 categoryName: category,
             });
             console.log("Found category doc:", categoryDoc);
@@ -35,7 +44,7 @@ const getAllMentors = async (req, res) => {
             }
         }
         console.log("Final filter:", filter);
-        const mentors = await mentor_model_1.MentorModel.find(filter)
+        const mentors = yield mentor_model_1.MentorModel.find(filter)
             .populate("category.categoryId")
             .select("firstName lastName profession experience education bio rating image category subcategory");
         console.log("Found mentors:", mentors.length);
@@ -75,5 +84,5 @@ const getAllMentors = async (req, res) => {
         console.error("Error getting all mentors:", error);
         res.status(500).json({ error: "Internal server error" });
     }
-};
+});
 exports.getAllMentors = getAllMentors;

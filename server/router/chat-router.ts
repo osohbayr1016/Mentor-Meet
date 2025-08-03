@@ -1,15 +1,9 @@
 import { Router } from "express";
-import {
-  createMessage,
-  getMessages,
-  chatAssistant,
-  suggestMentors,
-  getMentorsByQuestion,
-} from "../controller/chat-create";
+import { createMessage, getMessages } from "../controller/chat-create";
+import { creatMessage } from "../controller/chat";
+
 export const chatRouter = Router();
 
 chatRouter.post("/createMessage", createMessage);
 chatRouter.get("/getMessage", getMessages);
-chatRouter.post("/chat-assistant", chatAssistant);
-chatRouter.post("/suggestmentors", suggestMentors);
-chatRouter.post("/mentors-by-question", getMentorsByQuestion);
+chatRouter.post("/create", creatMessage);
