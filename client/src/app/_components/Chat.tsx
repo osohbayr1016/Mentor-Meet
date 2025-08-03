@@ -27,11 +27,45 @@ export const HomeChat = () => {
     const mentorToken = localStorage.getItem("mentorToken");
     const studentEmail = localStorage.getItem("studentEmail");
     const mentorEmail = localStorage.getItem("mentorEmail");
+    const studentUser = localStorage.getItem("studentUser");
+    const mentorUser = localStorage.getItem("mentorUser");
+
+    // Debug: localStorage-ийн мэдээлийг харах
+    console.log("localStorage debug:");
+    console.log("studentToken:", studentToken);
+    console.log("mentorToken:", mentorToken);
+    console.log("studentEmail:", studentEmail);
+    console.log("mentorEmail:", mentorEmail);
+    console.log("studentUser:", studentUser);
+    console.log("mentorUser:", mentorUser);
 
     setToken(studentToken || mentorToken);
-    setUserEmail(studentEmail || mentorEmail || "");
 
-    fetch("https://mentor-meet-o3rp.onrender.com/getMessages", {
+    // Email-г олж авах - эхлээд тусад нь хадгалагдсан email-г шалгах
+    let email = studentEmail || mentorEmail;
+
+    // Хэрэв email байхгүй бол user object-оос авах
+    if (!email) {
+      if (studentUser) {
+        try {
+          const userData = JSON.parse(studentUser);
+          email = userData.email;
+        } catch (e) {
+          console.error("Error parsing studentUser:", e);
+        }
+      } else if (mentorUser) {
+        try {
+          const userData = JSON.parse(mentorUser);
+          email = userData.email;
+        } catch (e) {
+          console.error("Error parsing mentorUser:", e);
+        }
+      }
+    }
+
+    setUserEmail(email || "");
+
+    fetch("http://localhost:8000/api/getMessages", {
       headers: {
         Authorization: `Bearer ${studentToken || mentorToken}`,
       },
@@ -77,17 +111,15 @@ export const HomeChat = () => {
     console.log("Sending message with email:", userEmail);
 
     try {
-      const res = await fetch(
-        "https://mentor-meet-o3rp.onrender.com/createMessage",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(newMsg),
-        }
-      );
+      const local = localStorage.getItem("studentUser");
+      const res = await fetch("http://localhost:8000/api/createMessage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newMsg),
+      });
 
       const data = await res.json();
       console.log("API Response:", data);
