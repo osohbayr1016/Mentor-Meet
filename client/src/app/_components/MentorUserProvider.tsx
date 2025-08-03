@@ -106,6 +106,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
               "mentorUser",
               JSON.stringify(mentorData.mentorId)
             );
+            localStorage.setItem("mentorEmail", mentorData.email); // Email-г тусад нь хадгалах
 
             setMentor(mentorData);
             console.log("Mentor state updated, login complete");
@@ -155,6 +156,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
           localStorage.setItem("mentorToken", token);
           localStorage.setItem("mentorUser", JSON.stringify(minimalUser));
+          localStorage.setItem("mentorEmail", minimalUser.email); // Email-г тусад нь хадгалах
           setMentor(minimalUser);
 
           // Optional redirect only if explicitly requested
@@ -193,6 +195,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   const logout = () => {
     localStorage.removeItem("mentorToken");
     localStorage.removeItem("mentorUser");
+    localStorage.removeItem("mentorEmail"); // Email-г устгах
     setMentor(null);
     router.push("/");
   };
@@ -237,8 +240,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         login,
         logout,
         checkAuth,
-      }}
-    >
+      }}>
       {children}
     </AuthContext.Provider>
   );

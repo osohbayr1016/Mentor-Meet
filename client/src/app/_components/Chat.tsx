@@ -77,17 +77,15 @@ export const HomeChat = () => {
     console.log("Sending message with email:", userEmail);
 
     try {
-      const res = await fetch(
-        "https://mentor-meet-o3rp.onrender.com/createMessage",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(newMsg),
-        }
-      );
+      const local = localStorage.getItem("studentEmail");
+      const res = await fetch("http://localhost:8000/api/createMessage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newMsg),
+      });
 
       const data = await res.json();
       console.log("API Response:", data);
