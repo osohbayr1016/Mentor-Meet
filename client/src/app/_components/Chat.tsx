@@ -166,7 +166,7 @@ export const HomeChat = () => {
             <X />
           </div>
           <p className="text-[16px] font-semibold mb-2 pt-[50px] pl-[20px]">
-            👋 Бид танд хэрхэн туслах вэ?s
+            👋 Бид танд хэрхэн туслах вэ?
           </p>
 
           <div
