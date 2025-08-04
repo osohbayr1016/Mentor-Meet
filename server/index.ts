@@ -9,6 +9,7 @@ import { StudentRouter } from "./router/student-router";
 import { CategoryRouter } from "./router/category-router";
 import { chatRouter } from "./router/chat-router";
 import { CalendarRouter } from "./router/calendar-router";
+import { PaymentRouter } from "./router/payment-router";
 
 const app = express();
 app.use(cors());
@@ -31,6 +32,7 @@ app.use(StudentRouter);
 app.use(CategoryRouter);
 app.use(chatRouter);
 app.use(CalendarRouter);
+app.use(PaymentRouter);
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
