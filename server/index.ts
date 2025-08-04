@@ -7,8 +7,9 @@ import { StudentRouter } from "./router/student-router";
 import { CategoryRouter } from "./router/category-router";
 import { chatRouter } from "./router/chat-router";
 import { CalendarRouter } from "./router/calendar-router";
+import MeetingRouter from "./router/meeting.router"; 
 
-// dotenv.config() хамгийн эхэнд байх ёстой
+
 dotenv.config();
 
 const dataBaseConnection = async () => {
@@ -32,11 +33,12 @@ if (!uri) {
   process.exit(1);
 }
 
-app.use("/api", MentorRouter);
-app.use("/api", StudentRouter);
-app.use("/api", CategoryRouter);
-app.use("/api", chatRouter);
-app.use("/api", CalendarRouter);
+app.use("/", MentorRouter);
+app.use("/", StudentRouter);
+app.use("/", CategoryRouter);
+app.use("/", chatRouter);
+app.use("/", CalendarRouter);
+app.use("/", MeetingRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
