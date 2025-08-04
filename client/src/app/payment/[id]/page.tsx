@@ -107,7 +107,9 @@ const MentorPayment = () => {
   }, [searchParams, mentor]);
 
   // Get all selected times for display
-  const getAllSelectedTimes = () => {
+  const getAllSelectedTimes = async () => {
+    const response = await axios.get(`http:localhost:8000/calendar${mentorId}`);
+
     return Object.values(selectedTimesByDate).flat();
   };
 
@@ -127,6 +129,12 @@ const MentorPayment = () => {
     return formattedTimes;
   };
 
+  //   const saveSelectedHours = async () => {
+  //     const response = await axios.post("http://localhost:8000/Calendar", {
+  //  setPaymentSuccess(response)
+  //     });
+  //   };
+
   return (
     <div className="relative w-full h-screen">
       <div className="absolute inset-0 bg-black/30 -z-10" />
@@ -137,8 +145,8 @@ const MentorPayment = () => {
         className="absolute object-cover -z-20"
       />
 
-      <div className="relative z-10 flex justify-center items-center h-full ">
-        <div className="w-320 h-[715px] flex rounded-3xl backdrop-blur-[20px] bg-[#33333366] text-white overflow-hidden shadow-xl ">
+      <div className="relative z-10 flex justify-center items-center ">
+        <div className="w-320 h-[600px] mt-[70px] flex rounded-3xl backdrop-blur-[20px] bg-[#33333366] text-white overflow-hidden shadow-xl ">
           <div className="w-[300px] p-6 flex flex-col  gap-15  bg-[#333333B2]">
             <Link href={`/mentor/${mentorId}`}>
               <div className="flex flex-row items-center gap-3 text-[20px] font-semibold">
@@ -287,50 +295,6 @@ const MentorPayment = () => {
                   )}
                 </DialogContent>
               </Dialog>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="fixed bottom-0 left-0 right-0 z-40">
-        <div className="backdrop-blur-2xl border-t border-white/10 bg-black/20">
-          <div className="max-w-5xl mx-auto px-6 py-4">
-            <div className="flex justify-between items-center">
-              <div className="flex space-x-6">
-                <Link
-                  href="/"
-                  className="px-6 py-2 transition-colors rounded-xl backdrop-blur-sm border text-sm text-white/70 hover:text-white border-white/20 hover:border-white/40"
-                >
-                  Нүүр хуудас
-                </Link>
-                <Link
-                  href="/mentors"
-                  className="px-6 py-2 transition-colors rounded-xl backdrop-blur-sm border text-sm text-white/70 hover:text-white border-white/20 hover:border-white/40"
-                >
-                  Менторууд
-                </Link>
-                <Link
-                  href="/create-profile"
-                  className="px-6 py-2 font-medium rounded-xl backdrop-blur-sm border text-sm bg-white/30 text-white border-white/60"
-                >
-                  Профайл
-                </Link>
-              </div>
-              <button className="p-2 text-white/70 hover:text-white transition-colors">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                </svg>
-              </button>
             </div>
           </div>
         </div>

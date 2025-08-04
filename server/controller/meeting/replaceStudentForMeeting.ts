@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 
 export const replaceStudentForMeeting = async (req: Request, res: Response) => {
   const { replacementRequestId } = req.body;
-  const newStudentId = req.userId; // Орлогч оюутан
+  const newStudentId = req.userId; 
 
   try {
     const request = await ReplacementRequest.findById(replacementRequestId);
@@ -20,11 +20,11 @@ export const replaceStudentForMeeting = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Уулзалт олдсонгүй" });
     }
 
-    // Update meeting
+
     meeting.studentId = new mongoose.Types.ObjectId(newStudentId);
     await meeting.save();
 
-    // Update replacement request
+
     request.status = ReplacementStatus.REPLACED;
     await request.save();
 

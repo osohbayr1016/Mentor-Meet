@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
     try {
       const response = await axios.post<LoginResponse>(
-        "https://mentor-meet-o3rp.onrender.com/mentorLogin",
+        "http://localhost:8000/mentorLogin",
         {
           email,
           password,
@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         try {
           // Fetch mentor profile data using the token
           const profileResponse = await axios.get<ProfileResponse>(
-            "https://mentor-meet-o3rp.onrender.com/mentorProfile",
+            "http://mentor-meet-ferb.onrender.com/mentorProfile",
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -240,7 +240,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         login,
         logout,
         checkAuth,
-      }}>
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

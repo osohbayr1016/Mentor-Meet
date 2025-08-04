@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 
 export const studentCancelMeeting = async (req: Request, res: Response) => {
   const { meetingId } = req.body;
-  const studentId = (req as any).userId; // temporarily casting
+  const studentId = (req as any).userId; 
 
   try {
     const meeting = await MeetingModel.findById(meetingId);

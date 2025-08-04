@@ -4,7 +4,7 @@ import { useAuth } from "../_components/MentorUserProvider";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import MeetingManager from "../../components/MeetingManager";
+import MeetingCard from "../../components/MeetingCard";
 
 interface MentorProfile {
   id: string;
@@ -31,6 +31,15 @@ interface MentorProfile {
   hourlyPrice: number;
 }
 
+interface Meeting {
+  id: string;
+  date: string;
+  day: string;
+  time: string;
+  studentEmail: string;
+  status: "scheduled" | "cancelled" | "completed";
+}
+
 const MentorDashboard = () => {
   const { mentor, isLoading, logout } = useAuth();
   const router = useRouter();
@@ -39,6 +48,49 @@ const MentorDashboard = () => {
   );
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"scheduled" | "history">(
+    "scheduled"
+  );
+  const [totalIncome] = useState(20000); // Mock data
+
+  // Mock meeting data
+  const [scheduledMeetings] = useState<Meeting[]>([
+    {
+      id: "1",
+      date: "8 сарын 4",
+      day: "Даваа гараг",
+      time: "10:00",
+      studentEmail: "maralguagurbadam@gmail.com",
+      status: "scheduled",
+    },
+    {
+      id: "2",
+      date: "8 сарын 4",
+      day: "Даваа гараг",
+      time: "10:00",
+      studentEmail: "maralguagurbadam@gmail.com",
+      status: "cancelled",
+    },
+  ]);
+
+  const [meetingHistory] = useState<Meeting[]>([
+    {
+      id: "3",
+      date: "7 сарын 28",
+      day: "Ням гараг",
+      time: "15:00",
+      studentEmail: "student3@gmail.com",
+      status: "completed",
+    },
+    {
+      id: "4",
+      date: "7 сарын 25",
+      day: "Пүрэв гараг",
+      time: "11:00",
+      studentEmail: "student4@gmail.com",
+      status: "completed",
+    },
+  ]);
 
   useEffect(() => {
     if (!isLoading && !mentor) {
@@ -79,6 +131,16 @@ const MentorDashboard = () => {
 
   const handleLogout = () => {
     logout();
+  };
+
+  const handleJoinMeeting = (meetingId: string) => {
+    // Handle join meeting logic
+    console.log("Joining meeting:", meetingId);
+  };
+
+  const handleCancelMeeting = (meetingId: string) => {
+    // Handle cancel meeting logic
+    console.log("Cancelling meeting:", meetingId);
   };
 
   if (isLoading) {
@@ -122,161 +184,134 @@ const MentorDashboard = () => {
       />
 
       {/* Main Dashboard */}
-      <div className="relative z-10 w-full min-h-screen flex flex-col">
-        {/* Header */}
-        <div className="flex justify-between items-center p-6">
-          <h1 className="text-2xl font-bold text-white">Ментор удирдлага</h1>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                <svg
-                  className="w-4 h-4 text-gray-800"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+      <div className="relative z-10 w-full h-screen flex flex-col">
+        {/* Main Content */}
+        <div className="flex-1 px-6 pb-6 pt-6 flex items-center justify-center">
+          <div className="w-full max-w-5xl">
+            {/* Main Dashboard Panel */}
+            <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20 h-[650px] w-full ">
+              <div className="flex gap-8 h-full ">
+                {/* Left Sidebar */}
+                <div className="w-72 flex flex-col h-full justify-between ">
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => setActiveTab("scheduled")}
+                      className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
+                        activeTab === "scheduled"
+                          ? "bg-gray-600 text-white"
+                          : "text-gray-300 hover:bg-gray-700/50"
+                      }`}
+                    >
+                      Товлосон уулзалтууд
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("history")}
+                      className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
+                        activeTab === "history"
+                          ? "bg-gray-600 text-white"
+                          : "text-gray-300 hover:bg-gray-700/50"
+                      }`}
+                    >
+                      Уулзалтын түүх
+                    </button>
+                  </div>
+
+                  <div className="mt-auto space-y-2">
+                    <button
+                      onClick={() => router.push("/mentor-dashboard-calendar")}
+                      className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-300 hover:bg-gray-700/50 transition-colors flex items-center gap-2"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      Календар засах
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-300 hover:bg-gray-700/50 transition-colors flex items-center gap-2"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                        />
+                      </svg>
+                      Гарах
+                    </button>
+                  </div>
+                </div>
+
+                {/* Right Content Area */}
+                <div className="flex-1 flex flex-col">
+                  {/* Income Section */}
+                  <div className="mb-6">
+                    <p className="text-gray-300 text-sm mb-1">
+                      Таны нийт орлого:
+                    </p>
+                    <p className="text-green-400 text-2xl font-bold">
+                      ¥{totalIncome.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="flex-1 flex flex-col">
+                    <h3 className="text-white text-lg font-semibold mb-4">
+                      {activeTab === "scheduled"
+                        ? "Таны товлосон уулзалтууд:"
+                        : "Уулзалтын түүх:"}
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+                      {(activeTab === "scheduled"
+                        ? scheduledMeetings
+                        : meetingHistory
+                      ).map((meeting) => (
+                        <MeetingCard
+                          key={meeting.id}
+                          meeting={meeting}
+                          onJoinMeeting={
+                            activeTab === "scheduled"
+                              ? handleJoinMeeting
+                              : undefined
+                          }
+                          onCancelMeeting={
+                            activeTab === "scheduled"
+                              ? handleCancelMeeting
+                              : undefined
+                          }
+                          showActions={activeTab === "scheduled"}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Meetings Section */}
+                </div>
               </div>
-              <span className="text-white font-semibold">Mentor Meet</span>
             </div>
-            <button
-              onClick={handleLogout}
-              className=" hover:bg-red-500/40 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
-              Гарах
-            </button>
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 px-6 pb-20">
-          <div className="max-w-6xl mx-auto">
-            {/* Welcome Message */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 mb-6">
-              <div className="text-center">
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  Сайн байна уу, {mentor.firstName} {mentor.lastName}!
-                </h2>
-                <p className="text-white/80">Таны ментор удирдлагын самбар</p>
-              </div>
-            </div>
+        {/* Bottom Navigation */}
 
-            {/* Dashboard Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-              {/* Profile Card */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <h3 className="text-white font-semibold text-lg mb-4">
-                  Профайл
-                </h3>
-                {profileLoading ? (
-                  <div className="text-white/80">
-                    <div className="w-4 h-4 border border-white/30 border-t-white rounded-full animate-spin mb-2"></div>
-                    <p>Профайл уншиж байна...</p>
-                  </div>
-                ) : profileError ? (
-                  <div className="text-white/80">
-                    <p className="text-red-300 mb-2">Алдаа: {profileError}</p>
-                    <p>
-                      Профайл мэдээлэл ачаалахад алдаа гарлаа. Дахин оролдоно
-                      уу.
-                    </p>
-                  </div>
-                ) : mentorProfile ? (
-                  <div className="space-y-2 text-white/80">
-                    <p>Мэргэжил: {mentorProfile.profession || "Тодорхойгүй"}</p>
-                    <p>
-                      Туршлага:{" "}
-                      {mentorProfile.experience?.careerDuration ||
-                        "Тодорхойгүй"}
-                    </p>
-                    <p>Имэйл: {mentor.email}</p>
-                  </div>
-                ) : (
-                  <div className="text-white/80">
-                    <p>Профайл мэдээлэл олдсонгүй</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Calendar Card */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <h3 className="text-white font-semibold text-lg mb-4">
-                  Хуваарь ба Уулзалтууд
-                </h3>
-                <p className="text-white/80 mb-4">
-                  Таны цагийн хуваарь ба Google Meet уулзалтуудыг удирдах
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => router.push("/mentor-calendar")}
-                    className="bg-white text-black px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-100 transition-colors"
-                  >
-                    Хуваарь
-                  </button>
-                  <button
-                    onClick={() => router.push("/meetings")}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors"
-                  >
-                    Уулзалтууд
-                  </button>
-                </div>
-              </div>
-
-              {/* Statistics Card */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <h3 className="text-white font-semibold text-lg mb-4">
-                  Статистик
-                </h3>
-                <div className="space-y-2 text-white/80">
-                  <p>Нийт суралцагч: 0</p>
-                  <p>Энэ сарын орлого: 0₮</p>
-                  <p>Дундаж үнэлгээ: {mentorProfile?.rating || 0}</p>
-                  {mentorProfile?.hourlyPrice && (
-                    <p>
-                      Цагийн үнэ: {mentorProfile.hourlyPrice.toLocaleString()}₮
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <h3 className="text-white font-semibold text-lg mb-4">
-                Сүүлийн үйл ажиллагаа
-              </h3>
-              <div className="text-white/80">
-                <p>Одоогоор үйл ажиллагаа байхгүй байна.</p>
-              </div>
-            </div>
-
-            {/* Google Meet Meetings Manager */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <h3 className="text-white font-semibold text-lg mb-4">
-                Миний Google Meet Уулзалтууд
-              </h3>
-              <div className="bg-white rounded-lg">
-                <MeetingManager className="bg-transparent shadow-none" />
-              </div>
-            </div>
-          </div>
+        {/* Copyright Footer */}
+        <div className="fixed bottom-2 left-6 text-xs text-white/60 z-30">
+          <div>Copyright © 2025 Mentor Meet</div>
+          <div>All rights reserved.</div>
         </div>
       </div>
     </div>

@@ -2,292 +2,430 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import BookingCard from "../../components/BookingCard";
+import StudentAuthGuard from "../../components/StudentAuthGuard";
 
-interface MentorAvailability {
-  mentorId: string;
-  mentorName: string;
-  mentorEmail: string;
+interface Mentor {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  image: string;
+  profession: string;
+  rating: number;
+}
+
+interface Booking {
+  _id: string;
+  mentorId: Mentor;
   date: string;
   time: string;
-  category: string;
+  status: "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
   price: number;
-  experience: string;
-  rating: number;
-  profession: string;
-  image: string;
+  category: string;
+}
+
+interface BookingsData {
+  upcoming: Booking[];
+  past: Booking[];
 }
 
 const StudentDashboard = () => {
-  const [availableMentors, setAvailableMentors] = useState<
-    MentorAvailability[]
-  >([]);
+  const router = useRouter();
+  const [bookings, setBookings] = useState<BookingsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] =
-    useState<string>("programming");
+  const [activeTab, setActiveTab] = useState<"upcoming" | "history">(
+    "upcoming"
+  );
+  const [totalSpent] = useState(150000); // Mock data
 
-  // Fetch available mentors from API
+  // Get student ID from localStorage
+  const [studentId, setStudentId] = useState("student_123");
+
   useEffect(() => {
-    const fetchMentors = async () => {
-      try {
-        const params = new URLSearchParams();
-        if (selectedCategory !== "all") {
-          params.append("category", selectedCategory);
-        }
-
-        const response = await fetch(`/api/get-available-mentors?${params}`);
-        const data = await response.json();
-
-        if (data.success) {
-          setAvailableMentors(data.mentors);
-        } else {
-          console.error("Failed to fetch mentors:", data.error);
-        }
-      } catch (error) {
-        console.error("Error fetching mentors:", error);
-      } finally {
-        setLoading(false);
+    // Get student data from localStorage
+    try {
+      const studentUser = localStorage.getItem("studentUser");
+      if (studentUser) {
+        const studentData = JSON.parse(studentUser);
+        setStudentId(studentData.studentId || "student_123");
       }
-    };
+    } catch (error) {
+      console.error("Error parsing student data:", error);
+    }
 
-    fetchMentors();
-  }, [selectedCategory]);
+    fetchBookings();
+  }, []);
 
-  const handleBookSession = (mentor: MentorAvailability) => {
-    // TODO: Implement booking logic
-    alert(
-      `Уулзалт захиалсан: ${mentor.mentorName} - ${mentor.date} ${mentor.time}`
-    );
+  const fetchBookings = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `/api/get-student-bookings?studentId=${studentId}`
+      );
+      const data = await response.json();
+
+      if (data.success) {
+        setBookings(data.data);
+      } else {
+        console.error("Failed to fetch bookings:", data.message);
+        // Use mock data for now
+        setBookings({
+          upcoming: [
+            {
+              _id: "1",
+              mentorId: {
+                _id: "mentor_1",
+                firstName: "Сараа",
+                lastName: "Бат",
+                image:
+                  "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face",
+                profession: "Программчлалын багш",
+                rating: 4.8,
+              },
+              date: "2025-08-04",
+              time: "10:00",
+              status: "CONFIRMED",
+              price: 50000,
+              category: "Программчлал",
+            },
+            {
+              _id: "2",
+              mentorId: {
+                _id: "mentor_2",
+                firstName: "Бат",
+                lastName: "Дорж",
+                image:
+                  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face",
+                profession: "Бизнес зөвлөгч",
+                rating: 4.9,
+              },
+              date: "2025-08-05",
+              time: "14:00",
+              status: "PENDING",
+              price: 75000,
+              category: "Бизнес",
+            },
+          ],
+          past: [
+            {
+              _id: "3",
+              mentorId: {
+                _id: "mentor_3",
+                firstName: "Оюун",
+                lastName: "Болд",
+                image:
+                  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face",
+                profession: "Дизайнер",
+                rating: 4.7,
+              },
+              date: "2025-07-28",
+              time: "15:00",
+              status: "COMPLETED",
+              price: 60000,
+              category: "Дизайн",
+            },
+          ],
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+      // Use mock data on error
+      setBookings({
+        upcoming: [
+          {
+            _id: "1",
+            mentorId: {
+              _id: "mentor_1",
+              firstName: "Сараа",
+              lastName: "Бат",
+              image:
+                "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face",
+              profession: "Программчлалын багш",
+              rating: 4.8,
+            },
+            date: "2025-08-04",
+            time: "10:00",
+            status: "CONFIRMED",
+            price: 50000,
+            category: "Программчлал",
+          },
+          {
+            _id: "2",
+            mentorId: {
+              _id: "mentor_2",
+              firstName: "Бат",
+              lastName: "Дорж",
+              image:
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face",
+              profession: "Бизнес зөвлөгч",
+              rating: 4.9,
+            },
+            date: "2025-08-05",
+            time: "14:00",
+            status: "PENDING",
+            price: 75000,
+            category: "Бизнес",
+          },
+        ],
+        past: [
+          {
+            _id: "3",
+            mentorId: {
+              _id: "mentor_3",
+              firstName: "Оюун",
+              lastName: "Болд",
+              image:
+                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face",
+              profession: "Дизайнер",
+              rating: 4.7,
+            },
+            date: "2025-07-28",
+            time: "15:00",
+            status: "COMPLETED",
+            price: 60000,
+            category: "Дизайн",
+          },
+        ],
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const categories = [
-    { id: "programming", name: "Программчлал ба Технологи" },
-    { id: "law", name: "Хууль, эрх зүй" },
-    { id: "health", name: "Эрүүл мэнд" },
-    { id: "design", name: "График ба Дизайн" },
-    { id: "sport", name: "Спорт" },
-    { id: "business", name: "Бизнес" },
-    { id: "finance", name: "Санхүү" },
-  ];
+  const handleJoinMeeting = async (bookingId: string) => {
+    try {
+      const response = await fetch("/api/join-meeting", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ bookingId, studentId }),
+      });
 
-  const filteredMentors = availableMentors.filter((mentor) => {
-    const categoryMatch =
-      selectedCategory === "all" ||
-      mentor.category.toLowerCase().includes(selectedCategory);
-    return categoryMatch;
-  });
+      const data = await response.json();
 
-  return (
-    <div className="relative w-full min-h-screen">
-      {/* Background image */}
-      <div className="absolute inset-0 bg-black/30 -z-10" />
-      <Image
-        src="https://images.unsplash.com/photo-1706074740295-d7a79c079562?q=80&w=2232&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-        alt="background image"
-        fill
-        className="absolute inset-0 -z-20 object-cover"
-        priority
-      />
+      if (data.success) {
+        // Open meeting link in new tab
+        window.open(data.data.meetingLink, "_blank");
+      } else {
+        alert("Failed to join meeting: " + data.message);
+      }
+    } catch (error) {
+      console.error("Error joining meeting:", error);
+      alert("Error joining meeting. Please try again.");
+    }
+  };
 
-      {/* Main Dashboard */}
-      <div className="relative z-10 w-full min-h-screen flex flex-col">
-        {/* Header */}
-        <div className="flex justify-between items-center p-6">
-          <h1 className="text-2xl font-bold text-white">Менторууд</h1>
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-              <svg
-                className="w-4 h-4 text-gray-800"
-                fill="currentColor"
-                viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <span className="text-white font-semibold">Mentor Meet</span>
-          </div>
-        </div>
+  const handleCancelBooking = async (bookingId: string) => {
+    if (!confirm("Уулзалтыг цуцлахдаа итгэлтэй байна уу?")) {
+      return;
+    }
 
-        {/* Category Filter Bar */}
-        <div className="px-6 mb-6">
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-all duration-200 ${
-                  selectedCategory === category.id
-                    ? "bg-white text-black font-medium"
-                    : "text-white border border-white/30 hover:bg-white/10"
-                }`}>
-                {category.name}
-              </button>
-            ))}
-          </div>
-        </div>
+    try {
+      const response = await fetch("/api/cancel-booking", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ bookingId, studentId }),
+      });
 
-        {/* Main Content */}
-        <div className="flex-1 px-6 pb-20">
-          <div className="max-w-6xl mx-auto">
-            {/* Left Panel - Search and Filters */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Left Sidebar */}
-              <div className="lg:col-span-1 space-y-6">
-                {/* Logo and Search */}
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                      <svg
-                        className="w-4 h-4 text-gray-800"
-                        fill="currentColor"
-                        viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <span className="text-white font-semibold">
-                      Mentor Meet
-                    </span>
-                  </div>
+      const data = await response.json();
 
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="Хайх..."
-                      className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-white/50"
-                    />
-                    <svg
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
-                    </svg>
-                  </div>
-                </div>
+      if (data.success) {
+        alert("Уулзалт амжилттай цуцлагдлаа.");
+        fetchBookings(); // Refresh bookings
+      } else {
+        alert("Failed to cancel booking: " + data.message);
+      }
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+      alert("Error cancelling booking. Please try again.");
+    }
+  };
 
-                {/* Category List */}
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                  <h3 className="text-white font-semibold mb-4">Ангилал</h3>
-                  <div className="space-y-2">
-                    {categories.map((category) => (
-                      <button
-                        key={category.id}
-                        onClick={() => setSelectedCategory(category.id)}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                          selectedCategory === category.id
-                            ? "bg-white/20 text-white"
-                            : "text-white/70 hover:text-white hover:bg-white/10"
-                        }`}>
-                        {category.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
+  const handleLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem("studentToken");
+    localStorage.removeItem("studentUser");
+    localStorage.removeItem("studentEmail");
 
-              {/* Right Panel - Mentor Cards */}
-              <div className="lg:col-span-3">
-                <h2 className="text-2xl font-bold text-white mb-6">
-                  Менторуудтайгаа танилцана уу!
-                </h2>
+    // Dispatch custom event to notify other components about auth change
+    window.dispatchEvent(new Event("authChange"));
 
-                {loading ? (
-                  <div className="flex items-center justify-center h-64">
-                    <div className="text-white">Уншиж байна...</div>
-                  </div>
-                ) : filteredMentors.length === 0 ? (
-                  <div className="flex items-center justify-center h-64">
-                    <div className="text-white text-center">
-                      <p className="text-lg mb-2">Боломжит ментор олдсонгүй</p>
-                      <p className="text-sm text-white/70">
-                        Дараа дахин шалгана уу
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {filteredMentors.map((mentor) => (
-                      <div
-                        key={mentor.mentorId}
-                        className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-200">
-                        <div className="flex items-start gap-4 mb-4">
-                          <div className="w-16 h-16 bg-gray-300 rounded-full overflow-hidden flex-shrink-0">
-                            <Image
-                              src={
-                                mentor.image || "https://via.placeholder.com/64"
-                              }
-                              alt={mentor.mentorName}
-                              width={64}
-                              height={64}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-white font-semibold text-lg mb-1">
-                              {mentor.mentorName}
-                            </h3>
-                            <p className="text-white/70 text-sm mb-2">
-                              {mentor.profession}
-                            </p>
-                            <div className="flex items-center gap-4 text-sm">
-                              <span className="text-white/80">
-                                Туршлага: {mentor.experience}
-                              </span>
-                              <div className="flex items-center gap-1">
-                                <svg
-                                  className="w-4 h-4 text-yellow-400"
-                                  fill="currentColor"
-                                  viewBox="0 0 20 20">
-                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                                <span className="text-white">
-                                  {mentor.rating}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+    // Redirect to login page
+    router.push("/student-login");
+  };
 
-                        <div className="flex justify-between items-center">
-                          <div className="text-white/80 text-sm">
-                            <p>Огноо: {mentor.date}</p>
-                            <p>Цаг: {mentor.time}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-white font-semibold text-lg">
-                              {mentor.price.toLocaleString()}₮
-                            </p>
-                            <p className="text-white/70 text-sm">цаг</p>
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={() => handleBookSession(mentor)}
-                          className="w-full mt-4 bg-white text-black px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-100 transition-colors">
-                          Захиалах
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+  // Show loading while fetching data
+  if (loading) {
+    return (
+      <div className="relative w-full h-screen">
+        <div className="absolute inset-0 bg-black/30 -z-10" />
+        <Image
+          src="https://images.unsplash.com/photo-1706074740295-d7a79c079562?q=80&w=2232&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="background image"
+          fill
+          className="absolute inset-0 -z-20 object-cover"
+          priority
+        />
+        <div className="relative z-10 min-h-screen flex items-center justify-center">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+            <div className="text-white text-center">
+              <div className="w-8 h-8 border border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+              <p>Уншиж байна...</p>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <StudentAuthGuard>
+      <div className="relative w-full min-h-screen">
+        {/* Background image */}
+        <div className="absolute inset-0 bg-black/30 -z-10" />
+        <Image
+          src="https://images.unsplash.com/photo-1706074740295-d7a79c079562?q=80&w=2232&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="background image"
+          fill
+          className="absolute inset-0 -z-20 object-cover"
+          priority
+        />
+
+        {/* Main Dashboard */}
+        <div className="relative z-10 w-full min-h-screen flex flex-col">
+          {/* Main Content */}
+          <div className="flex-1 px-6 pb-20 pt-6">
+            <div className="max-w-6xl mx-auto">
+              {/* Main Dashboard Panel */}
+              <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20 h-[650px] w-full">
+                <div className="flex gap-8 h-full">
+                  {/* Left Sidebar */}
+                  <div className="w-72 flex flex-col h-full justify-between">
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => setActiveTab("upcoming")}
+                        className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
+                          activeTab === "upcoming"
+                            ? "bg-gray-600 text-white"
+                            : "text-gray-300 hover:bg-gray-700/50"
+                        }`}
+                      >
+                        Товлосон уулзалтууд
+                      </button>
+                      <button
+                        onClick={() => setActiveTab("history")}
+                        className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
+                          activeTab === "history"
+                            ? "bg-gray-600 text-white"
+                            : "text-gray-300 hover:bg-gray-700/50"
+                        }`}
+                      >
+                        Уулзалтын түүх
+                      </button>
+                    </div>
+
+                    <div className="mt-auto space-y-2">
+                      <button
+                        onClick={() => router.push("/explore")}
+                        className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-300 hover:bg-gray-700/50 transition-colors flex items-center gap-2"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
+                        </svg>
+                        Ментор хайх
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-300 hover:bg-gray-700/50 transition-colors flex items-center gap-2"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                          />
+                        </svg>
+                        Гарах
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Right Content Area */}
+                  <div className="flex-1 flex flex-col">
+                    {/* Income Section */}
+                    <div className="mb-6">
+                      <p className="text-gray-300 text-sm mb-1">
+                        Таны нийт зарцуулсан мөнгө:
+                      </p>
+                      <p className="text-green-400 text-2xl font-bold">
+                        ₮{totalSpent.toLocaleString()}
+                      </p>
+                    </div>
+
+                    {/* Meetings Section */}
+                    <div className="flex-1 flex flex-col">
+                      <h3 className="text-white text-lg font-semibold mb-4">
+                        {activeTab === "upcoming"
+                          ? "Таны товлосон уулзалтууд:"
+                          : "Уулзалтын түүх:"}
+                      </h3>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto">
+                        {(activeTab === "upcoming"
+                          ? bookings?.upcoming
+                          : bookings?.past
+                        )?.map((booking) => (
+                          <BookingCard
+                            key={booking._id}
+                            booking={booking}
+                            onJoinMeeting={
+                              activeTab === "upcoming"
+                                ? handleJoinMeeting
+                                : undefined
+                            }
+                            onCancelBooking={
+                              activeTab === "upcoming"
+                                ? handleCancelBooking
+                                : undefined
+                            }
+                            showActions={activeTab === "upcoming"}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Copyright Footer */}
+          <div className="fixed bottom-2 left-6 text-xs text-white/60 z-30">
+            <div>Copyright © 2025 Mentor Meet</div>
+            <div>All rights reserved.</div>
+          </div>
+        </div>
+      </div>
+    </StudentAuthGuard>
   );
 };
 

@@ -48,6 +48,9 @@ const StudentLoginPage = () => {
         localStorage.setItem("studentUser", JSON.stringify(data.user));
         localStorage.setItem("studentEmail", data.user.email); // Email-г тусад нь хадгалах
 
+        // Dispatch custom event to notify other components about auth change
+        window.dispatchEvent(new Event("authChange"));
+
         // Redirect to student dashboard
         router.push("/student-dashboard");
       } else {
@@ -127,7 +130,8 @@ const StudentLoginPage = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-white text-black px-6 py-3 rounded-[40px] hover:bg-gray-100 transition-colors disabled:opacity-50">
+                  className="w-full bg-white text-black px-6 py-3 rounded-[40px] hover:bg-gray-100 transition-colors disabled:opacity-50"
+                >
                   {loading ? "Нэвтэрч байна..." : "Нэвтрэх"}
                 </button>
               </form>
