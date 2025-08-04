@@ -7,6 +7,7 @@ export type MeetingModel = {
   studentId: ObjectId;
   status: MeetingStatus;
   duration: number;
+  scheduledAt: Date;
 };
 
 export enum MeetingStatus {
@@ -14,5 +15,3 @@ export enum MeetingStatus {
   CANCELLED = "CANCELLED",
   COMPLETED = "COMPLETED",
 }
-
-
