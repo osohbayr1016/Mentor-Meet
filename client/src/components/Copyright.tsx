@@ -1,23 +1,22 @@
-import React from 'react';
+import React from "react";
 
 interface CopyrightProps {
   className?: string;
-  variant?: 'fixed' | 'relative';
+  variant?: "fixed" | "relative";
 }
 
-const Copyright: React.FC<CopyrightProps> = ({ 
-  className = '', 
-  variant = 'fixed' 
+const Copyright: React.FC<CopyrightProps> = ({
+  className = "",
+  variant = "fixed",
 }) => {
-  const baseClasses = variant === 'fixed' 
-    ? 'fixed bottom-4 left-4 z-50' 
-    : 'relative w-full';
+  const baseClasses =
+    variant === "fixed" ? "fixed bottom-4 left-4 z-50" : "relative w-full";
 
   return (
     <div className={`${baseClasses} ${className}`}>
       <div className="relative">
         {/* Copyright text */}
-        <div className="flex flex-col items-center justify-center py-2 px-3 text-white">
+        <div className="flex flex-col items-start justify-center py-2 px-3 text-white">
           <div className="text-xs font-medium tracking-wide">
             Copyright © 2025 Mentor Meet
           </div>
@@ -30,4 +29,4 @@ const Copyright: React.FC<CopyrightProps> = ({
   );
 };
 
-export default Copyright; 
+export default Copyright;
