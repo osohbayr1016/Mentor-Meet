@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
     try {
       const response = await axios.post<LoginResponse>(
-        "http://https://mentor-meet-ferb.onrender.com/mentorLogin",
+        "http://localhost:8000/mentorLogin",
         {
           email,
           password,
