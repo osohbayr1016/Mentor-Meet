@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { Student } from "../model/student-model";
+import { StudentModel } from "../model/student-model";
 import { Booking, BookingStatus } from "../model/booking-model";
-import { Mentor } from "../model/mentor-model";
+import { MentorModel } from "../model/mentor-model";
 
 // Get student's booked meetings
 export const getStudentBookings = async (req: Request, res: Response) => {
@@ -113,6 +113,10 @@ export const joinMeeting = async (req: Request, res: Response) => {
       });
     }
 
+    // Type assertion for populated mentorId
+    const populatedBooking = booking.toObject();
+    const mentorId = populatedBooking.mentorId as any;
+
     // Here you would typically generate a meeting link
     // For now, we'll just return success
     res.json({
@@ -120,7 +124,7 @@ export const joinMeeting = async (req: Request, res: Response) => {
       message: "Joining meeting",
       data: {
         meetingLink: `https://meet.google.com/abc-defg-hij`, // Mock link
-        mentorName: `${booking.mentorId.firstName} ${booking.mentorId.lastName}`,
+        mentorName: `${mentorId.firstName} ${mentorId.lastName}`,
         booking,
       },
     });
@@ -138,7 +142,7 @@ export const getStudentProfile = async (req: Request, res: Response) => {
   try {
     const { studentId } = req.params;
 
-    const student = await Student.findById(studentId).select("-password");
+    const student = await StudentModel.findById(studentId).select("-password");
 
     if (!student) {
       return res.status(404).json({
