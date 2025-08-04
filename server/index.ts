@@ -68,19 +68,11 @@ if (!uri) {
   process.exit(1);
 }
 
-mongoose.connect(uri)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => {
-    console.error("❌ MongoDB connection error:", err);
-    process.exit(1);
-  });
-
-// 5. Router-ууд
-app.use(MentorRouter);
-app.use(StudentRouter);
-app.use(CategoryRouter);
-app.use(chatRouter);
-app.use(CalendarRouter);
+app.use("/api", MentorRouter);
+app.use("/api", StudentRouter);
+app.use("/api", CategoryRouter);
+app.use("/api", chatRouter);
+app.use("/api", CalendarRouter);
 
 // 6. Server эхлүүлэх
 const PORT = process.env.PORT || 8000;
