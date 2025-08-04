@@ -396,36 +396,6 @@ const StudentDashboard = () => {
             </div>
           </div>
         </div>
-
-        {/* Bottom Navigation */}
-        <div className="fixed bottom-0 left-0 right-0 bg-gray-800/80 backdrop-blur-sm border-t border-white/20">
-          <div className="flex justify-around items-center py-4 px-6">
-            <button className="text-gray-400 hover:text-white transition-colors">
-              Нүүр хуудас
-            </button>
-            <button className="text-gray-400 hover:text-white transition-colors">
-              Менторууд
-            </button>
-            <button className="text-white font-medium">Профайл</button>
-            <button className="relative">
-              <svg
-                className="w-6 h-6 text-gray-400 hover:text-white transition-colors"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 17h5l-5 5v-5zM4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"
-                />
-              </svg>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
-            </button>
-          </div>
-        </div>
-
         {/* Copyright Footer */}
         <div className="fixed bottom-2 left-6 text-xs text-white/60 z-30">
           <div>Copyright © 2025 Mentor Meet</div>
