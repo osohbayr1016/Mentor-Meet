@@ -30,7 +30,7 @@ const StudentLoginPage = () => {
 
     try {
       const response = await fetch(
-        "https://mentor-meet-o3rp.onrender.com/api/studentLogin",
+        "https://mentor-meet-o3rp.onrender.com/studentLogin",
         {
           method: "POST",
           headers: {
