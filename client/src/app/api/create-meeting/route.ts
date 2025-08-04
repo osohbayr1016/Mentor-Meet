@@ -18,8 +18,18 @@ export async function POST(request: NextRequest) {
         const body: MeetingRequest = await request.json();
         const { start, end, mentorEmail, menteeEmail, title, description } = body;
 
+        console.log('Create meeting request:', {
+            start,
+            end,
+            mentorEmail,
+            menteeEmail,
+            title,
+            hasAccessToken: !!session.accessToken
+        });
+
         // Validate required fields
         if (!start || !end || !mentorEmail || !menteeEmail) {
+            console.error('Missing required fields:', { start, end, mentorEmail, menteeEmail });
             return NextResponse.json(
                 { error: "Missing required fields: start, end, mentorEmail, menteeEmail" },
                 { status: 400 }
@@ -44,11 +54,27 @@ export async function POST(request: NextRequest) {
             endTime: meetingData.endTime,
         });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error creating meeting:", error);
+
+        // Provide more specific error messages
+        let errorMessage = "Failed to create meeting";
+        let statusCode = 500;
+
+        if (error.message?.includes("insufficient permissions")) {
+            errorMessage = "Calendar access permission required";
+            statusCode = 403;
+        } else if (error.message?.includes("invalid_grant")) {
+            errorMessage = "OAuth token expired, please sign in again";
+            statusCode = 401;
+        } else if (error.code === 401) {
+            errorMessage = "Authentication failed";
+            statusCode = 401;
+        }
+
         return NextResponse.json(
-            { error: "Failed to create meeting" },
-            { status: 500 }
+            { error: errorMessage, details: error.message },
+            { status: statusCode }
         );
     }
 } 

@@ -20,7 +20,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import axios from "axios";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useParams, useSearchParams } from "next/navigation";
 
 interface Mentor {
@@ -52,11 +52,14 @@ interface Mentor {
 const MentorPayment = () => {
   const params = useParams();
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const { data: session } = useSession();
   const mentorId = Array.isArray(params.id) ? params.id[0] : params.id || "";
   const [open, setOpen] = useState(false);
   const [showQr, setShowQr] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [mentor, setMentor] = useState<Mentor | null>(null);
   const [selectedTimesByDate, setSelectedTimesByDate] = useState<
     Record<string, string[]>
@@ -67,6 +70,136 @@ const MentorPayment = () => {
     e.preventDefault();
     if (agreed) {
       setShowQr(true);
+    }
+  };
+
+  const handlePaymentVerification = async () => {
+    if (!session?.user?.email || !mentor) {
+      alert("Нэвтрэх шаардлагатай эсвэл ментор мэдээлэл дутуу байна");
+      return;
+    }
+
+    if (!session?.accessToken) {
+      alert("Google OAuth токен дутуу байна. Дахин нэвтэрнэ үү.");
+      return;
+    }
+
+    console.log("Session info:", {
+      userEmail: session.user.email,
+      hasAccessToken: !!session.accessToken,
+      mentor: { id: mentor.id, email: mentor.email },
+    });
+
+    setIsProcessingPayment(true);
+
+    try {
+      // Create meetings for all selected time slots
+      const meetings = [];
+
+      for (const [date, times] of Object.entries(selectedTimesByDate)) {
+        for (const time of times) {
+          // Convert date/time to proper ISO format
+          // Try multiple date parsing approaches
+          let startDate, endDate;
+
+          try {
+            // Method 1: Direct string parsing
+            startDate = new Date(`2024-08-${date} ${time}:00`);
+
+            // Method 2: If Method 1 fails, try with explicit formatting
+            if (isNaN(startDate.getTime())) {
+              const year = 2024;
+              const month = 8; // August
+              const day = parseInt(date);
+              const [hours, minutes] = time.split(":").map(Number);
+              startDate = new Date(year, month - 1, day, hours, minutes);
+            }
+
+            endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1 hour
+
+            // Validate date parsing
+            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+              throw new Error(`Invalid date format: ${date} ${time}`);
+            }
+
+            console.log("Date parsing successful:", {
+              input: { date, time },
+              output: {
+                start: startDate.toISOString(),
+                end: endDate.toISOString(),
+              },
+            });
+          } catch (dateError: any) {
+            console.error("Date parsing failed:", {
+              date,
+              time,
+              error: dateError,
+            });
+            throw new Error(
+              `Cannot parse date: ${date} ${time} - ${
+                dateError?.message || "Unknown error"
+              }`
+            );
+          }
+
+          const meetingRequest = {
+            start: startDate.toISOString(),
+            end: endDate.toISOString(),
+            mentorEmail: mentor.email,
+            menteeEmail: session.user.email,
+            title: `Mentor Session with ${mentor.firstName} ${mentor.lastName}`,
+            description: `
+               Mentorship Session
+               
+               Mentor: ${mentor.firstName} ${mentor.lastName} (${mentor.email})
+               Student: ${session.user.email}
+               Duration: 1 hour
+               Price: ₮${mentor.hourlyPrice.toLocaleString()}
+               
+               Meeting created via Mentor Meet platform.
+             `,
+          };
+
+          console.log("Creating meeting with request:", meetingRequest);
+
+          const response = await fetch("/api/create-meeting", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(meetingRequest),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error("Meeting creation failed:", {
+              status: response.status,
+              statusText: response.statusText,
+              error: errorData,
+            });
+            throw new Error(
+              `Failed to create meeting: ${response.status} - ${
+                errorData.error || response.statusText
+              }`
+            );
+          }
+
+          const meetingData = await response.json();
+          console.log("Meeting created successfully:", meetingData);
+          meetings.push(meetingData);
+        }
+      }
+
+      // Store meeting info in localStorage for success page
+      localStorage.setItem("completedMeetings", JSON.stringify(meetings));
+
+      // Redirect to success page
+      router.push("/payment/payment-successfully");
+    } catch (error) {
+      console.error("Error processing payment:", error);
+      alert("Уулзалт үүсгэхэд алдаа гарлаа. Дахин оролдоно уу.");
+    } finally {
+      setIsProcessingPayment(false);
     }
   };
 
@@ -273,16 +406,15 @@ const MentorPayment = () => {
                         />
                       </div>
 
-                      <DialogClose asChild>
-                        <Link href={"/payment-successfully"}>
-                          <Button
-                            type="submit"
-                            className="w-[200px] h-[40px] rounded-[40px] bg-[#000000] text-[#FFFFFF]"
-                          >
-                            Төлбөр шалгах
-                          </Button>
-                        </Link>
-                      </DialogClose>
+                      <Button
+                        onClick={handlePaymentVerification}
+                        disabled={isProcessingPayment}
+                        className="w-[200px] h-[40px] rounded-[40px] bg-[#000000] text-[#FFFFFF] disabled:bg-gray-500"
+                      >
+                        {isProcessingPayment
+                          ? "Боловсруулж байна..."
+                          : "Төлбөр шалгах"}
+                      </Button>
                     </div>
                   )}
                 </DialogContent>

@@ -5,7 +5,9 @@ import { MentorModel } from "../model/mentor-model";
 import { OpenAI } from "openai";
 
 // OpenAI client үүсгэх
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = process.env.OPENAI_API_KEY
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null;
 
 // Intent detection функц
 const detectIntent = async (
@@ -100,6 +102,10 @@ const generateAIResponse = async (
   intent: string
 ): Promise<string> => {
   try {
+    // OpenAI байхгүй бол энгийн хариу буцаах
+    if (!openai) {
+      return generateSimpleResponse(userMessage);
+    }
     let systemPrompt = "";
 
     // Intent-ээс хамааран system prompt тохируулах

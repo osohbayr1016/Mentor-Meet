@@ -11,8 +11,36 @@ import { chatRouter } from "./router/chat-router";
 import { CalendarRouter } from "./router/calendar-router";
 
 const app = express();
-app.use(cors());
+
+// Configure CORS for production
+const corsOptions = {
+  origin: [
+    'http://localhost:3001', // Development frontend
+    'https://mentor-meet-pybapseng-twissus-projects.vercel.app', // Production frontend
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin'
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
+
+// Health check endpoint
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Mentor Meet API is running!',
+    timestamp: new Date().toISOString(),
+    cors: 'configured'
+  });
+});
 
 const uri = process.env.MONGODB_URI;
 const dataBaseConnection = async () => {

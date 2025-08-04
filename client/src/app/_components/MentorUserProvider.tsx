@@ -71,7 +71,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
     try {
       const response = await axios.post<LoginResponse>(
-        "http://localhost:8000/mentorLogin",
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/mentorLogin`,
         {
           email,
           password,
@@ -87,7 +89,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         try {
           // Fetch mentor profile data using the token
           const profileResponse = await axios.get<ProfileResponse>(
-            "http://https://mentor-meet-ferb.onrender.com/mentorProfile",
+            `${process.env.NEXT_PUBLIC_API_URL}/mentorProfile`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -240,7 +242,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         login,
         logout,
         checkAuth,
-      }}>
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
