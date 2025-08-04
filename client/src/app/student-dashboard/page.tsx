@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import BookingCard from "../../components/BookingCard";
+import StudentAuthGuard from "../../components/StudentAuthGuard";
 
 interface Mentor {
   _id: string;
@@ -38,10 +39,21 @@ const StudentDashboard = () => {
   );
   const [totalSpent] = useState(150000); // Mock data
 
-  // Mock student ID - replace with actual auth
-  const studentId = "student_123";
+  // Get student ID from localStorage
+  const [studentId, setStudentId] = useState("student_123");
 
   useEffect(() => {
+    // Get student data from localStorage
+    try {
+      const studentUser = localStorage.getItem("studentUser");
+      if (studentUser) {
+        const studentData = JSON.parse(studentUser);
+        setStudentId(studentData.studentId || "student_123");
+      }
+    } catch (error) {
+      console.error("Error parsing student data:", error);
+    }
+
     fetchBookings();
   }, []);
 
@@ -234,10 +246,19 @@ const StudentDashboard = () => {
   };
 
   const handleLogout = () => {
-    // Handle logout logic
+    // Clear localStorage
+    localStorage.removeItem("studentToken");
+    localStorage.removeItem("studentUser");
+    localStorage.removeItem("studentEmail");
+
+    // Dispatch custom event to notify other components about auth change
+    window.dispatchEvent(new Event("authChange"));
+
+    // Redirect to login page
     router.push("/student-login");
   };
 
+  // Show loading while fetching data
   if (loading) {
     return (
       <div className="relative w-full h-screen">
@@ -262,147 +283,149 @@ const StudentDashboard = () => {
   }
 
   return (
-    <div className="relative w-full min-h-screen">
-      {/* Background image */}
-      <div className="absolute inset-0 bg-black/30 -z-10" />
-      <Image
-        src="https://images.unsplash.com/photo-1706074740295-d7a79c079562?q=80&w=2232&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-        alt="background image"
-        fill
-        className="absolute inset-0 -z-20 object-cover"
-        priority
-      />
+    <StudentAuthGuard>
+      <div className="relative w-full min-h-screen">
+        {/* Background image */}
+        <div className="absolute inset-0 bg-black/30 -z-10" />
+        <Image
+          src="https://images.unsplash.com/photo-1706074740295-d7a79c079562?q=80&w=2232&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="background image"
+          fill
+          className="absolute inset-0 -z-20 object-cover"
+          priority
+        />
 
-      {/* Main Dashboard */}
-      <div className="relative z-10 w-full min-h-screen flex flex-col">
-        {/* Main Content */}
-        <div className="flex-1 px-6 pb-20 pt-6">
-          <div className="max-w-6xl mx-auto">
-            {/* Main Dashboard Panel */}
-            <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20 h-[650px] w-full">
-              <div className="flex gap-8 h-full">
-                {/* Left Sidebar */}
-                <div className="w-72 flex flex-col h-full justify-between">
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => setActiveTab("upcoming")}
-                      className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
-                        activeTab === "upcoming"
-                          ? "bg-gray-600 text-white"
-                          : "text-gray-300 hover:bg-gray-700/50"
-                      }`}
-                    >
-                      Товлосон уулзалтууд
-                    </button>
-                    <button
-                      onClick={() => setActiveTab("history")}
-                      className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
-                        activeTab === "history"
-                          ? "bg-gray-600 text-white"
-                          : "text-gray-300 hover:bg-gray-700/50"
-                      }`}
-                    >
-                      Уулзалтын түүх
-                    </button>
-                  </div>
-
-                  <div className="mt-auto space-y-2">
-                    <button
-                      onClick={() => router.push("/explore")}
-                      className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-300 hover:bg-gray-700/50 transition-colors flex items-center gap-2"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+        {/* Main Dashboard */}
+        <div className="relative z-10 w-full min-h-screen flex flex-col">
+          {/* Main Content */}
+          <div className="flex-1 px-6 pb-20 pt-6">
+            <div className="max-w-6xl mx-auto">
+              {/* Main Dashboard Panel */}
+              <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20 h-[650px] w-full">
+                <div className="flex gap-8 h-full">
+                  {/* Left Sidebar */}
+                  <div className="w-72 flex flex-col h-full justify-between">
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => setActiveTab("upcoming")}
+                        className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
+                          activeTab === "upcoming"
+                            ? "bg-gray-600 text-white"
+                            : "text-gray-300 hover:bg-gray-700/50"
+                        }`}
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        />
-                      </svg>
-                      Ментор хайх
-                    </button>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-300 hover:bg-gray-700/50 transition-colors flex items-center gap-2"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                        Товлосон уулзалтууд
+                      </button>
+                      <button
+                        onClick={() => setActiveTab("history")}
+                        className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
+                          activeTab === "history"
+                            ? "bg-gray-600 text-white"
+                            : "text-gray-300 hover:bg-gray-700/50"
+                        }`}
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                        />
-                      </svg>
-                      Гарах
-                    </button>
-                  </div>
-                </div>
+                        Уулзалтын түүх
+                      </button>
+                    </div>
 
-                {/* Right Content Area */}
-                <div className="flex-1 flex flex-col">
-                  {/* Income Section */}
-                  <div className="mb-6">
-                    <p className="text-gray-300 text-sm mb-1">
-                      Таны нийт зарцуулсан мөнгө:
-                    </p>
-                    <p className="text-green-400 text-2xl font-bold">
-                      ₮{totalSpent.toLocaleString()}
-                    </p>
+                    <div className="mt-auto space-y-2">
+                      <button
+                        onClick={() => router.push("/explore")}
+                        className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-300 hover:bg-gray-700/50 transition-colors flex items-center gap-2"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
+                        </svg>
+                        Ментор хайх
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-300 hover:bg-gray-700/50 transition-colors flex items-center gap-2"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                          />
+                        </svg>
+                        Гарах
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Meetings Section */}
+                  {/* Right Content Area */}
                   <div className="flex-1 flex flex-col">
-                    <h3 className="text-white text-lg font-semibold mb-4">
-                      {activeTab === "upcoming"
-                        ? "Таны товлосон уулзалтууд:"
-                        : "Уулзалтын түүх:"}
-                    </h3>
+                    {/* Income Section */}
+                    <div className="mb-6">
+                      <p className="text-gray-300 text-sm mb-1">
+                        Таны нийт зарцуулсан мөнгө:
+                      </p>
+                      <p className="text-green-400 text-2xl font-bold">
+                        ₮{totalSpent.toLocaleString()}
+                      </p>
+                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto">
-                      {(activeTab === "upcoming"
-                        ? bookings?.upcoming
-                        : bookings?.past
-                      )?.map((booking) => (
-                        <BookingCard
-                          key={booking._id}
-                          booking={booking}
-                          onJoinMeeting={
-                            activeTab === "upcoming"
-                              ? handleJoinMeeting
-                              : undefined
-                          }
-                          onCancelBooking={
-                            activeTab === "upcoming"
-                              ? handleCancelBooking
-                              : undefined
-                          }
-                          showActions={activeTab === "upcoming"}
-                        />
-                      ))}
+                    {/* Meetings Section */}
+                    <div className="flex-1 flex flex-col">
+                      <h3 className="text-white text-lg font-semibold mb-4">
+                        {activeTab === "upcoming"
+                          ? "Таны товлосон уулзалтууд:"
+                          : "Уулзалтын түүх:"}
+                      </h3>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto">
+                        {(activeTab === "upcoming"
+                          ? bookings?.upcoming
+                          : bookings?.past
+                        )?.map((booking) => (
+                          <BookingCard
+                            key={booking._id}
+                            booking={booking}
+                            onJoinMeeting={
+                              activeTab === "upcoming"
+                                ? handleJoinMeeting
+                                : undefined
+                            }
+                            onCancelBooking={
+                              activeTab === "upcoming"
+                                ? handleCancelBooking
+                                : undefined
+                            }
+                            showActions={activeTab === "upcoming"}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        {/* Copyright Footer */}
-        <div className="fixed bottom-2 left-6 text-xs text-white/60 z-30">
-          <div>Copyright © 2025 Mentor Meet</div>
-          <div>All rights reserved.</div>
+          {/* Copyright Footer */}
+          <div className="fixed bottom-2 left-6 text-xs text-white/60 z-30">
+            <div>Copyright © 2025 Mentor Meet</div>
+            <div>All rights reserved.</div>
+          </div>
         </div>
       </div>
-    </div>
+    </StudentAuthGuard>
   );
 };
 

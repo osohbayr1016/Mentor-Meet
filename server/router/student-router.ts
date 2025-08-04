@@ -14,6 +14,7 @@ import {
   joinMeeting,
   getStudentProfile,
 } from "../controller/student-dashboard";
+import { createBooking } from "../controller/create-booking";
 
 export const StudentRouter = Router();
 
@@ -26,6 +27,7 @@ StudentRouter.put("/StudentForgotPassword", studentForgetPass);
 StudentRouter.put("/studentVerify", studentVerify);
 
 // Student Dashboard routes
+StudentRouter.post("/bookings", createBooking);
 StudentRouter.get("/bookings/:studentId", getStudentBookings);
 StudentRouter.put("/bookings/:bookingId/cancel", cancelBooking);
 StudentRouter.post("/bookings/:bookingId/join", joinMeeting);

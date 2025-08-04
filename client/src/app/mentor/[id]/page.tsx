@@ -293,21 +293,6 @@ const MentorDetailPage = () => {
         </div>
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-3 left-1/2 transform -translate-x-1/2 z-30">
-        <div className="bg-black/20 backdrop-blur-md rounded-full px-4 py-2 flex gap-4">
-          <button className="text-white text-xs hover:text-gray-300 transition-colors">
-            Нүүр хуудас
-          </button>
-          <button className="text-white text-xs bg-white/20 px-2 py-0.5 rounded-full transition-colors">
-            Менторууд
-          </button>
-          <button className="text-white text-xs hover:text-gray-300 transition-colors">
-            Нэвтрэх
-          </button>
-        </div>
-      </div>
-
       {/* Copyright Footer */}
       <div className="fixed bottom-2 left-6 text-xs text-white/60 z-30">
         <div>Copyright © 2025 Mentor Meet All rights reserved.</div>

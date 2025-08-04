@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useAuthWithFallback } from "../lib/auth";
 
 interface MeetingData {
   eventId: string;
@@ -20,13 +20,17 @@ interface MeetingManagerProps {
 export default function MeetingManager({
   className = "",
 }: MeetingManagerProps) {
-  const { data: session } = useSession();
+  const {
+    authData,
+    isLoading: authLoading,
+    error: authError,
+  } = useAuthWithFallback();
   const [meetings, setMeetings] = useState<MeetingData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchMeetings = async () => {
-    if (!session?.accessToken) {
+    if (!authData?.token) {
       setError("Нэвтрэх шаардлагатай");
       return;
     }
@@ -57,7 +61,7 @@ export default function MeetingManager({
   };
 
   const cancelMeeting = async (eventId: string) => {
-    if (!session?.accessToken) {
+    if (!authData?.token) {
       setError("Нэвтрэх шаардлагатай");
       return;
     }
@@ -101,12 +105,23 @@ export default function MeetingManager({
   };
 
   useEffect(() => {
-    if (session?.accessToken) {
+    if (authData?.token) {
       fetchMeetings();
     }
-  }, [session]);
+  }, [authData]);
 
-  if (!session) {
+  if (authLoading) {
+    return (
+      <div className={`p-6 bg-white rounded-lg shadow-md ${className}`}>
+        <div className="flex items-center justify-center">
+          <div className="w-6 h-6 border border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+          <span className="ml-2 text-gray-600">Уншиж байна...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!authData) {
     return (
       <div className={`p-6 bg-white rounded-lg shadow-md ${className}`}>
         <p className="text-gray-600 text-center">
@@ -136,9 +151,9 @@ export default function MeetingManager({
         </button>
       </div>
 
-      {error && (
+      {(error || authError) && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
+          {error || authError}
         </div>
       )}
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -33,14 +32,23 @@ export default function BookingModal({
   selectedTimesByDate = {},
   MentorId,
 }: BookingModalProps) {
-  const { data: session } = useSession();
+  // Check for student authentication in localStorage
+  const studentToken =
+    typeof window !== "undefined" ? localStorage.getItem("studentToken") : null;
+  const studentUser =
+    typeof window !== "undefined" ? localStorage.getItem("studentUser") : null;
 
-  // Check for mock user in localStorage for development
-  const mockUser =
-    typeof window !== "undefined" ? localStorage.getItem("mockUser") : null;
-  const isAuthenticated = session || mockUser;
-  const userEmail =
-    session?.user?.email || (mockUser ? JSON.parse(mockUser).email : null);
+  const isAuthenticated = studentToken && studentUser;
+  const userEmail = studentUser
+    ? (() => {
+        try {
+          return JSON.parse(studentUser).email;
+        } catch (error) {
+          console.error("Error parsing student user data:", error);
+          return null;
+        }
+      })()
+    : null;
   const [isLoading, setIsLoading] = useState(false);
   const [meetingLinks, setMeetingLinks] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -48,9 +56,9 @@ export default function BookingModal({
 
   if (!isOpen) return null;
 
-  const handleMarkAvailability = async () => {
+  const handleCreateBooking = async () => {
     if (!isAuthenticated) {
-      setError("Please sign in to mark availability");
+      setError("Хэрэглэгч нэвтрэх шаардлагатай!");
       return;
     }
 
@@ -58,127 +66,67 @@ export default function BookingModal({
     setError(null);
 
     try {
-      // Prepare all availability requests
-      const availabilityRequests = [];
+      // Get student data from localStorage
+      const studentUserData = JSON.parse(studentUser!);
+      const studentId = studentUserData.studentId;
 
-      // Process all selected times from all dates
+      // Create bookings for all selected times
+      const bookingPromises = [];
+
       for (const [date, times] of Object.entries(selectedTimesByDate)) {
         for (const time of times) {
-          // Convert selected date and time to ISO string
-          const [hours, minutes] = time.split(":");
-          const availabilityDate = new Date(
-            `2024-08-${date.padStart(2, "0")}T${hours}:${minutes}:00.000Z`
-          );
-          const endDate = new Date(availabilityDate.getTime() + 60 * 60 * 1000); // 1 hour later
-
-          availabilityRequests.push({
-            start: availabilityDate.toISOString(),
-            end: endDate.toISOString(),
-            mentorEmail: userEmail,
-            date: date,
+          const bookingData = {
+            mentorId: MentorId,
+            studentId: studentId,
+            date: `2025-08-${date.padStart(2, "0")}`,
             time: time,
-          });
+            duration: 60, // 1 hour
+            price:
+              totalPrice / Object.values(selectedTimesByDate).flat().length, // Divide total price by number of slots
+            category: "General", // You can make this dynamic based on mentor's category
+            notes: `Booking for ${date} at ${time}`,
+          };
+
+          bookingPromises.push(
+            fetch("/api/create-booking", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(bookingData),
+            })
+          );
         }
       }
 
-      // First, mark availability
-      const availabilityResponse = await fetch("/api/mark-availability", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          availabilities: availabilityRequests,
-        }),
-      });
+      const bookingResponses = await Promise.all(bookingPromises);
+      const bookingResults = await Promise.all(
+        bookingResponses.map((response) => response.json())
+      );
 
-      const data = await availabilityResponse.json();
+      const successfulBookings = bookingResults.filter(
+        (result) => result.success
+      );
+      const failedBookings = bookingResults.filter((result) => !result.success);
 
-      if (availabilityResponse.ok && data.success) {
-        const createdMeetings = data.results
-          .filter((result: any) => result.success)
-          .map((result: any) => `08/${result.date} - ${result.time}`);
-        setMeetingLinks(createdMeetings);
+      if (successfulBookings.length > 0) {
+        const bookingMessages = successfulBookings.map((booking: any) => {
+          const bookingData = booking.booking;
+          return `08/${bookingData.date.split("-")[2]} - ${bookingData.time}`;
+        });
 
-        // Create Google Meet meetings for each successful availability
-        // Create Google Meet meetings for each successful availability
-        try {
-          const meetingPromises = availabilityRequests.map(async (request) => {
-            try {
-              const meetingResponse = await fetch("/api/create-meeting", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  start: request.start,
-                  end: request.end,
-                  mentorEmail: userEmail,
-                  menteeEmail: "student@example.com", // Replace with actual student email
-                  title: "Mentorship Session",
-                  description: `Mentorship session on ${request.date} at ${request.time}`,
-                }),
-              });
-
-              if (meetingResponse.ok) {
-                const meetingData = await meetingResponse.json();
-                return {
-                  link: meetingData.hangoutLink,
-                  eventId: meetingData.eventId,
-                  date: request.date,
-                  time: request.time,
-                  startTime: meetingData.startTime,
-                  endTime: meetingData.endTime,
-                };
-              } else {
-                console.error(
-                  `Failed to create meeting for ${request.date} at ${request.time}`
-                );
-                return null;
-              }
-            } catch (meetingError) {
-              console.error(
-                `Error creating meeting for ${request.date} at ${request.time}:`,
-                meetingError
-              );
-              return null;
-            }
-          });
-
-          const meetingResults = await Promise.all(meetingPromises);
-          const validMeetings = meetingResults.filter(
-            (meeting) => meeting !== null
-          );
-          const meetingLinks = validMeetings
-            .map((meeting) => meeting?.link)
-            .filter(Boolean);
-
-          setMeetingLinks(meetingLinks);
-
-          if (validMeetings.length > 0) {
-            setSuccessMessage(
-              `${validMeetings.length} Google Meet холбооуд амжилттай үүсгэгдлээ!`
-            );
-          } else {
-            setError(
-              "Google Meet холбоо үүсгэхэд алдаа гарлаа. Дахин оролдоно уу."
-            );
-          }
-        } catch (meetingError) {
-          console.error("Error creating Google Meet links:", meetingError);
-          setError(
-            "Google Meet холбоо үүсгэхэд алдаа гарлаа. Дахин оролдоно уу."
-          );
-        }
+        setMeetingLinks(bookingMessages);
+        setSuccessMessage(
+          `${successfulBookings.length} захиалга амжилттай үүсгэгдлээ!`
+        );
       } else {
-        const data = await availabilityResponse.json();
         setError(
-          data.error ||
-            "Боломжит цаг тэмдэглэхэд алдаа гарлаа. Дахин оролдоно уу."
+          failedBookings[0]?.error ||
+            "Захиалга үүсгэхэд алдаа гарлаа. Дахин оролдоно уу."
         );
       }
     } catch (error) {
-      console.error("Error marking availability:", error);
+      console.error("Error creating booking:", error);
       setError("Алдаа гарлаа. Дахин оролдоно уу.");
     } finally {
       setIsLoading(false);
@@ -212,13 +160,6 @@ export default function BookingModal({
             />
             <p className="font-[700] text-[22px] text-white">Mentor Meet</p>
           </div>
-
-          {/* Error/Success Messages */}
-          {error && (
-            <div className="bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-2 rounded-lg text-sm mb-4">
-              {error}
-            </div>
-          )}
           {successMessage && (
             <div className="bg-green-500/20 border border-green-500/30 text-green-200 px-4 py-2 rounded-lg text-sm mb-4">
               {successMessage}
@@ -265,7 +206,7 @@ export default function BookingModal({
                     )}`}
                   >
                     <button
-                      onClick={handleMarkAvailability}
+                      onClick={handleCreateBooking}
                       disabled={isLoading}
                       className="px-6 py-3 bg-white text-black rounded-[40px] hover:bg-gray-100 transition-colors disabled:opacity-50"
                     >
