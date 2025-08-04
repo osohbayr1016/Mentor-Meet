@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "./_components/MentorUserProvider";
 import SessionProvider from "../components/SessionProvider";
+import ErrorBoundary from "../components/ErrorBoundary";
 import { HomeChat } from "./_components/Chat";
 import BottomNavigation from "../components/BottomNavigation";
 import Copyright from "../components/Copyright";
@@ -32,14 +33,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProvider>
-          <AuthProvider>
-            <HomeChat />
-            {children}
-            <BottomNavigation />
-            <Copyright />
-          </AuthProvider>
-        </SessionProvider>
+        <ErrorBoundary>
+          <SessionProvider>
+            <AuthProvider>
+              <HomeChat />
+              {children}
+              <BottomNavigation />
+              <Copyright />
+            </AuthProvider>
+          </SessionProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

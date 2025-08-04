@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
 import BookingModal from "./BookingModal";
-import { headers } from "next/headers";
-import axios from "axios";
 
 interface MentorCalendarProps {
   mentorId?: string;
@@ -82,44 +79,30 @@ const MentorCalendar: React.FC<MentorCalendarProps> = ({
   const handleTimeClick = async (time: string, date: string) => {
     if (!mentorId) return;
 
-    const token = localStorage.getItem("mentorToken");
-    if (!token) return alert("Нэвтрэх шаардлагатай!");
+    // Check for student token instead of mentor token
+    const studentToken = localStorage.getItem("studentToken");
+    const studentUser = localStorage.getItem("studentUser");
+
+    if (!studentToken || !studentUser) {
+      alert("Хэрэглэгч нэвтрэх шаардлагатай!");
+      return;
+    }
+
+    // Validate that studentUser is valid JSON
+    try {
+      JSON.parse(studentUser);
+    } catch (error) {
+      console.error("Error parsing student user data:", error);
+      alert("Хэрэглэгчийн мэдээлэл алдаатай байна. Дахин оролдоно уу.");
+      return;
+    }
 
     // өөрчлөгдсөн утгаа пайж руу дамжуулдаг функц юм шиг байна.
     onTimeSelect?.(date, time);
 
-    // шинэчилж сонгосон цагуудаа энэ дотор задалж бэлдээд байгаа юм уу даа.
-    //
-    const newTimes = { ...selectedTimesByDate };
-    const times = newTimes[date] || [];
-    // асуух?
-    const updatedTimes = times.includes(time)
-      ? times.filter((t) => t !== time)
-      : [...times, time];
-
-    newTimes[date] = updatedTimes;
-
-    const availabilities = Object.entries(newTimes).map(([date, times]) => ({
-
-      date: `2025-08-${date.padStart(2, "0")}`,
-      times,
-    }));
-
-    try {
-      const res = await axios.post(
-        "http://localhost:8000/Calendar",
-        { availabilities },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log("Амжилттай хадгаллаа:", res.data);
-    } catch (err) {
-      console.error("Алдаа:", err);
-    }
+    // Note: We don't need to call the Calendar API here since this is for students selecting time slots
+    // The actual booking will be handled when they confirm the booking in the BookingModal
+    console.log("Time slot selected:", { date, time, mentorId });
   };
 
   const renderTimeSlots = (date: string) => (

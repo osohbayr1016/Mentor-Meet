@@ -38,6 +38,30 @@ const BottomNavigation = () => {
     };
 
     checkStudentAuth();
+
+    // Listen for storage changes (when user logs in/out in another tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "studentToken" || e.key === "studentUser") {
+        checkStudentAuth();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    // Listen for custom events (when user logs in/out in same tab)
+    const handleAuthChange = () => {
+      // Small delay to ensure localStorage is updated
+      setTimeout(() => {
+        checkStudentAuth();
+      }, 100);
+    };
+
+    window.addEventListener("authChange", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("authChange", handleAuthChange);
+    };
   }, []);
 
   // Determine the third button text and link based on current page and auth state
