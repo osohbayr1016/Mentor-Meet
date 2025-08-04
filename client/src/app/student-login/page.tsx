@@ -30,7 +30,7 @@ const StudentLoginPage = () => {
 
     try {
       const response = await fetch(
-        "https://mentor-meet-o3rp.onrender.com/api/studentLogin",
+        "https://mentor-meet-o3rp.onrender.com/studentLogin",
         {
           method: "POST",
           headers: {
@@ -127,7 +127,8 @@ const StudentLoginPage = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-white text-black px-6 py-3 rounded-[40px] hover:bg-gray-100 transition-colors disabled:opacity-50">
+                  className="w-full bg-white text-black px-6 py-3 rounded-[40px] hover:bg-gray-100 transition-colors disabled:opacity-50"
+                >
                   {loading ? "Нэвтэрч байна..." : "Нэвтрэх"}
                 </button>
               </form>
