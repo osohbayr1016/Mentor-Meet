@@ -65,7 +65,7 @@ export const HomeChat = () => {
 
     setUserEmail(email || "");
 
-    fetch("http://localhost:8000/api/getMessages", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getMessages`, {
       headers: {
         Authorization: `Bearer ${studentToken || mentorToken}`,
       },
@@ -112,14 +112,17 @@ export const HomeChat = () => {
 
     try {
       const local = localStorage.getItem("studentUser");
-      const res = await fetch("http://localhost:8000/api/createMessage", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newMsg),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/createMessage`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(newMsg),
+        }
+      );
 
       const data = await res.json();
       console.log("API Response:", data);
@@ -145,7 +148,8 @@ export const HomeChat = () => {
     <div>
       <div
         className="w-[44px] h-[44px] rounded-full bg-transparent  flex justify-center items-center border border-[#00000040] mt-2 cursor-pointer fixed bottom-6 right-6 z-50"
-        onClick={() => setOpen(true)}>
+        onClick={() => setOpen(true)}
+      >
         <MessagesSquare className="h-[20px]" />
       </div>
 
@@ -158,11 +162,13 @@ export const HomeChat = () => {
               ? "opacity-100 translate-y-0 pointer-events-auto"
               : "opacity-0 translate-y-10 pointer-events-none"
           }
-        `}>
+        `}
+      >
         <div className="w-[320px] h-[400px] bg-white rounded-[20px] p-4 flex flex-col gap-2 border-2 border-[#808080] shadow-2xl relative">
           <div
             className="absolute right-4 top-4 cursor-pointer"
-            onClick={() => setOpen(false)}>
+            onClick={() => setOpen(false)}
+          >
             <X />
           </div>
           <p className="text-[16px] font-semibold mb-2 pt-[50px] pl-[20px]">
@@ -172,7 +178,8 @@ export const HomeChat = () => {
           <div
             ref={scrollRef}
             className="flex-1 overflow-y-auto p-4 flex flex-col gap-2"
-            style={{ wordBreak: "break-word" }}>
+            style={{ wordBreak: "break-word" }}
+          >
             {messages.map((el, index) => (
               <div
                 key={el._id || index}
@@ -180,7 +187,8 @@ export const HomeChat = () => {
                   el.senderType === "student" || el.senderType === "mentor"
                     ? "bg-green-600 font-medium text-white self-end"
                     : "bg-[#666] text-white self-start"
-                }`}>
+                }`}
+              >
                 {el.message}
               </div>
             ))}
@@ -216,7 +224,8 @@ export const HomeChat = () => {
                   isLoading ? "text-gray-400" : "text-[#808080]"
                 }`}
                 onClick={handleSend}
-                disabled={isLoading}>
+                disabled={isLoading}
+              >
                 {isLoading ? (
                   <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                 ) : (
