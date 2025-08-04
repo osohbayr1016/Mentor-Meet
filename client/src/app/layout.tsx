@@ -5,6 +5,7 @@ import { AuthProvider } from "./_components/MentorUserProvider";
 import SessionProvider from "../components/SessionProvider";
 import { HomeChat } from "./_components/Chat";
 import BottomNavigation from "../components/BottomNavigation";
+import Copyright from "../components/Copyright";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +37,7 @@ export default function RootLayout({
             <HomeChat />
             {children}
             <BottomNavigation />
+            <Copyright />
           </AuthProvider>
         </SessionProvider>
       </body>
