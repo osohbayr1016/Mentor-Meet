@@ -107,7 +107,9 @@ const MentorPayment = () => {
   }, [searchParams, mentor]);
 
   // Get all selected times for display
-  const getAllSelectedTimes = () => {
+  const getAllSelectedTimes = async () => {
+    const response = await axios.get(`http:localhost:8000/calendar${mentorId}`);
+
     return Object.values(selectedTimesByDate).flat();
   };
 
@@ -126,6 +128,12 @@ const MentorPayment = () => {
     }
     return formattedTimes;
   };
+
+  //   const saveSelectedHours = async () => {
+  //     const response = await axios.post("http://localhost:8000/Calendar", {
+  //  setPaymentSuccess(response)
+  //     });
+  //   };
 
   return (
     <div className="relative w-full h-screen">

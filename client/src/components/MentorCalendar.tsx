@@ -18,10 +18,14 @@ const MentorCalendar: React.FC<MentorCalendarProps> = ({
   selectedTimesByDate = {},
 }) => {
   const [activeDate, setActiveDate] = useState<string | null>(null);
-  const [activeDatePosition, setActiveDatePosition] = useState<"top" | "bottom">("top");
+  const [activeDatePosition, setActiveDatePosition] = useState<
+    "top" | "bottom"
+  >("top");
   const [isAnimating, setIsAnimating] = useState(false);
   const [animatingDate, setAnimatingDate] = useState<string | null>(null);
-  const [animatingPosition, setAnimatingPosition] = useState<"top" | "bottom">("top");
+  const [animatingPosition, setAnimatingPosition] = useState<"top" | "bottom">(
+    "top"
+  );
 
   const week1Dates = [
     { day: "Да", date: "4" },
@@ -44,8 +48,18 @@ const MentorCalendar: React.FC<MentorCalendarProps> = ({
   ];
 
   const timeSlots = [
-    "09:00", "10:00", "11:00", "12:00", "13:00", "14:00",
-    "15:00", "16:00", "17:00", "18:00", "19:00", "20:00",
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+    "19:00",
+    "20:00",
   ];
 
   const handleDateClick = (date: string, position: "top" | "bottom") => {
@@ -86,7 +100,7 @@ const MentorCalendar: React.FC<MentorCalendarProps> = ({
     newTimes[date] = updatedTimes;
 
     const availabilities = Object.entries(newTimes).map(([date, times]) => ({
-      // энэ object.entries ийг анх удаа л харж байна
+
       date: `2025-08-${date.padStart(2, "0")}`,
       times,
     }));
@@ -128,14 +142,21 @@ const MentorCalendar: React.FC<MentorCalendarProps> = ({
 
   return (
     <div className="w-full flex flex-col gap-[15px]">
-      {[{ label: "08/04 - 08/10", dates: week1Dates, pos: "top" }, { label: "08/11 - 08/17", dates: week2Dates, pos: "bottom" }].map((week) => (
+      {[
+        { label: "08/04 - 08/10", dates: week1Dates, pos: "top" },
+        { label: "08/11 - 08/17", dates: week2Dates, pos: "bottom" },
+      ].map((week) => (
         <div key={week.label} className="flex flex-col gap-[15px]">
-          <p className="text-white text-center text-sm font-medium">{week.label}</p>
+          <p className="text-white text-center text-sm font-medium">
+            {week.label}
+          </p>
           <div className="flex justify-between gap-[8px]">
             {week.dates.map(({ day, date }) => (
               <button
                 key={date}
-                onClick={() => handleDateClick(date, week.pos as "top" | "bottom")}
+                onClick={() =>
+                  handleDateClick(date, week.pos as "top" | "bottom")
+                }
                 className={`flex flex-col items-center justify-center w-[45px] h-[45px] rounded-full border transition-colors ${
                   activeDate === date
                     ? "bg-white text-black border-white"
@@ -151,7 +172,9 @@ const MentorCalendar: React.FC<MentorCalendarProps> = ({
           </div>
 
           {((activeDate && activeDatePosition === week.pos) ||
-            (isAnimating && animatingDate && animatingPosition === week.pos)) && (
+            (isAnimating &&
+              animatingDate &&
+              animatingPosition === week.pos)) && (
             <div
               className={`overflow-hidden transition-all duration-300 ${
                 isAnimating ? "animate-slideUp" : "animate-slideDown"
@@ -167,7 +190,6 @@ const MentorCalendar: React.FC<MentorCalendarProps> = ({
 };
 
 export default MentorCalendar;
-
 
 // interface MentorCalendarProps {
 //   mentorId?: string;
@@ -229,8 +251,6 @@ export default MentorCalendar;
 //     "20:00",
 //   ];
 
-
-  
 //   const handleDateClick = (date: string, position: "top" | "bottom") => {
 //     if (activeDate === date) {
 //       // Start slide-up animation
@@ -257,7 +277,6 @@ export default MentorCalendar;
 //     date: `2025-08-${date.padStart(2, "0")}`,
 //     times,
 //   }));
-
 
 //     try {
 //       const response = await axios.post(

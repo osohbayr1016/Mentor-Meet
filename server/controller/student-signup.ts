@@ -22,9 +22,8 @@ export const Checkemail = async (req: Request, res: Response) => {
 
     if (user) {
       res.status(400).json({ message: "User already existed" });
-      return
+      return;
     }
-
 
     const tempUserExists = await TempUserModel.findOne({ email });
     if (tempUserExists) {
@@ -44,7 +43,6 @@ export const Checkemail = async (req: Request, res: Response) => {
 
     const code = Math.floor(1000 + Math.random() * 9000).toString();
 
-
     await TempUserModel.create({ email, code });
 
     const options = {
@@ -56,7 +54,7 @@ export const Checkemail = async (req: Request, res: Response) => {
      <div style="font-size: 32px; font-weight: bold; color: black; margin: 20px 0; letter-spacing: 5px;">
   ${code}
 </div>
-`
+`,
     };
 
     await OtpModel.create({ email, code });
@@ -82,18 +80,15 @@ export const checkOtp = async (req: Request, res: Response) => {
       return;
     }
 
-
     const tempUser = await TempUserModel.findOne({ email, code });
 
     if (!tempUser) {
       res.status(400).json({ message: "Wrong OTP code" });
-      return
+      return;
     }
-
 
     tempUser.isVerified = true;
     await tempUser.save();
-
 
     res.status(200).send({ message: "success", isOtpExisting });
   } catch (err) {
@@ -111,15 +106,13 @@ export const createPassword = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Email not verified or invalid" });
     }
 
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
-
     tempUser.password = hashedPassword;
-    await tempUser.save()
+    await tempUser.save();
 
     res.send({ message: "Successfully updated password" });
-    return
+    return;
   } catch (error) {
     console.error("Error updating password:", error);
     return res.status(500).send({ message: "Internal server error" });
@@ -132,7 +125,11 @@ export const StudentNameNumber = async (req: Request, res: Response) => {
   try {
     // For Google OAuth users, skip temp user verification
     if (googleAuth) {
-      console.log("Processing Google OAuth student signup:", { email, nickname, phoneNumber });
+      console.log("Processing Google OAuth student signup:", {
+        email,
+        nickname,
+        phoneNumber,
+      });
 
       // Check if student already exists
       const existingStudent = await StudentModel.findOne({ email });
@@ -160,15 +157,21 @@ export const StudentNameNumber = async (req: Request, res: Response) => {
           nickname: student.nickname,
           phoneNumber: student.phoneNumber,
         },
-        token
+        token,
       });
     }
 
     // Traditional signup flow
-    const tempUser = await TempUserModel.findOne({ email, isVerified: true, password: { $exists: true } });
+    const tempUser = await TempUserModel.findOne({
+      email,
+      isVerified: true,
+      password: { $exists: true },
+    });
 
     if (!tempUser) {
-      return res.status(400).json({ message: "Email not verified or password not set" });
+      return res
+        .status(400)
+        .json({ message: "Email not verified or password not set" });
     }
 
     tempUser.nickname = nickname;
@@ -178,7 +181,9 @@ export const StudentNameNumber = async (req: Request, res: Response) => {
 
     const existingStudent = await StudentModel.findOne({ email });
     if (existingStudent) {
-      return res.status(400).json({ message: "User already exists in main collection" });
+      return res
+        .status(400)
+        .json({ message: "User already exists in main collection" });
     }
 
     const student = await StudentModel.create({
@@ -196,7 +201,7 @@ export const StudentNameNumber = async (req: Request, res: Response) => {
     return res.status(200).json({
       message: "Successfully updated name and number",
       tempUser,
-      token
+      token,
     });
   } catch (error) {
     console.error("StudentNameNumber error:", error);

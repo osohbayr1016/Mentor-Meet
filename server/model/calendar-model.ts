@@ -9,6 +9,11 @@ export type MentorCalendar = {
   _id: ObjectId;
   mentorId: Schema.Types.ObjectId;
   availabilities: Availability[];
+  status: {
+    type: String;
+    enum: ["PENDING", "PAID", "CANCELLED"];
+    default: "PENDING";
+  };
   createdAt: string;
   updatedAt: string;
 };
