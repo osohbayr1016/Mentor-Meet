@@ -46,32 +46,38 @@ const MentorCards: React.FC<MentorCardsProps> = ({
 
   // Fetch mentors from API
   useEffect(() => {
-    if (!mounted) return;
-
-  
+    if (!mounted || !categories || categories.length === 0) return;
 
     const fetchMentors = async () => {
       try {
         setLoading(true);
         setError(null);
     
-        // Category name авах
-        const selectedCategoryName = categories.find(
-          (cat) => cat._id === selectedCategory
-        )?.categoryName;
-    
         // Query params бэлдэх
         const params: Record<string, string> = {};
     
-        if (selectedCategory && selectedCategory !== "all" && selectedCategoryName) {
-          params.category = selectedCategoryName;
+        // Always filter by category if selected
+        if (selectedCategory && selectedCategory !== "" && selectedCategory !== "all") {
+          const selectedCategoryName = categories.find(
+            (cat) => cat._id === selectedCategory
+          )?.categoryName;
+          if (selectedCategoryName) {
+            params.category = selectedCategoryName;
+          }
         }
     
+        // Add subcategory filter if selected
         if (selectedSubCategory) {
           params.subCategory = selectedSubCategory;
         }
-    
-                const response = await axios.get<Mentor[]>("https://mentor-meet-o3rp.onrender.com/mentors", {
+
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+        
+        console.log("🔍 Fetching mentors with params:", params);
+        console.log("🔍 Selected category ID:", selectedCategory);
+        console.log("🔍 Selected subcategory:", selectedSubCategory);
+        console.log("🔍 API URL:", `${API_BASE_URL}/mentors`);
+                const response = await axios.get<Mentor[]>(`${API_BASE_URL}/mentors`, {
           params,
         });
 
@@ -79,7 +85,8 @@ const MentorCards: React.FC<MentorCardsProps> = ({
       } catch (error) {
         console.error("Error fetching mentors:", error);
         setError("Менторуудыг авахад алдаа гарлаа.");
-        setMentors(getSampleMentors()); // fallback
+        // Set empty array instead of showing error immediately
+        setMentors([]);
       } finally {
         setLoading(false);
       }
@@ -88,192 +95,202 @@ const MentorCards: React.FC<MentorCardsProps> = ({
     
 
     fetchMentors();
-  }, [mounted, selectedCategory, selectedSubCategory]);
+  }, [mounted, selectedCategory, selectedSubCategory, categories]);
   // Sample mentors data for fallback
-  const getSampleMentors = (): Mentor[] => [
-    // Программчлал ба Технологи - Web Development
-    {
-      id: "1",
-      name: "Ч. Энхжин",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 8 жил",
-      rating: 4.9,
-      image: "/image709.png",
-      category: "Программчлал ба Технологи",
-      subCategory: "Web Development",
-    },
-    {
-      id: "2",
-      name: "Б. Сүхбат",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 5 жил",
-      rating: 4.7,
-      image: "/image709.png",
-      category: "Программчлал ба Технологи",
-      subCategory: "Web Development",
-    },
-    // Программчлал ба Технологи - Mobile Development
-    {
-      id: "3",
-      name: "Д. Батбаяр",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 6 жил",
-      rating: 4.8,
-      image: "/image709.png",
-      category: "Программчлал ба Технологи",
-      subCategory: "Mobile Development",
-    },
-    {
-      id: "4",
-      name: "Л. Мөнхбат",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 4 жил",
-      rating: 4.6,
-      image: "/image709.png",
-      category: "Программчлал ба Технологи",
-      subCategory: "Mobile Development",
-    },
-    // Бизнес ба Менежмент - Business Strategy
-    {
-      id: "5",
-      name: "Н. Алтанцэцэг",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 10 жил",
-      rating: 4.9,
-      image: "/image709.png",
-      category: "Бизнес ба Менежмент",
-      subCategory: "Business Strategy",
-    },
-    {
-      id: "6",
-      name: "П. Батсүх",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 7 жил",
-      rating: 4.8,
-      image: "/image709.png",
-      category: "Бизнес ба Менежмент",
-      subCategory: "Business Strategy",
-    },
-    // Бизнес ба Менежмент - Project Management
-    {
-      id: "7",
-      name: "Р. Дэлгэрмаа",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 9 жил",
-      rating: 4.7,
-      image: "/image709.png",
-      category: "Бизнес ба Менежмент",
-      subCategory: "Project Management",
-    },
-    {
-      id: "8",
-      name: "С. Батзориг",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 6 жил",
-      rating: 4.6,
-      image: "/image709.png",
-      category: "Бизнес ба Менежмент",
-      subCategory: "Project Management",
-    },
-    // Боловсрол ба Сургалт - Teaching Methods
-    {
-      id: "9",
-      name: "Т. Оюунчимэг",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 12 жил",
-      rating: 4.9,
-      image: "/image709.png",
-      category: "Боловсрол ба Сургалт",
-      subCategory: "Teaching Methods",
-    },
-    {
-      id: "10",
-      name: "У. Батбаатар",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 8 жил",
-      rating: 4.8,
-      image: "/image709.png",
-      category: "Боловсрол ба Сургалт",
-      subCategory: "Teaching Methods",
-    },
-    // Эрүүл мэнд ба Анагаах ухаан - Clinical Practice
-    {
-      id: "11",
-      name: "Ф. Энхтуяа",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 15 жил",
-      rating: 4.9,
-      image: "/image709.png",
-      category: "Эрүүл мэнд ба Анагаах ухаан",
-      subCategory: "Clinical Practice",
-    },
-    {
-      id: "12",
-      name: "Х. Батбаатар",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 11 жил",
-      rating: 4.8,
-      image: "/image709.png",
-      category: "Эрүүл мэнд ба Анагаах ухаан",
-      subCategory: "Clinical Practice",
-    },
-    // Урлаг ба Дизайн - Graphic Design
-    {
-      id: "13",
-      name: "Ц. Мөнхзул",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 9 жил",
-      rating: 4.7,
-      image: "/image709.png",
-      category: "Урлаг ба Дизайн",
-      subCategory: "Graphic Design",
-    },
-    {
-      id: "14",
-      name: "Ш. Батбаатар",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 7 жил",
-      rating: 4.6,
-      image: "/image709.png",
-      category: "Урлаг ба Дизайн",
-      subCategory: "Graphic Design",
-    },
-    // Хууль ба Эрх зүй - Corporate Law
-    {
-      id: "15",
-      name: "Э. Батбаатар",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 13 жил",
-      rating: 4.9,
-      image: "/image709.png",
-      category: "Хууль ба Эрх зүй",
-      subCategory: "Corporate Law",
-    },
-    {
-      id: "16",
-      name: "Ю. Энхтуяа",
-      profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-      experience: "Туршлага: 10 жил",
-      rating: 4.8,
-      image: "/image709.png",
-      category: "Хууль ба Эрх зүй",
-      subCategory: "Corporate Law",
-    },
-  ];
+  // const getSampleMentors = (): Mentor[] => [
+  //   // Программчлал ба Технологи - Web Development
+  //   {
+  //     id: "1",
+  //     name: "Ч. Энхжин",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 8 жил",
+  //     rating: 4.9,
+  //     image: "/image709.png",
+  //     category: "Программчлал ба Технологи",
+  //     subCategory: "Web Development",
+  //   },
+  //   {
+  //     id: "2",
+  //     name: "Б. Сүхбат",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 5 жил",
+  //     rating: 4.7,
+  //     image: "/image709.png",
+  //     category: "Программчлал ба Технологи",
+  //     subCategory: "Web Development",
+  //   },
+  //   // Программчлал ба Технологи - Mobile Development
+  //   {
+  //     id: "3",
+  //     name: "Д. Батбаяр",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 6 жил",
+  //     rating: 4.8,
+  //     image: "/image709.png",
+  //     category: "Программчлал ба Технологи",
+  //     subCategory: "Mobile Development",
+  //   },
+  //   {
+  //     id: "4",
+  //     name: "Л. Мөнхбат",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 4 жил",
+  //     rating: 4.6,
+  //     image: "/image709.png",
+  //     category: "Программчлал ба Технологи",
+  //     subCategory: "Mobile Development",
+  //   },
+  //   // Бизнес ба Менежмент - Business Strategy
+  //   {
+  //     id: "5",
+  //     name: "Н. Алтанцэцэг",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 10 жил",
+  //     rating: 4.9,
+  //     image: "/image709.png",
+  //     category: "Бизнес ба Менежмент",
+  //     subCategory: "Business Strategy",
+  //   },
+  //   {
+  //     id: "6",
+  //     name: "П. Батсүх",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 7 жил",
+  //     rating: 4.8,
+  //     image: "/image709.png",
+  //     category: "Бизнес ба Менежмент",
+  //     subCategory: "Business Strategy",
+  //   },
+  //   // Бизнес ба Менежмент - Project Management
+  //   {
+  //     id: "7",
+  //     name: "Р. Дэлгэрмаа",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 9 жил",
+  //     rating: 4.7,
+  //     image: "/image709.png",
+  //     category: "Бизнес ба Менежмент",
+  //     subCategory: "Project Management",
+  //   },
+  //   {
+  //     id: "8",
+  //     name: "С. Батзориг",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 6 жил",
+  //     rating: 4.6,
+  //     image: "/image709.png",
+  //     category: "Бизнес ба Менежмент",
+  //     subCategory: "Project Management",
+  //   },
+  //   // Боловсрол ба Сургалт - Teaching Methods
+  //   {
+  //     id: "9",
+  //     name: "Т. Оюунчимэг",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 12 жил",
+  //     rating: 4.9,
+  //     image: "/image709.png",
+  //     category: "Боловсрол ба Сургалт",
+  //     subCategory: "Teaching Methods",
+  //   },
+  //   {
+  //     id: "10",
+  //     name: "У. Батбаатар",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 8 жил",
+  //     rating: 4.8,
+  //     image: "/image709.png",
+  //     category: "Боловсрол ба Сургалт",
+  //     subCategory: "Teaching Methods",
+  //   },
+  //   // Эрүүл мэнд ба Анагаах ухаан - Clinical Practice
+  //   {
+  //     id: "11",
+  //     name: "Ф. Энхтуяа",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 15 жил",
+  //     rating: 4.9,
+  //     image: "/image709.png",
+  //     category: "Эрүүл мэнд ба Анагаах ухаан",
+  //     subCategory: "Clinical Practice",
+  //   },
+  //   {
+  //     id: "12",
+  //     name: "Х. Батбаатар",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 11 жил",
+  //     rating: 4.8,
+  //     image: "/image709.png",
+  //     category: "Эрүүл мэнд ба Анагаах ухаан",
+  //     subCategory: "Clinical Practice",
+  //   },
+  //   // Урлаг ба Дизайн - Graphic Design
+  //   {
+  //     id: "13",
+  //     name: "Ц. Мөнхзул",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 9 жил",
+  //     rating: 4.7,
+  //     image: "/image709.png",
+  //     category: "Урлаг ба Дизайн",
+  //     subCategory: "Graphic Design",
+  //   },
+  //   {
+  //     id: "14",
+  //     name: "Ш. Батбаатар",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 7 жил",
+  //     rating: 4.6,
+  //     image: "/image709.png",
+  //     category: "Урлаг ба Дизайн",
+  //     subCategory: "Graphic Design",
+  //   },
+  //   // Хууль ба Эрх зүй - Corporate Law
+  //   {
+  //     id: "15",
+  //     name: "Э. Батбаатар",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 13 жил",
+  //     rating: 4.9,
+  //     image: "/image709.png",
+  //     category: "Хууль ба Эрх зүй",
+  //     subCategory: "Corporate Law",
+  //   },
+  //   {
+  //     id: "16",
+  //     name: "Ю. Энхтуяа",
+  //     profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
+  //     experience: "Туршлага: 10 жил",
+  //     rating: 4.8,
+  //     image: "/image709.png",
+  //     category: "Хууль ба Эрх зүй",
+  //     subCategory: "Corporate Law",
+  //   },
+  // ];
 
-  // Filter mentors based on category and subcategory (if needed for additional filtering)
-  // For now, show all mentors since many don't have proper category assignments
+  // Filter mentors based on category and subcategory
   const filteredMentors = mentors.filter((mentor: Mentor) => {
-    // If no category is selected, show all mentors
-    if (!selectedCategory) {
+    // If no filters are selected, show all mentors
+    if ((!selectedCategory || selectedCategory === "" || selectedCategory === "all") && !selectedSubCategory) {
       return true;
     }
 
-    // If category is selected, show mentors that match or have unknown category
-    const matchesCategory =
-      mentor.category === selectedCategory || mentor.category === "Тодорхойгүй";
-    const matchesSubCategory =
-      !selectedSubCategory || mentor.subCategory === selectedSubCategory;
+    // Check category filter
+    let matchesCategory = true;
+    if (selectedCategory && selectedCategory !== "" && selectedCategory !== "all") {
+      const selectedCategoryName = categories.find(
+        (cat) => cat._id === selectedCategory
+      )?.categoryName;
+      matchesCategory = selectedCategoryName ? mentor.category === selectedCategoryName : true;
+    }
+
+    // Check subcategory filter
+    let matchesSubCategory = true;
+    if (selectedSubCategory) {
+      matchesSubCategory = mentor.subCategory === selectedSubCategory;
+    }
+
+    // Both filters must match
     return matchesCategory && matchesSubCategory;
   });
 
@@ -284,10 +301,19 @@ const MentorCards: React.FC<MentorCardsProps> = ({
         <h1 className="text-white text-3xl font-bold">
           Менторуудтайгаа танилцана уу!
         </h1>
-        {selectedCategory && (
+        {selectedSubCategory && (
           <p className="text-gray-300 text-sm mt-2">
-            {selectedCategory}{" "}
-            {selectedSubCategory && `• ${selectedSubCategory}`}
+            {selectedSubCategory}
+          </p>
+        )}
+        {!selectedSubCategory && selectedCategory && selectedCategory !== "" && selectedCategory !== "all" && (
+          <p className="text-gray-300 text-sm mt-2">
+            {categories.find(cat => cat._id === selectedCategory)?.categoryName || selectedCategory}
+          </p>
+        )}
+        {!selectedSubCategory && (!selectedCategory || selectedCategory === "" || selectedCategory === "all") && (
+          <p className="text-gray-300 text-sm mt-2">
+            Бүх Ментор
           </p>
         )}
       </div>

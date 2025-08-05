@@ -22,10 +22,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   selectedSubCategory,
   categories = [],
 }) => {
-  // Get current subcategories from the selected category
-  const currentSubCategories = categories.find(
-    (cat) => cat._id === selectedCategory
-  )?.subCategory || [];
+  // Get subcategories from the selected category only
+  const selectedCategoryData = categories.find(cat => cat._id === selectedCategory);
+  const currentSubCategories = selectedCategoryData?.subCategory || [];
 
   const handleSubCategoryClick = (subCategory: string) => {
     onSubCategorySelect?.(subCategory);
@@ -53,8 +52,20 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Subcategory Filters - Wrap and Scroll */}
       <div className="flex-1 overflow-y-auto">
+        {/* Clear Filter Button */}
+        {selectedSubCategory && (
+          <div className="mb-4">
+            <button
+              onClick={() => handleSubCategoryClick("")}
+              className="px-4 py-2 rounded-lg text-white text-sm transition-colors backdrop-blur-xl border border-red-500/50 hover:bg-red-500/20"
+            >
+              ✕ Бүх шүүлтүүрийг цэвэрлэх
+            </button>
+          </div>
+        )}
+        
         <div className="flex flex-wrap gap-3">
-          {currentSubCategories.map((subCategory, index) => (
+          {currentSubCategories.map((subCategory: string, index: number) => (
             <button
               key={index}
               onClick={() => handleSubCategoryClick(subCategory)}
