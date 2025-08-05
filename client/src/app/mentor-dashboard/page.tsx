@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import MeetingCard from "../../components/MeetingCard";
 
+
 interface MentorProfile {
   id: string;
   firstName: string;
@@ -94,7 +95,7 @@ const MentorDashboard = () => {
 
   useEffect(() => {
     if (!isLoading && !mentor) {
-      router.push("/mentor-login");
+      router.push("/");
     }
   }, [mentor, isLoading, router]);
 
