@@ -11,6 +11,7 @@ import { chatRouter } from "./router/chat-router";
 import { CalendarRouter } from "./router/calendar-router";
 import { PaymentRouter } from "./router/payment-router";
 import MeetingRouter from "./router/meeting.router";
+import { BookingRouter } from "./router/booking-router";
 
 const app = express();
 app.use(
@@ -44,17 +45,43 @@ const dataBaseConnection = async () => {
   }
 };
 
-dataBaseConnection();
+const startServer = async () => {
+  try {
+    await dataBaseConnection(); 
 
-app.use(MentorRouter);
-app.use(StudentRouter);
-app.use(CategoryRouter);
-app.use(chatRouter);
-app.use(CalendarRouter);
-app.use(PaymentRouter);
-app.use(MeetingRouter);
+    app.use(MentorRouter);
+    app.use(StudentRouter);
+    app.use(CategoryRouter);
+    app.use(chatRouter);
+    app.use(CalendarRouter);
+    app.use(PaymentRouter);
+    app.use(MeetingRouter);
+    app.use(BookingRouter);
 
-const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+    const PORT = process.env.PORT || 8000;
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("❌ Failed to start server:", error);
+  }
+};
+
+startServer(); 
+
+//  dataBaseConnection();
+
+
+// app.use(MentorRouter);
+// app.use(StudentRouter);
+// app.use(CategoryRouter);
+// app.use(chatRouter);
+// app.use(CalendarRouter);
+// app.use(PaymentRouter);
+// app.use(MeetingRouter);
+// app.use(BookingRouter);
+
+// const PORT = process.env.PORT || 8000;
+// app.listen(PORT, () => {
+//   console.log(`🚀 Server running on http://localhost:${PORT}`);
+

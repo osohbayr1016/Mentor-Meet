@@ -9,22 +9,26 @@ export const createBooking = async (req: Request, res: Response) => {
       mentorId,
       studentId,
       date,
-      time,
+      times,
       price,
       category,
-      notes,
     } = req.body;
 
-    // Validate required fields
-    if (!mentorId || !studentId || !date || !time || !price || !category) {
+    if (!mentorId || !studentId || !date || !times || !price || !category) {
       return res.status(400).json({
         success: false,
         message:
-          "Missing required fields: mentorId, studentId, date, time, price, category",
+          "Missing required fields: mentorId, studentId, date, times, price, category",
       });
     }
 
-    // Check if student exists
+    if (!Array.isArray(times) || times.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Times must be a non-empty array",
+      });
+    }
+
     const student = await StudentModel.findById(studentId);
     if (!student) {
       return res.status(404).json({
@@ -33,7 +37,6 @@ export const createBooking = async (req: Request, res: Response) => {
       });
     }
 
-    // Check if mentor exists
     const mentor = await MentorModel.findById(mentorId);
     if (!mentor) {
       return res.status(404).json({
@@ -42,40 +45,42 @@ export const createBooking = async (req: Request, res: Response) => {
       });
     }
 
+    const bookings = [];
+
+    // Create one booking with all times
     const booking = new Booking({
       mentorId,
       studentId,
       date: new Date(date),
-      time,
-      price,
+      times, // Use times array
+      price: Number(price),
       category,
-      notes,
       status: "PENDING",
     });
 
     await booking.save();
+    bookings.push(booking);
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
-      message: "Booking created successfully",
-      booking: {
-        _id: booking._id,
-        mentorId: booking.mentorId,
-        studentId: booking.studentId,
-        date: booking.date,
-        time: booking.time,
-        price: booking.price,
-        category: booking.category,
-        status: booking.status,
-        notes: booking.notes,
-        createdAt: booking.createdAt,
-      },
+      message: "Bookings created successfully",
+      bookings: bookings.map((b) => ({
+        _id: b._id,
+        mentorId: b.mentorId,
+        studentId: b.studentId,
+        date: b.date,
+        times: b.times, 
+        price: b.price,
+        category: b.category,
+        status: b.status,
+        createdAt: b.createdAt,
+      })),
     });
   } catch (error) {
-    console.error("Error creating booking:", error);
-    res.status(500).json({
+    console.error("Error creating bookings:", error);
+    return res.status(500).json({
       success: false,
-      message: "Failed to create booking",
+      message: "Failed to create bookings",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
