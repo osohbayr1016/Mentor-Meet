@@ -7,7 +7,7 @@ import FirstStudentForgotPassword from "./_components/FirstStudentForgotPassword
 import SecondStudentForgotPassword from "./_components/SecondStudentForgotPassword";
 import ThirdStudentForgotPassword from "./_components/ThirdStudentForgotPassword";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const BACKEND_URL = "http://localhost:8000";
 
 const ForgotPasswordPage = () => {
   const [step, setStep] = useState(0);
