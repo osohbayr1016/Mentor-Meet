@@ -13,9 +13,13 @@ export async function GET(request: NextRequest) {
 
     // Call the server API
     const response = await fetch(
+<<<<<<< HEAD
       `${
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
       }/mentors?${queryParams.toString()}`,
+=======
+      `http://localhost:8000/mentors?${queryParams.toString()}`,
+>>>>>>> 104be8d (backend url fixed)
       {
         method: "GET",
         headers: {

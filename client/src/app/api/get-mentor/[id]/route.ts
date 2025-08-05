@@ -14,6 +14,7 @@ export async function GET(
     }
 
     // Call the server API
+<<<<<<< HEAD
     const response = await fetch(
       `${
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
@@ -25,6 +26,14 @@ export async function GET(
         },
       }
     );
+=======
+    const response = await fetch(`http://localhost:8000/mentor/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+>>>>>>> 104be8d (backend url fixed)
 
     if (!response.ok) {
       const errorData = await response.json();
