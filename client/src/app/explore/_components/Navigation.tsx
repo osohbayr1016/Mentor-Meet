@@ -78,6 +78,8 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   //   createdAt: string;
   //   updatedAt: string;
   // };
+
+  type CategoriesResponse = {
     categories: Category[];
   };
   // Fetch categor
@@ -95,7 +97,8 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
         console.log(categories);
         if (Array.isArray(categories) && categories.length > 0) {
           setCategories(categories);
-          setSelectedCategory(categories[0]._id); // анхны category-г сонгоно
+          // Don't auto-select first category, let user choose or show all
+          setSelectedCategory(""); // Start with no category selected
         } else {
           setError("Ангилал олдсонгүй");
         }
@@ -191,6 +194,11 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
     setSelectedSubCategory(subCategory);
   };
 
+  const handleAllMentorsClick = () => {
+    setSelectedCategory("");
+    setSelectedSubCategory("");
+  };
+
   const handleMentorClick = (mentor: any) => {
     console.log("Mentor clicked:", mentor);
     console.log("Navigating to:", `/mentor/${mentor.id}`);
@@ -225,6 +233,19 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
         <div className="bg-[#737373]/50 w-[90vw] max-w-[1200px] rounded-full">
           <div className="mx-auto">
             <div className="flex items-center justify-between py-3 px-4 relative">
+              {/* All Mentors Button - Top Right */}
+              <button
+                onClick={handleAllMentorsClick}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 whitespace-nowrap relative flex-shrink-0 ${
+                  !selectedCategory && !selectedSubCategory
+                    ? "text-white font-semibold bg-gray-600/50 border border-blue-400/50"
+                    : "text-white hover:bg-gray-600/50"
+                }`}
+              >
+                <span className="text-sm font-medium">
+                  {!selectedCategory && !selectedSubCategory ? "✓ Бүх Ментор" : "Бүх Ментор"}
+                </span>
+              </button>
               {/* Left Double Arrow */}
               <button
                 onClick={scrollLeft}
@@ -272,6 +293,11 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
                       </span>
                       <span className="text-sm font-medium">
                         {category.categoryName}
+                        {selectedSubCategory && selectedCategory === category._id && (
+                          <span className="ml-1 text-xs text-blue-300">
+                            • {selectedSubCategory}
+                          </span>
+                        )}
                       </span>
                     </button>
                   ))}
@@ -305,7 +331,7 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
           <div className="flex-1 h-full flex flex-col">
             <MentorCards
                  categories={categories}
-              selectedCategory={selectedCategoryName}
+              selectedCategory={selectedCategory}
               selectedSubCategory={selectedSubCategory}
               onMentorClick={handleMentorClick}
             />
