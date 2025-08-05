@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -20,12 +19,25 @@ interface CalendarResponse {
   message?: string;
 }
 
-const MentorCalendar = ({ mentorId, onTimeSelect, selectedTimesByDate: initialTimes = {} }: MentorCalendarProps) => {
-  const [selectedTimesByDate, setSelectedTimesByDate] = useState<Record<string, Set<string>>>(
-    Object.fromEntries(Object.entries(initialTimes).map(([date, times]) => [date, new Set(times)]))
+const MentorCalendar = ({
+  mentorId,
+  onTimeSelect,
+  selectedTimesByDate: initialTimes = {},
+}: MentorCalendarProps) => {
+  const [selectedTimesByDate, setSelectedTimesByDate] = useState<
+    Record<string, Set<string>>
+  >(
+    Object.fromEntries(
+      Object.entries(initialTimes).map(([date, times]) => [
+        date,
+        new Set(times),
+      ])
+    )
   );
   const [activeDate, setActiveDate] = useState<string | null>(null);
-  const [activeDatePosition, setActiveDatePosition] = useState<"top" | "bottom">("top");
+  const [activeDatePosition, setActiveDatePosition] = useState<
+    "top" | "bottom"
+  >("top");
   const [isAnimating, setIsAnimating] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -34,22 +46,43 @@ const MentorCalendar = ({ mentorId, onTimeSelect, selectedTimesByDate: initialTi
   const [selectedBookingTime, setSelectedBookingTime] = useState<string>("");
 
   const { data: session } = useSession();
-  const mockUser = typeof window !== "undefined" ? localStorage.getItem("mockUser") : null;
+  const mockUser =
+    typeof window !== "undefined" ? localStorage.getItem("mockUser") : null;
   const isAuthenticated = !!session || !!mockUser;
 
   const week1Dates = [
-    { day: "Да", date: "4" }, { day: "Мя", date: "5" }, { day: "Лх", date: "6" },
-    { day: "Пү", date: "7" }, { day: "Ба", date: "8" }, { day: "Бя", date: "9" }, { day: "Ня", date: "10" },
+    { day: "Да", date: "4" },
+    { day: "Мя", date: "5" },
+    { day: "Лх", date: "6" },
+    { day: "Пү", date: "7" },
+    { day: "Ба", date: "8" },
+    { day: "Бя", date: "9" },
+    { day: "Ня", date: "10" },
   ];
 
   const week2Dates = [
-    { day: "Да", date: "11" }, { day: "Мя", date: "12" }, { day: "Лх", date: "13" },
-    { day: "Пү", date: "14" }, { day: "Ба", date: "15" }, { day: "Бя", date: "16" }, { day: "Ня", date: "17" },
+    { day: "Да", date: "11" },
+    { day: "Мя", date: "12" },
+    { day: "Лх", date: "13" },
+    { day: "Пү", date: "14" },
+    { day: "Ба", date: "15" },
+    { day: "Бя", date: "16" },
+    { day: "Ня", date: "17" },
   ];
 
   const timeSlots = [
-    "09:00", "10:00", "11:00", "12:00", "13:00", "14:00",
-    "15:00", "16:00", "17:00", "18:00", "19:00", "20:00",
+    "09:00",
+    "10:00",
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
+    "16:00",
+    "17:00",
+    "18:00",
+    "19:00",
+    "20:00",
   ];
 
   const handleDateClick = (date: string, position: "top" | "bottom") => {
@@ -93,9 +126,13 @@ const MentorCalendar = ({ mentorId, onTimeSelect, selectedTimesByDate: initialTi
     }));
 
     try {
-      const res = await axios.post<CalendarResponse>("http://localhost:8000/Calendar", { availabilities }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.post<CalendarResponse>(
+        "http://localhost:8000/Calendar",
+        { availabilities },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       if (res.data?.calendarId) {
         localStorage.setItem("calendarId", res.data.calendarId);
       }
@@ -105,7 +142,9 @@ const MentorCalendar = ({ mentorId, onTimeSelect, selectedTimesByDate: initialTi
   };
 
   const handleContinue = () => {
-    const hasSelections = Object.values(selectedTimesByDate).some((set) => set.size > 0);
+    const hasSelections = Object.values(selectedTimesByDate).some(
+      (set) => set.size > 0
+    );
     hasSelections ? setShowSuccessModal(true) : setShowConfirmationModal(true);
   };
 
@@ -161,7 +200,9 @@ const MentorCalendar = ({ mentorId, onTimeSelect, selectedTimesByDate: initialTi
                       {week.map(({ day, date }) => (
                         <button
                           key={date}
-                          onClick={() => handleDateClick(date, i === 0 ? "top" : "bottom")}
+                          onClick={() =>
+                            handleDateClick(date, i === 0 ? "top" : "bottom")
+                          }
                           className={`flex flex-col items-center justify-center w-[50px] h-[50issenpx] rounded-full border-1 transition-colors ${
                             activeDate === date
                               ? "bg-white text-black border-white"
@@ -171,12 +212,14 @@ const MentorCalendar = ({ mentorId, onTimeSelect, selectedTimesByDate: initialTi
                           }`}
                         >
                           <span className="text-[10px] font-medium">{day}</span>
-                          <span className="text-[14px] font-semibold">{date}</span>
+                          <span className="text-[14px] font-semibold">
+                            {date}
+                          </span>
                         </button>
                       ))}
                     </div>
 
-                    {activeDate && week.some(d => d.date === activeDate) && (
+                    {activeDate && week.some((d) => d.date === activeDate) && (
                       <div
                         className={`overflow-hidden ${
                           isAnimating ? "animate-slideUp" : "animate-slideDown"
@@ -186,7 +229,9 @@ const MentorCalendar = ({ mentorId, onTimeSelect, selectedTimesByDate: initialTi
                           {timeSlots.map((time) => (
                             <div key={time} className="flex flex-col gap-1">
                               <button
-                                onClick={() => handleTimeClick(activeDate, time)}
+                                onClick={() =>
+                                  handleTimeClick(activeDate, time)
+                                }
                                 className={`px-3 py-2 rounded-lg border border-white transition-colors ${
                                   selectedTimesByDate[activeDate]?.has(time)
                                     ? "bg-white text-black"
@@ -303,4 +348,6 @@ const MentorCalendar = ({ mentorId, onTimeSelect, selectedTimesByDate: initialTi
   );
 };
 
-export default MentorCalendar;
+export default function MentorCalendarPage() {
+  return <MentorCalendar />;
+}
