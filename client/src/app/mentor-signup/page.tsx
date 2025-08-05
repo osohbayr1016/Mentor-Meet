@@ -121,7 +121,7 @@ const SignupPage = () => {
     setError("");
     try {
       const res = await axios.post(
-        `https://mentor-meet-o3rp.onrender.com/mentorEmail`,
+        `${BACKEND_URL}/mentorEmail`,
         {
           email: form.email,
         }
@@ -151,7 +151,7 @@ const SignupPage = () => {
     setError("");
     try {
       const res = await axios.post(
-        `https://mentor-meet-o3rp.onrender.com/mentorOtp`,
+        `${BACKEND_URL}/mentorOtp`,
         {
           email: form.email,
           code: form.otp,
@@ -195,7 +195,7 @@ const SignupPage = () => {
     try {
       // Step 1: Complete signup
       const res = await axios.post<SignupResponse>(
-        `https://mentor-meet-o3rp.onrender.com/mentorSignup`,
+        `${BACKEND_URL}/mentorSignup`,
         {
           email: form.email,
           password: form.password,
@@ -227,7 +227,7 @@ const SignupPage = () => {
         try {
           // Fetch mentor profile data using the token
           const profileResponse = await axios.get<ProfileResponse>(
-            "https://mentor-meet-o3rp.onrender.com/mentorProfile",
+            `${BACKEND_URL}/mentorProfile`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
