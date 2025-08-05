@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuthWithFallback } from "../lib/auth";
+import { useAuth } from "../app/_components/MentorUserProvider";
 
 interface MeetingData {
   eventId: string;
@@ -20,17 +20,14 @@ interface MeetingManagerProps {
 export default function MeetingManager({
   className = "",
 }: MeetingManagerProps) {
-  const {
-    authData,
-    isLoading: authLoading,
-    error: authError,
-  } = useAuthWithFallback();
+  const { mentor: authData, isLoading: authLoading } = useAuth();
   const [meetings, setMeetings] = useState<MeetingData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchMeetings = async () => {
-    if (!authData?.token) {
+    const token = localStorage.getItem("mentorToken");
+    if (!token) {
       setError("Нэвтрэх шаардлагатай");
       return;
     }
@@ -61,7 +58,8 @@ export default function MeetingManager({
   };
 
   const cancelMeeting = async (eventId: string) => {
-    if (!authData?.token) {
+    const token = localStorage.getItem("mentorToken");
+    if (!token) {
       setError("Нэвтрэх шаардлагатай");
       return;
     }
@@ -105,7 +103,8 @@ export default function MeetingManager({
   };
 
   useEffect(() => {
-    if (authData?.token) {
+    const token = localStorage.getItem("mentorToken");
+    if (token) {
       fetchMeetings();
     }
   }, [authData]);
@@ -151,9 +150,9 @@ export default function MeetingManager({
         </button>
       </div>
 
-      {(error || authError) && (
+      {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error || authError}
+          {error}
         </div>
       )}
 
