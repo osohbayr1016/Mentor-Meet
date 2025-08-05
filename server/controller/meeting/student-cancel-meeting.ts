@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 
 export const studentCancelMeeting = async (req: Request, res: Response) => {
   const { meetingId } = req.body;
-  const studentId = (req as any).userId; 
+  const { studentId } = res.locals;
 
   try {
     const meeting = await MeetingModel.findById(meetingId);
@@ -20,7 +20,9 @@ export const studentCancelMeeting = async (req: Request, res: Response) => {
       (meeting.scheduledAt.getTime() - Date.now()) / (1000 * 60 * 60);
 
     if (timeDiffInHours < 4) {
-      return res.status(400).json({ message: "Цуцлах боломжгүй. 4 цаг хүрэхгүй байна." });
+      return res
+        .status(400)
+        .json({ message: "Цуцлах боломжгүй. 4 цаг хүрэхгүй байна." });
     }
 
     const existing = await ReplacementRequest.findOne({
@@ -29,7 +31,9 @@ export const studentCancelMeeting = async (req: Request, res: Response) => {
     });
 
     if (existing) {
-      return res.status(400).json({ message: "Та аль хэдийн цуцлалтын хүсэлт илгээсэн байна." });
+      return res
+        .status(400)
+        .json({ message: "Та аль хэдийн цуцлалтын хүсэлт илгээсэн байна." });
     }
 
     await ReplacementRequest.create({
@@ -41,7 +45,8 @@ export const studentCancelMeeting = async (req: Request, res: Response) => {
     });
 
     return res.status(200).json({
-      message: "Цуцлалтын хүсэлт илгээгдлээ. Орлуулагч оюутан орвол бүрэн цуцлагдана.",
+      message:
+        "Цуцлалтын хүсэлт илгээгдлээ. Орлуулагч оюутан орвол бүрэн цуцлагдана.",
     });
   } catch (err) {
     console.error(err);

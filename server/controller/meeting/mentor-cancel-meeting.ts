@@ -4,15 +4,12 @@ import { Types } from "mongoose";
 
 export const mentorCancelMeeting = async (req: Request, res: Response) => {
   try {
-
-    const mentorId = req.userId;
+    const { mentorId } = res.locals;
     const { meetingId } = req.body;
-
 
     if (!Types.ObjectId.isValid(meetingId)) {
       return res.status(400).json({ message: "Invalid meeting ID" });
     }
-
 
     const meeting = await MeetingModel.findById(meetingId);
 
@@ -20,13 +17,11 @@ export const mentorCancelMeeting = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Meeting not found" });
     }
 
-
     if (meeting.mentorId.toString() !== mentorId) {
       return res.status(403).json({
         message: "You are not authorized to cancel this meeting.",
       });
     }
-
 
     meeting.status = MeetingStatus.CANCELLED;
     await meeting.save();

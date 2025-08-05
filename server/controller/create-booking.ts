@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Booking } from "../model/booking-model";
-import { Student } from "../model/student-model";
-import { Mentor } from "../model/mentor-model";
+import { StudentModel } from "../model/student-model";
+import { MentorModel } from "../model/mentor-model";
 
 export const createBooking = async (req: Request, res: Response) => {
   try {
@@ -26,7 +26,7 @@ export const createBooking = async (req: Request, res: Response) => {
     }
 
     // Check if student exists
-    const student = await Student.findById(studentId);
+    const student = await StudentModel.findById(studentId);
     if (!student) {
       return res.status(404).json({
         success: false,
@@ -35,7 +35,7 @@ export const createBooking = async (req: Request, res: Response) => {
     }
 
     // Check if mentor exists
-    const mentor = await Mentor.findById(mentorId);
+    const mentor = await MentorModel.findById(mentorId);
     if (!mentor) {
       return res.status(404).json({
         success: false,
