@@ -65,11 +65,16 @@ export const HomeChat = () => {
 
     setUserEmail(email || "");
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/getMessages`, {
-      headers: {
-        Authorization: `Bearer ${studentToken || mentorToken}`,
-      },
-    })
+    fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+      }/getMessages`,
+      {
+        headers: {
+          Authorization: `Bearer ${studentToken || mentorToken}`,
+        },
+      }
+    )
       .then((res) => res.json())
       .then((data: Message[]) => {
         setMessages(data);
@@ -113,7 +118,9 @@ export const HomeChat = () => {
     try {
       const local = localStorage.getItem("studentUser");
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/createMessage`,
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/createMessage`,
         {
           method: "POST",
           headers: {

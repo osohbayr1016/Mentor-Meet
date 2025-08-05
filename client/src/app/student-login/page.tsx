@@ -34,10 +34,15 @@ const StudentLoginPage = () => {
         token: string;
         user: { email: string };
         message: string;
-      }>(`${process.env.NEXT_PUBLIC_API_URL}/studentLogin`, {
-        email,
-        password,
-      });
+      }>(
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/studentLogin`,
+        {
+          email,
+          password,
+        }
+      );
 
       const data = response.data;
 

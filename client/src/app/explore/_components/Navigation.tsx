@@ -78,7 +78,7 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   //   createdAt: string;
   //   updatedAt: string;
   // };
-  
+
   type CategoriesResponse = {
     categories: Category[];
   };
@@ -90,21 +90,24 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
         setLoading(true);
 
         const response = await axios.get<CategoriesResponse>(
-          "https://mentor-meet-o3rp.onrender.com/mentor-get-category"
+          `${
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+          }/mentor-get-category`
         );
 
         const categories = response.data?.categories;
-        console.log(categories)
+        console.log(categories);
         if (Array.isArray(categories) && categories.length > 0) {
           setCategories(categories);
           setSelectedCategory(categories[0]._id); // анхны category-г сонгоно
         } else {
           setError("Ангилал олдсонгүй");
         }
-
       } catch (error: any) {
         console.error("Ангилал авахад алдаа гарлаа:", error);
-        setError(error.response?.data?.message || "Ангилал авахад амжилтгүй боллоо");
+        setError(
+          error.response?.data?.message || "Ангилал авахад амжилтгүй боллоо"
+        );
       } finally {
         setLoading(false);
       }
@@ -112,7 +115,6 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
 
     fetchCategories();
   }, []);
-
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -156,7 +158,9 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
 
   useEffect(() => {
     if (categories.length > 0 && selectedCategory) {
-      const selectedIndex = categories.findIndex(cat => cat._id === selectedCategory);
+      const selectedIndex = categories.findIndex(
+        (cat) => cat._id === selectedCategory
+      );
       if (selectedIndex !== -1) {
         updateSliderPosition(selectedIndex);
       }
@@ -166,7 +170,9 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   useEffect(() => {
     // Trigger initial category change when categories are loaded
     if (categories.length > 0 && selectedCategory && onCategoryChange) {
-      const selectedCat = categories.find(cat => cat._id === selectedCategory);
+      const selectedCat = categories.find(
+        (cat) => cat._id === selectedCategory
+      );
       if (selectedCat) {
         onCategoryChange(selectedCategory, selectedCat.subCategory);
       }
@@ -176,9 +182,9 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setSelectedSubCategory(""); // Reset subcategory when main category changes
-    
+
     if (onCategoryChange) {
-      const selectedCat = categories.find(cat => cat._id === categoryId);
+      const selectedCat = categories.find((cat) => cat._id === categoryId);
       if (selectedCat) {
         onCategoryChange(categoryId, selectedCat.subCategory);
       }
@@ -196,7 +202,9 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   };
 
   // Get the selected category name
-  const selectedCategoryName = categories.find(cat => cat._id === selectedCategory)?.categoryName;
+  const selectedCategoryName = categories.find(
+    (cat) => cat._id === selectedCategory
+  )?.categoryName;
 
   if (loading) {
     return (

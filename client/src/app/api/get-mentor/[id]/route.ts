@@ -16,8 +16,7 @@ export async function GET(
     // Call the server API
     const response = await fetch(
       `${
-        process.env.NEXT_PUBLIC_API_URL ||
-        "https://mentor-meet-o3rp.onrender.com"
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
       }/mentor/${id}`,
       {
         method: "GET",
