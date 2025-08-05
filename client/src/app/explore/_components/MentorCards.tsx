@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MentorCard from "./MentorCard";
+import axios from "axios";
 
 interface Mentor {
   id: string;
@@ -12,10 +13,18 @@ interface Mentor {
   subCategory?: string;
   hourlyPrice?: number;
 }
+interface Category {
+  _id: string;
+  categoryName: string;
+  subCategory: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 interface MentorCardsProps {
   selectedCategory?: string;
   selectedSubCategory?: string;
+  categories:Category[];
   onMentorClick?: (mentor: Mentor) => void;
 }
 
@@ -23,6 +32,7 @@ const MentorCards: React.FC<MentorCardsProps> = ({
   selectedCategory,
   selectedSubCategory,
   onMentorClick,
+  categories,
 }) => {
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,34 +48,44 @@ const MentorCards: React.FC<MentorCardsProps> = ({
   useEffect(() => {
     if (!mounted) return;
 
+  
+
     const fetchMentors = async () => {
       try {
         setLoading(true);
         setError(null);
-
-        // Build query parameters
-        const params = new URLSearchParams();
-        if (selectedCategory) params.append("category", selectedCategory);
-        if (selectedSubCategory)
-          params.append("subCategory", selectedSubCategory);
-
-        const response = await fetch(`/api/get-mentors?${params.toString()}`);
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch mentors");
+    
+        // Category name авах
+        const selectedCategoryName = categories.find(
+          (cat) => cat._id === selectedCategory
+        )?.categoryName;
+    
+        // Query params бэлдэх
+        const params: Record<string, string> = {};
+    
+        if (selectedCategory && selectedCategory !== "all" && selectedCategoryName) {
+          params.category = selectedCategoryName;
         }
+    
+        if (selectedSubCategory) {
+          params.subCategory = selectedSubCategory;
+        }
+    
+                const response = await axios.get<Mentor[]>("https://mentor-meet-o3rp.onrender.com/mentors", {
+          params,
+        });
 
-        const data = await response.json();
-        setMentors(data);
-      } catch (err) {
-        console.error("Error fetching mentors:", err);
-        setError("Failed to load mentors");
-        // Fallback to sample data for development
-        setMentors(getSampleMentors());
+        setMentors(response.data as Mentor[]);  
+      } catch (error) {
+        console.error("Error fetching mentors:", error);
+        setError("Менторуудыг авахад алдаа гарлаа.");
+        setMentors(getSampleMentors()); // fallback
       } finally {
         setLoading(false);
       }
     };
+    
+    
 
     fetchMentors();
   }, [mounted, selectedCategory, selectedSubCategory]);
