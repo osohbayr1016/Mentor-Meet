@@ -9,7 +9,11 @@ import axios from "axios";
 import Link from "next/link";
 import { useAuth } from "../_components/MentorUserProvider";
 
+<<<<<<< HEAD
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+=======
+const BACKEND_URL = "http://localhost:8000";
+>>>>>>> 104be8d (backend url fixed)
 
 type SignupResponse = {
   message: string;

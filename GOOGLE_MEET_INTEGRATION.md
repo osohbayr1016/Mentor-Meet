@@ -75,7 +75,7 @@ GOOGLE_CLIENT_ID=your-google-client-id-from-console
 GOOGLE_CLIENT_SECRET=your-google-client-secret-from-console
 
 # API Configuration
-NEXT_PUBLIC_API_URL=https://mentor-meet-o3rp.onrender.com
+NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
 ### 4. Required Scopes
