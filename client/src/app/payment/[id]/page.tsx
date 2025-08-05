@@ -66,6 +66,7 @@ const MentorPayment = () => {
   const handlePayment = (e: React.FormEvent) => {
     e.preventDefault();
     if (agreed) {
+      savePayment();
       setShowQr(true);
     }
   };
@@ -75,7 +76,7 @@ const MentorPayment = () => {
 
     const fetchMentor = async () => {
       try {
-        const res = await fetch(`/api/get-mentor/${mentorId}`);
+        const res = await fetch(`http://localhost:8000/mentor/${mentorId}`);
         if (!res.ok) {
           throw new Error("Mentor олдсонгүй");
         }
@@ -106,14 +107,34 @@ const MentorPayment = () => {
     }
   }, [searchParams, mentor]);
 
-  // Get all selected times for display
-  const getAllSelectedTimes = async () => {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/calendar/${mentorId}`
-    );
+const getAllSelectedTimes = async () => {
+  try {
 
-    return Object.values(selectedTimesByDate).flat();
+
+    const response = await axios.get<{
+      availabilities: { date: string; times: string[] }[];
+    }>(`http://localhost:8000/calendar/${mentorId}`);
+
+    const allTimes = response.data.availabilities.flatMap((a) => a.times);
+    return allTimes;
+    
+  } catch (err) {
+    console.error("Цаг авахад алдаа гарлаа:", err);
+    return [];
+  }
+};
+
+useEffect(() => {
+  const fetchTimes = async () => {
+    const times = await getAllSelectedTimes();
+    console.log("Сонгосон цагууд:", times);
   };
+
+  fetchTimes();
+}, []);
+
+
+
 
   // Get total selected hours
   const getTotalSelectedHours = () => {
@@ -131,12 +152,30 @@ const MentorPayment = () => {
     return formattedTimes;
   };
 
-  //   const saveSelectedHours = async () => {
-  //     const response = await axios.post("http://localhost:8000/Calendar", {
-  //  setPaymentSuccess(response)
-  //     });
-  //   };
+    const savePayment = async () => {
+      const token = localStorage.getItem("studentToken");
+const studentId = JSON.parse(localStorage.getItem("studentUser") || "{}")
+const calendarId = localStorage.getItem("calendarId")
+const paymentStatus = "pending"
+const studentEmail = localStorage.getItem("studentEmail")
 
+      try{
+
+   const response = await axios.post(`http://localhost:8000/payment${studentId}`, {
+        mentorId,
+        calendarId,
+        price:totalPrice,
+        paymentStatus,
+        email:studentEmail
+  
+      });
+        console.log(response.data, "savepayment")
+        setPaymentSuccess(true)
+    } catch (err){
+    console.error("Төлбөр илгээхэд алдаа гарлаа:", err);
+      }
+    }
+  
   return (
     <div className="relative w-full h-screen">
       <div className="absolute inset-0 bg-black/30 -z-10" />
@@ -311,3 +350,5 @@ const MentorPayment = () => {
 };
 
 export default MentorPayment;
+
+

@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Star, ArrowLeft } from "lucide-react";
 import MentorCalendar from "../../../components/MentorCalendar";
 import BookingModal from "../../../components/BookingModal";
+import axios from "axios";
 
 interface Mentor {
   id: string;
@@ -32,6 +33,26 @@ interface Mentor {
   };
 }
 
+interface CalendarResponse {
+  message: string;
+  booking: {
+    _id: string;
+    mentorId: string;
+    studentId: string;
+    date: string;
+    time: string;
+    status: "PENDING" | "CONFIRMED" | "CANCELLED";
+    createdAt: string;
+    updatedAt: string;
+  };
+}
+
+interface CalendarSlot {
+  date: string;
+  times: string[];
+}
+
+
 const MentorDetailPage = () => {
   const router = useRouter();
   const params = useParams();
@@ -46,41 +67,21 @@ const MentorDetailPage = () => {
   const [selectedBookingDate, setSelectedBookingDate] = useState<string>("");
   const [selectedBookingTime, setSelectedBookingTime] = useState<string>("");
   const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [calendar, setCalendar] = useState<CalendarSlot[]>([]);
 
-  // Fetch mentor data from API
+
   useEffect(() => {
     const fetchMentor = async () => {
+
       try {
-        const response = await fetch(`/api/get-mentor/${mentorId}`);
-        if (response.ok) {
-          const mentorData = await response.json();
+        const response = await axios.get(`http://localhost:8000/mentor/${mentorId}`);
+
+        const mentorData:any = response?.data
+
+        if (response.data) {
+      
           setMentor(mentorData);
-        } else {
-          console.error("Failed to fetch mentor");
-          // Fallback to mock data for development
-          const mockMentor: Mentor = {
-            id: mentorId || "1",
-            firstName: "Энхжин",
-            lastName: "Ч.",
-            profession: "Эмч, Нийгмийн эрүүл мэндийн судлаач",
-            experience: {
-              work: "АШУҮИС",
-              position: "Эмч",
-              careerDuration: "8 жил",
-            },
-            education: {
-              schoolName: "АШУҮИС",
-              major: "Эрүүл мэнд",
-              endedYear: "2020",
-            },
-            bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-            rating: 4.9,
-            hourlyPrice: 20000,
-            image:
-              "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop&crop=face",
-          };
-          setMentor(mockMentor);
-        }
+        } 
       } catch (error) {
         console.error("Error fetching mentor:", error);
       }
@@ -91,25 +92,64 @@ const MentorDetailPage = () => {
     }
   }, [mentorId]);
 
+
+useEffect(() => {
+
+  const fetchCalendar = async () => {
+    try {
+      const res = await axios.get<any>(`http://localhost:8000/calendar/${mentorId}`);
+        setCalendar(res.data.availabilities);
+    } catch (error) {
+      console.error("Calendar fetch алдаа:", error);
+    }
+  };
+
+  if (mentorId) {
+    fetchCalendar();
+  }
+}, [mentorId]); 
+
+
+
+// const handleTimeSelect = async (date: string, time: string) => {
+
+//   try {
+  
+//     const res = await axios.get(`http://localhost:8000/calendar/${mentorId}`);
+
+//     const mentorCal = res.data;
+//     console.log("Mentor calendar data:", mentorCal);
+//   } catch (err) {
+//     console.error("Calendar fetch error:", err);
+//   }
+//   setSelectedDate(date);
+//   const currentTimesForDate = selectedTimesByDate[date] || [];
+
+//   const newTimesForDate = currentTimesForDate.includes(time)
+//     ? currentTimesForDate.filter((t) => t !== time)
+//     : [...currentTimesForDate, time];
+
+//   setSelectedTimesByDate((prev) => ({
+//     ...prev,
+//     [date]: newTimesForDate,
+//   }));
+// };
+
   const handleTimeSelect = (date: string, time: string) => {
-    setSelectedDate(date);
-
-    // Get current selected times for this date
     const currentTimesForDate = selectedTimesByDate[date] || [];
-
-    // Toggle the selected time for this specific date
     const newTimesForDate = currentTimesForDate.includes(time)
       ? currentTimesForDate.filter((t) => t !== time)
       : [...currentTimesForDate, time];
 
-    // Update the selected times for this date
     setSelectedTimesByDate((prev) => ({
       ...prev,
       [date]: newTimesForDate,
     }));
+
+    setSelectedBookingDate(date);
+    setSelectedBookingTime(time);
   };
 
-  // Calculate total price whenever selectedTimesByDate or mentor changes
   useEffect(() => {
     if (mentor) {
       const allSelectedTimes = Object.values(selectedTimesByDate).flat();
@@ -119,11 +159,45 @@ const MentorDetailPage = () => {
     }
   }, [selectedTimesByDate, mentor]);
 
-  const handleBooking = (date: string, time: string) => {
+const handleBooking = async (date: string, time: string) => {
+  const token = localStorage.getItem("studentToken");
+  const mentorId = localStorage.getItem("MentorUser"); 
+
+  if (!token) {
+    alert("Нэвтрэх эсвэл mentor сонгогдоогүй байна!");
+    return;
+  }
+
+  try {
+    const res = await axios.post<CalendarResponse>(
+      "http://localhost:8000/booking",
+      {
+        mentorId,
+        date,
+        time,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log("Амжилттай хадгаллаа:", res.data);
+    const bookingId = res.data?.booking?._id;
+
+    if (bookingId) {
+      localStorage.setItem("bookingId", bookingId);
+    }
+
     setSelectedBookingDate(date);
     setSelectedBookingTime(time);
     setShowBookingModal(true);
-  };
+  } catch (err) {
+    console.error("Алдаа:", err);
+    alert("Захиалга хийхэд алдаа гарлаа!");
+  }
+};
 
   // Get total selected hours across all dates
   const getTotalSelectedHours = () => {
@@ -209,19 +283,20 @@ const MentorDetailPage = () => {
                 </div>
 
                 {/* Book Session Button */}
-                <button
-                  onClick={() => {
-                    if (getTotalSelectedHours() > 0) {
-                      setSelectedBookingDate(selectedDate);
-                      setSelectedBookingTime(getAllSelectedTimes()[0]);
-                      setShowBookingModal(true);
-                    }
-                  }}
-                  disabled={getTotalSelectedHours() === 0}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
-                >
-                  Захиалга хийх ({getTotalSelectedHours()} цаг)
-                </button>
+             <button
+  onClick={() => {
+    const times = getAllSelectedTimes();
+    if (getTotalSelectedHours() > 0 && times.length > 0) {
+       times.forEach((time) => {
+      handleBooking(selectedDate, time); 
+    });
+    }
+  }}
+  disabled={getTotalSelectedHours() === 0}
+  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+>
+  Захиалга хийх ({getTotalSelectedHours()} цаг)
+</button>
               </div>
             </div>
 
@@ -260,13 +335,35 @@ const MentorDetailPage = () => {
                 </div>
 
                 {/* Calendar Section */}
-                <div className="flex-1">
+                {/* <div className="flex-1">
                   <MentorCalendar
                     mentorId={mentor.id}
                     onTimeSelect={handleTimeSelect}
                     selectedTimesByDate={selectedTimesByDate}
                   />
-                </div>
+                </div> */}
+
+   {calendar.map((slot) => (
+  <div key={slot.date} className="mb-4">
+    <h4 className="font-medium">{slot.date}</h4>
+    <div className="flex gap-2 flex-wrap">
+      {slot.times.map((time) => {
+        const isSelected = selectedTimesByDate[slot.date]?.includes(time);
+        return (
+          <button
+            key={time}
+            onClick={() => handleTimeSelect(slot.date, time)}
+            className={`px-3 py-1 rounded ${
+              isSelected ? "bg-blue-500 text-white" : "bg-gray-200"
+            }`}
+          >
+            {time}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+))}
 
                 {/* Price */}
                 <div className="bg-white/10 rounded-lg p-2.5">

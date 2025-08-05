@@ -13,7 +13,6 @@ export type BookingType = {
   studentId: mongoose.Types.ObjectId;
   date: Date;
   time: string;
-  duration: number; // in minutes
   status: BookingStatus;
   price: number;
   category: string;
@@ -27,7 +26,6 @@ const BookingSchema = new Schema<BookingType>({
   studentId: { type: Schema.Types.ObjectId, ref: "Student", required: true },
   date: { type: Date, required: true },
   time: { type: String, required: true },
-  duration: { type: Number, default: 60 }, // 60 minutes default
   status: {
     type: String,
     enum: Object.values(BookingStatus),

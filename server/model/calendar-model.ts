@@ -13,6 +13,7 @@ export type MentorCalendar = {
     type: String;
     enum: ["PENDING", "PAID", "CANCELLED"];
     default: "PENDING";
+    
   };
   createdAt: string;
   updatedAt: string;
@@ -31,7 +32,13 @@ const MentorCalendarSchema = new Schema<MentorCalendar>(
       required: true,
     },
     availabilities: [availabilitiesSchema],
+      status: {
+      type: String,
+      enum: ["PENDING", "PAID", "CANCELLED"],
+      default: "PENDING",
+    },
   },
+
   { timestamps: true }
 );
 
