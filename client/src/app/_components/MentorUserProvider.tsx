@@ -70,16 +70,21 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post<LoginResponse>(
-        "http://localhost:8000/mentorLogin",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/mentorLogin`,
         {
-          email,
-          password,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
         }
       );
 
-      console.log("Login response:", response.data);
-      const { token, mentorId, message } = response.data;
+      // Parse the response as JSON since fetch does not have a .data property
+      const data = await response.json();
+      console.log("Login response:", data);
+      const { token, mentorId, message } = data;
 
       if (token && mentorId) {
         console.log("Login successful, fetching mentor data...");
@@ -87,7 +92,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         try {
           // Fetch mentor profile data using the token
           const profileResponse = await axios.get<ProfileResponse>(
-            "http://mentor-meet-ferb.onrender.com/mentorProfile",
+            `${process.env.NEXT_PUBLIC_API_URL}/mentorProfile`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

@@ -16,7 +16,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const response = await fetch(
-      `http://localhost:8000/bookings/${bookingId}/cancel`,
+      `${process.env.NEXT_PUBLIC_API_URL}/bookings/${bookingId}/cancel`,
       {
         method: "PUT",
         headers: {
