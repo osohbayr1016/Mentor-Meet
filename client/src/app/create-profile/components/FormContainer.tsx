@@ -98,7 +98,9 @@ const FormContainer = () => {
     const loadCategories = async () => {
       try {
         const response = await fetch(
-          "https://mentor-meet-o3rp.onrender.com/mentor-get-category"
+          `${
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+          }/mentor-get-category`
         );
         const result = await response.json();
 
@@ -248,7 +250,9 @@ const FormContainer = () => {
 
         // Call Step 1 API
         const response = await fetch(
-          "https://mentor-meet-o3rp.onrender.com/mentorProfile/step1",
+          `${
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+          }/mentorProfile/step1`,
           {
             method: "POST",
             headers: {
@@ -293,7 +297,9 @@ const FormContainer = () => {
 
         // Call Step 2 API
         const response = await fetch(
-          "https://mentor-meet-o3rp.onrender.com/mentorProfile/step2",
+          `${
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+          }/mentorProfile/step2`,
           {
             method: "PATCH",
             headers: {
@@ -361,7 +367,9 @@ const FormContainer = () => {
 
       // Call Step 3 API
       const response = await fetch(
-        "https://mentor-meet-o3rp.onrender.com/mentorProfile/step3",
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/mentorProfile/step3`,
         {
           method: "PATCH",
           headers: {

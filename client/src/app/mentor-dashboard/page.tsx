@@ -116,7 +116,9 @@ const MentorDashboard = () => {
       try {
         const token = localStorage.getItem("mentorToken");
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/mentorProfile`,
+          `${
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+          }/mentorProfile`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -171,7 +173,9 @@ const MentorDashboard = () => {
     try {
       const token = localStorage.getItem("mentorToken");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/mentorEditProfile`,
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/mentorEditProfile`,
         {
           method: "PUT",
           headers: {

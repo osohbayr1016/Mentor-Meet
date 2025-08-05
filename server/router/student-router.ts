@@ -22,7 +22,7 @@ StudentRouter.post("/Checkemail", Checkemail);
 StudentRouter.post("/checkOtp", checkOtp);
 StudentRouter.post("/createPassword", createPassword);
 StudentRouter.post("/StudentNameNumber", StudentNameNumber);
-StudentRouter.post("/studentlogin", StudentLogin);
+StudentRouter.post("/studentLogin", StudentLogin);
 StudentRouter.put("/StudentForgotPassword", studentForgetPass);
 StudentRouter.put("/studentVerify", studentVerify);
 

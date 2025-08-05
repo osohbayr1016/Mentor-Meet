@@ -16,7 +16,9 @@ export async function POST(request: NextRequest) {
     }
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/bookings/${bookingId}/join`,
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+      }/bookings/${bookingId}/join`,
       {
         method: "POST",
         headers: {
