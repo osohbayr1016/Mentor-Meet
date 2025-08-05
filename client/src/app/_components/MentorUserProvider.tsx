@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
     try {
       const response = await axios.post<LoginResponse>(
-        `${process.env.NEXT_PUBLIC_API_URL}/mentorLogin`,
+        `http://localhost:8000/mentorLogin`,
         {
           email,
           password,
@@ -90,7 +90,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         try {
           // Fetch mentor profile data using the token
           const profileResponse = await axios.get<ProfileResponse>(
-            `${process.env.NEXT_PUBLIC_API_URL}/mentorProfile`,
+            `${
+              process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+            }/mentorProfile`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

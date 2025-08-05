@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import axios from "axios";
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,21 +16,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const response = await fetch(
-      `${
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-      }/bookings/${studentId}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+    const response = await axios.get(
+      `http://localhost:8000/bookings/${studentId}`
     );
 
-    const data = await response.json();
+    const data = response.data as {
+      success: boolean;
+      message: string;
+    };
 
-    if (response.ok) {
+    if (response.status === 200) {
       return NextResponse.json(data);
     } else {
       return NextResponse.json(

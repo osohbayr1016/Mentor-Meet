@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import axios from "axios";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,31 +13,19 @@ export async function GET(request: NextRequest) {
     if (subCategory) queryParams.append("subCategory", subCategory);
 
     // Call the server API
-    const response = await fetch(
-<<<<<<< HEAD
-      `${
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-      }/mentors?${queryParams.toString()}`,
-=======
-      `http://localhost:8000/mentors?${queryParams.toString()}`,
->>>>>>> 104be8d (backend url fixed)
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+    const response = await axios.get(
+      `http://localhost:8000/mentors?${queryParams.toString()}`
     );
 
-    if (!response.ok) {
-      const errorData = await response.json();
+    if (response.status !== 200) {
+      const errorData = response.data as { error: string };
       return NextResponse.json(
         { error: errorData.error || "Failed to fetch mentors" },
         { status: response.status }
       );
     }
 
-    const mentorsData = await response.json();
+    const mentorsData = response.data;
     return NextResponse.json(mentorsData);
   } catch (error) {
     console.error("Error fetching mentors:", error);
