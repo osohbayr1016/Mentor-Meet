@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create booking on the server
-    const response = await fetch(`http://localhost:8000/bookings`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

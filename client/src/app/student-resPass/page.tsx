@@ -7,7 +7,7 @@ import FirstStudentForgotPassword from "./_components/FirstStudentForgotPassword
 import SecondStudentForgotPassword from "./_components/SecondStudentForgotPassword";
 import ThirdStudentForgotPassword from "./_components/ThirdStudentForgotPassword";
 
-const BACKEND_URL = "http://localhost:8000";
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const ForgotPasswordPage = () => {
   const [step, setStep] = useState(0);
@@ -25,7 +25,7 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(`http://localhost:8000/findStuMail`, {
+      const res = await axios.post(`${BACKEND_URL}/findStuMail`, {
         email: form.email,
       });
       if (
@@ -49,7 +49,7 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(`http://localhost:8000/findOtp`, {
+      const res = await axios.post(`${BACKEND_URL}/findOtp`, {
         email: form.email,
         code: form.otp,
       });

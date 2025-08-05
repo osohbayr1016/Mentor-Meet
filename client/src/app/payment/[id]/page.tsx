@@ -108,7 +108,9 @@ const MentorPayment = () => {
 
   // Get all selected times for display
   const getAllSelectedTimes = async () => {
-    const response = await axios.get(`http:localhost:8000/calendar${mentorId}`);
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/calendar/${mentorId}`
+    );
 
     return Object.values(selectedTimesByDate).flat();
   };

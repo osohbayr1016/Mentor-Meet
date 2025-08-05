@@ -6,7 +6,7 @@ import FirstMentorForgotPassword from "./_components/FirstMentorForgotPassword";
 import SecondMentorForgotPassword from "./_components/SecondMentorForgotPassword";
 import ThirdMentorForgotPassword from "./_components/ThirdMentorForgotPassword";
 
-const BACKEND_URL = "http://localhost:8000";
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const ForgotPasswordPage = () => {
   const [step, setStep] = useState(0);
@@ -24,7 +24,7 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(`http://localhost:8000/findMail`, {
+      const res = await axios.post(`${BACKEND_URL}/findMail`, {
         email: form.email,
       });
       if (
@@ -48,7 +48,7 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(`http://localhost:8000/mentorOtp`, {
+      const res = await axios.post(`${BACKEND_URL}/mentorOtp`, {
         email: form.email,
         code: form.otp,
       });
@@ -73,7 +73,7 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.put(`http://localhost:8000/mentorResetPassword`, {
+      const res = await axios.put(`${BACKEND_URL}/mentorResetPassword`, {
         email: form.email,
         password: form.newPassword,
         //  confirmPassword: form.confirmPassword,

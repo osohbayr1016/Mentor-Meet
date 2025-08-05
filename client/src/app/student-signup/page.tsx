@@ -33,7 +33,7 @@ const StudentSignupPage = () => {
 
     try {
       // Check if student already exists with this email
-      const checkResponse = await fetch("http://localhost:8000/Checkemail", {
+      const checkResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Checkemail`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -46,7 +46,7 @@ const StudentSignupPage = () => {
       if (checkResponse.ok) {
         // Student doesn't exist, create new student with Google data
         const signupResponse = await fetch(
-          "http://localhost:8000/StudentNameNumber",
+          `${process.env.NEXT_PUBLIC_API_URL}/StudentNameNumber`,
           {
             method: "POST",
             headers: {
