@@ -4,36 +4,17 @@ import { useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
-import BookingModal from "../../components/BookingModal";
 
-interface MentorCalendarProps {
-  mentorId?: string;
-  onTimeSelect?: (date: string, time: string) => void;
-  selectedTimesByDate?: Record<string, string[]>;
-}
-
-interface CalendarResponse {
+type CalendarResponse = {
   calendarId?: string;
   _id?: string;
   message?: string;
-}
+};
 
-const MentorCalendar = ({
-  mentorId,
-  onTimeSelect,
-  selectedTimesByDate: initialTimes = {},
-}: MentorCalendarProps) => {
+const MentorCalendar = () => {
   const [selectedTimesByDate, setSelectedTimesByDate] = useState<
     Record<string, Set<string>>
-  >(
-    Object.fromEntries(
-      Object.entries(initialTimes).map(([date, times]) => [
-        date,
-        new Set(times),
-      ])
-    )
-  );
+  >({});
   const [activeDate, setActiveDate] = useState<string | null>(null);
   const [activeDatePosition, setActiveDatePosition] = useState<
     "top" | "bottom"
@@ -41,14 +22,9 @@ const MentorCalendar = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedBookingDate, setSelectedBookingDate] = useState<string>("");
   const [selectedBookingTime, setSelectedBookingTime] = useState<string>("");
-
-  const { data: session } = useSession();
-  const mockUser =
-    typeof window !== "undefined" ? localStorage.getItem("mockUser") : null;
-  const isAuthenticated = !!session || !!mockUser;
+  const [isLoading, setIsLoading] = useState(false);
 
   const week1Dates = [
     { day: "Да", date: "4" },
@@ -104,15 +80,12 @@ const MentorCalendar = ({
 
     setSelectedBookingDate(`2025-08-${date.padStart(2, "0")}`);
     setSelectedBookingTime(time);
-    setShowBookingModal(true);
 
     const token = localStorage.getItem("mentorToken");
     if (!token) {
       alert("Токен олдсонгүй!");
       return;
     }
-
-    onTimeSelect?.(date, time);
 
     const updated = { ...selectedTimesByDate };
     const timeSet = updated[date] || new Set<string>();
@@ -127,7 +100,7 @@ const MentorCalendar = ({
 
     try {
       const res = await axios.post<CalendarResponse>(
-        "http://localhost:8000/Calendar",
+        `${process.env.NEXT_PUBLIC_API_URL}/calendar`,
         { availabilities },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -333,13 +306,6 @@ const MentorCalendar = ({
         </div>
       )}
 
-      {/* <BookingModal
-        isOpen={showBookingModal}
-        onClose={() => setShowBookingModal(false)}
-        selectedDate={selectedBookingDate}
-        selectedTime={selectedBookingTime}
-      /> */}
-
       <div className="fixed bottom-2 left-6 text-xs text-white/60 z-30">
         <div>Copyright © 2025 Mentor Meet</div>
         <div>All rights reserved.</div>
@@ -348,6 +314,4 @@ const MentorCalendar = ({
   );
 };
 
-export default function MentorCalendarPage() {
-  return <MentorCalendar />;
-}
+export default MentorCalendar;
