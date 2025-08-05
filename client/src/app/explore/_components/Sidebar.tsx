@@ -1,218 +1,31 @@
 import React from "react";
 import { Search } from "lucide-react";
 
+interface Category {
+  _id: string;
+  categoryName: string;
+  subCategory: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 interface SidebarProps {
-  selectedCategory?: number;
+  selectedCategory?: string;
   onSubCategorySelect?: (subCategory: string) => void;
   selectedSubCategory?: string;
+  categories?: Category[];
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
-  selectedCategory = 1,
+  selectedCategory = "",
   onSubCategorySelect,
   selectedSubCategory,
+  categories = [],
 }) => {
-  // Subcategories for each main category
-  const subCategories = {
-    1: [
-      // Программчлал ба Технологи
-      "Web Development",
-      "Mobile Development",
-      "Data Science",
-      "Artificial Intelligence",
-      "Cybersecurity",
-      "DevOps",
-      "UI/UX Design",
-      "Database Management",
-      "Cloud Computing",
-      "Machine Learning",
-    ],
-    2: [
-      // Бизнес ба Менежмент
-      "Business Strategy",
-      "Project Management",
-      "Marketing",
-      "Sales",
-      "Finance",
-      "Human Resources",
-      "Operations",
-      "Leadership",
-      "Entrepreneurship",
-      "Consulting",
-    ],
-    3: [
-      // Боловсрол ба Сургалт
-      "Teaching Methods",
-      "Curriculum Development",
-      "Student Assessment",
-      "Educational Technology",
-      "Special Education",
-      "Language Teaching",
-      "Online Education",
-      "Academic Writing",
-      "Research Methods",
-      "Educational Leadership",
-    ],
-    4: [
-      // Эрүүл мэнд ба Анагаах ухаан
-      "Clinical Practice",
-      "Medical Research",
-      "Public Health",
-      "Nursing",
-      "Pharmacy",
-      "Mental Health",
-      "Emergency Medicine",
-      "Pediatrics",
-      "Surgery",
-      "Preventive Medicine",
-    ],
-    5: [
-      // Урлаг ба Дизайн
-      "Graphic Design",
-      "Web Design",
-      "Illustration",
-      "Photography",
-      "Digital Art",
-      "Branding",
-      "Typography",
-      "Animation",
-      "3D Modeling",
-      "User Experience Design",
-    ],
-    6: [
-      // Хууль ба Эрх зүй
-      "Corporate Law",
-      "Criminal Law",
-      "Civil Law",
-      "International Law",
-      "Constitutional Law",
-      "Environmental Law",
-      "Intellectual Property",
-      "Tax Law",
-      "Family Law",
-      "Labor Law",
-    ],
-    7: [
-      // Сэргээгдэх эрчим хүч
-      "Solar Energy",
-      "Wind Energy",
-      "Hydroelectric Power",
-      "Biomass Energy",
-      "Geothermal Energy",
-      "Energy Storage",
-      "Smart Grid",
-      "Energy Policy",
-      "Green Building",
-      "Carbon Reduction",
-    ],
-    8: [
-      // Хөдөө аж ахуй
-      "Crop Management",
-      "Livestock Farming",
-      "Organic Farming",
-      "Agricultural Technology",
-      "Soil Science",
-      "Pest Management",
-      "Irrigation Systems",
-      "Agricultural Economics",
-      "Food Safety",
-      "Sustainable Agriculture",
-    ],
-    9: [
-      // Байгаль орчин
-      "Environmental Science",
-      "Climate Change",
-      "Conservation",
-      "Waste Management",
-      "Air Quality",
-      "Water Resources",
-      "Biodiversity",
-      "Environmental Policy",
-      "Green Technology",
-      "Sustainability",
-    ],
-    10: [
-      // Спорт ба Фитнес
-      "Personal Training",
-      "Sports Coaching",
-      "Nutrition",
-      "Physical Therapy",
-      "Athletic Performance",
-      "Sports Psychology",
-      "Injury Prevention",
-      "Strength Training",
-      "Cardiovascular Fitness",
-      "Flexibility Training",
-    ],
-    11: [
-      // Мэдээлэл ба Хэвлэл
-      "Journalism",
-      "Content Writing",
-      "Digital Media",
-      "Broadcasting",
-      "Public Relations",
-      "Social Media",
-      "Video Production",
-      "Podcasting",
-      "News Reporting",
-      "Media Ethics",
-    ],
-    12: [
-      // Тээвэр ба Логистик
-      "Supply Chain Management",
-      "Logistics",
-      "Transportation",
-      "Warehouse Management",
-      "Inventory Control",
-      "Freight Forwarding",
-      "Route Optimization",
-      "Fleet Management",
-      "Import/Export",
-      "Last Mile Delivery",
-    ],
-    13: [
-      // Үйлчилгээ ба Худалдаа
-      "Customer Service",
-      "Retail Management",
-      "E-commerce",
-      "Hospitality",
-      "Tourism",
-      "Event Planning",
-      "Food Service",
-      "Beauty Services",
-      "Real Estate",
-      "Financial Services",
-    ],
-    14: [
-      // Үйлдвэрлэл ба Технологи
-      "Manufacturing",
-      "Quality Control",
-      "Process Improvement",
-      "Industrial Engineering",
-      "Automation",
-      "Robotics",
-      "3D Printing",
-      "Lean Manufacturing",
-      "Supply Chain",
-      "Product Development",
-    ],
-    15: [
-      // Барилга ба Архитектур
-      "Architectural Design",
-      "Construction Management",
-      "Structural Engineering",
-      "Interior Design",
-      "Urban Planning",
-      "Building Codes",
-      "Project Planning",
-      "Cost Estimation",
-      "Sustainability",
-      "Renovation",
-    ],
-  };
-
-  const currentSubCategories =
-    subCategories[selectedCategory as keyof typeof subCategories] || [];
+  // Get current subcategories from the selected category
+  const currentSubCategories = categories.find(
+    (cat) => cat._id === selectedCategory
+  )?.subCategory || [];
 
   const handleSubCategoryClick = (subCategory: string) => {
     onSubCategorySelect?.(subCategory);

@@ -21,313 +21,103 @@ import {
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import Sidebar from "./Sidebar";
 import MentorCards from "./MentorCards";
 
-// Subcategories for each main category
-const subCategories = {
-  1: [
-    // Программчлал ба Технологи
-    "Web Development",
-    "Mobile Development",
-    "Data Science",
-    "Artificial Intelligence",
-    "Cybersecurity",
-    "DevOps",
-    "UI/UX Design",
-    "Database Management",
-    "Cloud Computing",
-    "Machine Learning",
-  ],
-  2: [
-    // Бизнес ба Менежмент
-    "Business Strategy",
-    "Project Management",
-    "Marketing",
-    "Sales",
-    "Finance",
-    "Human Resources",
-    "Operations",
-    "Leadership",
-    "Entrepreneurship",
-    "Consulting",
-  ],
-  3: [
-    // Боловсрол ба Сургалт
-    "Teaching Methods",
-    "Curriculum Development",
-    "Student Assessment",
-    "Educational Technology",
-    "Special Education",
-    "Language Teaching",
-    "Online Education",
-    "Academic Writing",
-    "Research Methods",
-    "Educational Leadership",
-  ],
-  4: [
-    // Эрүүл мэнд ба Анагаах ухаан
-    "Clinical Practice",
-    "Medical Research",
-    "Public Health",
-    "Nursing",
-    "Pharmacy",
-    "Mental Health",
-    "Emergency Medicine",
-    "Pediatrics",
-    "Surgery",
-    "Preventive Medicine",
-  ],
-  5: [
-    // Урлаг ба Дизайн
-    "Graphic Design",
-    "Web Design",
-    "Illustration",
-    "Photography",
-    "Digital Art",
-    "Branding",
-    "Typography",
-    "Animation",
-    "3D Modeling",
-    "User Experience Design",
-  ],
-  6: [
-    // Хууль ба Эрх зүй
-    "Corporate Law",
-    "Criminal Law",
-    "Civil Law",
-    "International Law",
-    "Constitutional Law",
-    "Environmental Law",
-    "Intellectual Property",
-    "Tax Law",
-    "Family Law",
-    "Labor Law",
-  ],
-  7: [
-    // Сэргээгдэх эрчим хүч
-    "Solar Energy",
-    "Wind Energy",
-    "Hydroelectric Power",
-    "Biomass Energy",
-    "Geothermal Energy",
-    "Energy Storage",
-    "Smart Grid",
-    "Energy Policy",
-    "Green Building",
-    "Carbon Reduction",
-  ],
-  8: [
-    // Хөдөө аж ахуй
-    "Crop Management",
-    "Livestock Farming",
-    "Organic Farming",
-    "Agricultural Technology",
-    "Soil Science",
-    "Pest Management",
-    "Irrigation Systems",
-    "Agricultural Economics",
-    "Food Safety",
-    "Sustainable Agriculture",
-  ],
-  9: [
-    // Байгаль орчин
-    "Environmental Science",
-    "Climate Change",
-    "Conservation",
-    "Waste Management",
-    "Air Quality",
-    "Water Resources",
-    "Biodiversity",
-    "Environmental Policy",
-    "Green Technology",
-    "Sustainability",
-  ],
-  10: [
-    // Спорт ба Фитнес
-    "Personal Training",
-    "Sports Coaching",
-    "Nutrition",
-    "Physical Therapy",
-    "Athletic Performance",
-    "Sports Psychology",
-    "Injury Prevention",
-    "Strength Training",
-    "Cardiovascular Fitness",
-    "Flexibility Training",
-  ],
-  11: [
-    // Мэдээлэл ба Хэвлэл
-    "Journalism",
-    "Content Writing",
-    "Digital Media",
-    "Broadcasting",
-    "Public Relations",
-    "Social Media",
-    "Video Production",
-    "Podcasting",
-    "News Reporting",
-    "Media Ethics",
-  ],
-  12: [
-    // Тээвэр ба Логистик
-    "Supply Chain Management",
-    "Logistics",
-    "Transportation",
-    "Warehouse Management",
-    "Inventory Control",
-    "Freight Forwarding",
-    "Route Optimization",
-    "Fleet Management",
-    "Import/Export",
-    "Last Mile Delivery",
-  ],
-  13: [
-    // Үйлчилгээ ба Худалдаа
-    "Customer Service",
-    "Retail Management",
-    "E-commerce",
-    "Hospitality",
-    "Tourism",
-    "Event Planning",
-    "Food Service",
-    "Beauty Services",
-    "Real Estate",
-    "Financial Services",
-  ],
-  14: [
-    // Үйлдвэрлэл ба Технологи
-    "Manufacturing",
-    "Quality Control",
-    "Process Improvement",
-    "Industrial Engineering",
-    "Automation",
-    "Robotics",
-    "3D Printing",
-    "Lean Manufacturing",
-    "Supply Chain",
-    "Product Development",
-  ],
-  15: [
-    // Барилга ба Архитектур
-    "Architectural Design",
-    "Construction Management",
-    "Structural Engineering",
-    "Interior Design",
-    "Urban Planning",
-    "Building Codes",
-    "Project Planning",
-    "Cost Estimation",
-    "Sustainability",
-    "Renovation",
-  ],
+// Icon mapping for categories
+const categoryIcons: { [key: string]: any } = {
+  "Программчлал ба Технологи": <SquareCode />,
+  "Бизнес ба Менежмент": <BriefcaseBusiness />,
+  "Боловсрол ба Сургалт": <Brain />,
+  "Эрүүл мэнд ба Анагаах ухаан": <Cross />,
+  "Урлаг ба Дизайн": <Palette />,
+  "Хууль ба Эрх зүй": <Scale />,
+  "Сэргээгдэх эрчим хүч": <Landmark />,
+  "Хөдөө аж ахуй": <House />,
+  "Байгаль орчин": <Pickaxe />,
+  "Спорт ба Фитнес": <Medal />,
+  "Мэдээлэл ба Хэвлэл": <Mail />,
+  "Тээвэр ба Логистик": <ChartCandlestick />,
+  "Үйлчилгээ ба Худалдаа": <Crown />,
+  "Үйлдвэрлэл ба Технологи": <Video />,
+  "Барилга ба Архитектур": <Camera />,
 };
 
-const jobCategories = [
-  {
-    id: 1,
-    name: "Программчлал ба Технологи",
-    icon: <SquareCode />,
-    description: "Programming and Technology",
-  },
-  {
-    id: 2,
-    name: "Бизнес ба Менежмент",
-    icon: <BriefcaseBusiness />,
-    description: "Business and Management",
-  },
-  {
-    id: 3,
-    name: "Боловсрол ба Сургалт",
-    icon: <Brain />,
-    description: "Education and Training",
-  },
-  {
-    id: 4,
-    name: "Эрүүл мэнд ба Анагаах ухаан",
-    icon: <Cross />,
-    description: "Health and Medicine",
-  },
-  {
-    id: 5,
-    name: "Урлаг ба Дизайн",
-    icon: <Palette />,
-    description: "Arts and Design",
-  },
-  {
-    id: 6,
-    name: "Хууль ба Эрх зүй",
-    icon: <Scale />,
-    description: "Law and Legal",
-  },
-  {
-    id: 7,
-    name: "Сэргээгдэх эрчим хүч",
-    icon: <Landmark />,
-    description: "Renewable Energy",
-  },
-  { id: 8, name: "Хөдөө аж ахуй", icon: <House />, description: "Agriculture" },
-  {
-    id: 9,
-    name: "Байгаль орчин",
-    icon: <Pickaxe />,
-    description: "Environment",
-  },
-  {
-    id: 10,
-    name: "Спорт ба Фитнес",
-    icon: <Medal />,
-    description: "Sports and Fitness",
-  },
-  {
-    id: 11,
-    name: "Мэдээлэл ба Хэвлэл",
-    icon: <Mail />,
-    description: "Media and Journalism",
-  },
-  {
-    id: 12,
-    name: "Тээвэр ба Логистик",
-    icon: <ChartCandlestick />,
-    description: "Transportation and Logistics",
-  },
-  {
-    id: 13,
-    name: "Үйлчилгээ ба Худалдаа",
-    icon: <Crown />,
-    description: "Services and Commerce",
-  },
-  {
-    id: 14,
-    name: "Үйлдвэрлэл ба Технологи",
-    icon: <Video />,
-    description: "Manufacturing and Technology",
-  },
-  {
-    id: 15,
-    name: "Барилга ба Архитектур",
-    icon: <Camera />,
-    description: "Construction and Architecture",
-  },
-];
+// Default fallback icon
+const defaultIcon = <SquareCode />;
+
+interface Category {
+  _id: string;
+  categoryName: string;
+  subCategory: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 interface NavigationProps {
-  onCategoryChange?: (categoryId: number, subCategories: string[]) => void;
+  onCategoryChange?: (categoryId: string, subCategories: string[]) => void;
 }
 
 const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState(1);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [sliderPosition, setSliderPosition] = useState(0);
   const [sliderWidth, setSliderWidth] = useState(0);
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // type Category = {
+  //   _id: string;
+  //   categoryName: string;
+  //   subCategory: string[];
+  //   createdAt: string;
+  //   updatedAt: string;
+  // };
+  
+  type CategoriesResponse = {
+    categories: Category[];
+  };
+  // Fetch categor
+  // ies from backend
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+
+        const response = await axios.get<CategoriesResponse>(
+          "https://mentor-meet-o3rp.onrender.com/mentor-get-category"
+        );
+
+        const categories = response.data?.categories;
+        console.log(categories)
+        if (Array.isArray(categories) && categories.length > 0) {
+          setCategories(categories);
+          setSelectedCategory(categories[0]._id); // анхны category-г сонгоно
+        } else {
+          setError("Ангилал олдсонгүй");
+        }
+
+      } catch (error: any) {
+        console.error("Ангилал авахад алдаа гарлаа:", error);
+        setError(error.response?.data?.message || "Ангилал авахад амжилтгүй боллоо");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
-      const scrollAmount = 300; // Increased scroll amount for better visibility
+      const scrollAmount = 300;
 
       container.scrollBy({
         left: -scrollAmount,
@@ -339,7 +129,7 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   const scrollRight = () => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
-      const scrollAmount = 300; // Increased scroll amount for better visibility
+      const scrollAmount = 300;
 
       container.scrollBy({
         left: scrollAmount,
@@ -348,8 +138,8 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
     }
   };
 
-  const updateSliderPosition = (categoryId: number) => {
-    const buttonElement = buttonRefs.current[categoryId - 1];
+  const updateSliderPosition = (categoryIndex: number) => {
+    const buttonElement = buttonRefs.current[categoryIndex];
     if (buttonElement) {
       const containerRect = scrollContainerRef.current?.getBoundingClientRect();
       const buttonRect = buttonElement.getBoundingClientRect();
@@ -365,29 +155,33 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   };
 
   useEffect(() => {
-    updateSliderPosition(selectedCategory);
-  }, [selectedCategory]);
+    if (categories.length > 0 && selectedCategory) {
+      const selectedIndex = categories.findIndex(cat => cat._id === selectedCategory);
+      if (selectedIndex !== -1) {
+        updateSliderPosition(selectedIndex);
+      }
+    }
+  }, [selectedCategory, categories]);
 
   useEffect(() => {
-    // Initial position
-    updateSliderPosition(selectedCategory);
-    // Trigger initial category change
-    if (onCategoryChange) {
-      onCategoryChange(
-        selectedCategory,
-        subCategories[selectedCategory as keyof typeof subCategories] || []
-      );
+    // Trigger initial category change when categories are loaded
+    if (categories.length > 0 && selectedCategory && onCategoryChange) {
+      const selectedCat = categories.find(cat => cat._id === selectedCategory);
+      if (selectedCat) {
+        onCategoryChange(selectedCategory, selectedCat.subCategory);
+      }
     }
-  }, []);
+  }, [categories, selectedCategory, onCategoryChange]);
 
-  const handleCategoryClick = (categoryId: number) => {
+  const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setSelectedSubCategory(""); // Reset subcategory when main category changes
+    
     if (onCategoryChange) {
-      onCategoryChange(
-        categoryId,
-        subCategories[categoryId as keyof typeof subCategories] || []
-      );
+      const selectedCat = categories.find(cat => cat._id === categoryId);
+      if (selectedCat) {
+        onCategoryChange(categoryId, selectedCat.subCategory);
+      }
     }
   };
 
@@ -398,19 +192,32 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   const handleMentorClick = (mentor: any) => {
     console.log("Mentor clicked:", mentor);
     console.log("Navigating to:", `/mentor/${mentor.id}`);
-    // Navigate to mentor detail page
     router.push(`/mentor/${mentor.id}`);
   };
 
   // Get the selected category name
-  const selectedCategoryName = jobCategories.find(
-    (cat) => cat.id === selectedCategory
-  )?.name;
+  const selectedCategoryName = categories.find(cat => cat._id === selectedCategory)?.categoryName;
+
+  if (loading) {
+    return (
+      <div className="w-full h-[600px] flex items-center justify-center">
+        <div className="text-white text-lg">Loading categories...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full h-[600px] flex items-center justify-center">
+        <div className="text-red-500 text-lg">Error: {error}</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full h-[600px] flex flex-col">
+    <div className="w-full h-[600px] flex flex-col mb-40">
       {/* Navigation Bar */}
-      <div className="w-full flex justify-center relative pt-[120px]">
+      <div className="w-full flex justify-center relative pt-[60px] py-3">
         <div className="bg-[#737373]/50 w-[90vw] max-w-[1200px] rounded-full">
           <div className="mx-auto">
             <div className="flex items-center justify-between py-3 px-4 relative">
@@ -443,22 +250,24 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
                     WebkitOverflowScrolling: "touch",
                   }}
                 >
-                  {jobCategories.map((category, index) => (
+                  {categories.map((category, index) => (
                     <button
-                      key={category.id}
+                      key={category._id}
                       ref={(el) => {
                         buttonRefs.current[index] = el;
                       }}
-                      onClick={() => handleCategoryClick(category.id)}
+                      onClick={() => handleCategoryClick(category._id)}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 whitespace-nowrap relative flex-shrink-0 ${
-                        selectedCategory === category.id
+                        selectedCategory === category._id
                           ? "text-white font-semibold"
                           : "text-white hover:bg-gray-600/50"
                       }`}
                     >
-                      <span className="text-base">{category.icon}</span>
+                      <span className="text-base">
+                        {categoryIcons[category.categoryName] || defaultIcon}
+                      </span>
                       <span className="text-sm font-medium">
-                        {category.name}
+                        {category.categoryName}
                       </span>
                     </button>
                   ))}
@@ -478,13 +287,14 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
       </div>
 
       {/* Main Content Area with Sidebar and Mentor Cards */}
-      <div className="flex-1 px-[150px] pt-[30px]">
+      <div className="flex-1 px-[120px] pt-[10px]">
         <div className="w-full h-[500px] border-gray-400/50 border-1 backdrop-blur-md bg-black/20 flex rounded-[20px]">
           {/* Left Sidebar */}
           <Sidebar
             selectedCategory={selectedCategory}
             onSubCategorySelect={handleSubCategorySelect}
             selectedSubCategory={selectedSubCategory}
+            categories={categories}
           />
 
           {/* Right Content Area */}
