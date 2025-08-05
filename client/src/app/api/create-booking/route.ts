@@ -37,22 +37,25 @@ export async function POST(request: NextRequest) {
     }
 
     // Create booking on the server
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        mentorId,
-        studentId,
-        date,
-        time,
-        duration: duration || 60,
-        price,
-        category,
-        notes,
-      }),
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/bookings`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          mentorId,
+          studentId,
+          date,
+          time,
+          duration: duration || 60,
+          price,
+          category,
+          notes,
+        }),
+      }
+    );
 
     const data = await response.json();
 

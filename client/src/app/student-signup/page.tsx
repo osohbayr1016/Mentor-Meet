@@ -33,20 +33,27 @@ const StudentSignupPage = () => {
 
     try {
       // Check if student already exists with this email
-      const checkResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/Checkemail`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: userData.email }),
-      });
+      const checkResponse = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/Checkemail`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: userData.email }),
+        }
+      );
 
       const checkData = await checkResponse.json();
 
       if (checkResponse.ok) {
         // Student doesn't exist, create new student with Google data
         const signupResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/StudentNameNumber`,
+          `${
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+          }/StudentNameNumber`,
           {
             method: "POST",
             headers: {
@@ -108,7 +115,9 @@ const StudentSignupPage = () => {
 
     try {
       const response = await fetch(
-        "https://mentor-meet-o3rp.onrender.com/Checkemail",
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/Checkemail`,
         {
           method: "POST",
           headers: {
@@ -144,7 +153,9 @@ const StudentSignupPage = () => {
 
     try {
       const response = await fetch(
-        "https://mentor-meet-o3rp.onrender.com/checkOtp",
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/checkOtp`,
         {
           method: "POST",
           headers: {
@@ -190,7 +201,9 @@ const StudentSignupPage = () => {
 
     try {
       const response = await fetch(
-        "https://mentor-meet-o3rp.onrender.com/createPassword",
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/createPassword`,
         {
           method: "POST",
           headers: {
@@ -231,7 +244,9 @@ const StudentSignupPage = () => {
 
     try {
       const response = await fetch(
-        "https://mentor-meet-o3rp.onrender.com/StudentNameNumber",
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/StudentNameNumber`,
         {
           method: "POST",
           headers: {

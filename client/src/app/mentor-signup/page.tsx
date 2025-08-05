@@ -9,7 +9,7 @@ import axios from "axios";
 import Link from "next/link";
 import { useAuth } from "../_components/MentorUserProvider";
 
-const BACKEND_URL = "https://mentor-meet-o3rp.onrender.com";
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 type SignupResponse = {
   message: string;
@@ -120,12 +120,9 @@ const SignupPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(
-        `${BACKEND_URL}/mentorEmail`,
-        {
-          email: form.email,
-        }
-      );
+      const res = await axios.post(`${BACKEND_URL}/mentorEmail`, {
+        email: form.email,
+      });
 
       // Type the response data properly
       const responseData = res.data as { error?: boolean; message?: string };
@@ -150,13 +147,10 @@ const SignupPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(
-        `${BACKEND_URL}/mentorOtp`,
-        {
-          email: form.email,
-          code: form.otp,
-        }
-      );
+      const res = await axios.post(`${BACKEND_URL}/mentorOtp`, {
+        email: form.email,
+        code: form.otp,
+      });
 
       // Type the response data properly
       const responseData = res.data as { error?: boolean; message?: string };

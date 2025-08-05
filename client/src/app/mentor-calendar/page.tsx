@@ -100,7 +100,9 @@ const MentorCalendar = () => {
 
     try {
       const res = await axios.post<CalendarResponse>(
-        `${process.env.NEXT_PUBLIC_API_URL}/calendar`,
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/calendar`,
         { availabilities },
         {
           headers: { Authorization: `Bearer ${token}` },
