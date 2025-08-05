@@ -115,16 +115,11 @@ const MentorDashboard = () => {
 
       try {
         const token = localStorage.getItem("mentorToken");
-        const response = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-          }/mentorProfile`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`http://localhost:8000/mentorProfile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const data = await response.json();
 
         if (response.ok) {
@@ -172,27 +167,22 @@ const MentorDashboard = () => {
 
     try {
       const token = localStorage.getItem("mentorToken");
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/mentorEditProfile`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+      const response = await fetch(`http://localhost:8000/mentorEditProfile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          nickName: editForm.nickName,
+          bio: editForm.bio,
+          profession: editForm.profession,
+          category: {
+            categoryId: mentorProfile?.category?.categoryId || "",
+            price: editForm.hourlyPrice,
           },
-          body: JSON.stringify({
-            nickName: editForm.nickName,
-            bio: editForm.bio,
-            profession: editForm.profession,
-            category: {
-              categoryId: mentorProfile?.category?.categoryId || "",
-              price: editForm.hourlyPrice,
-            },
-          }),
-        }
-      );
+        }),
+      });
 
       if (response.ok) {
         const updatedProfile = await response.json();
