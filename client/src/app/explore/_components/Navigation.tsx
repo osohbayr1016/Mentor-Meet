@@ -78,8 +78,6 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   //   createdAt: string;
   //   updatedAt: string;
   // };
-
-  type CategoriesResponse = {
     categories: Category[];
   };
   // Fetch categor
@@ -306,6 +304,7 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
           {/* Right Content Area */}
           <div className="flex-1 h-full flex flex-col">
             <MentorCards
+                 categories={categories}
               selectedCategory={selectedCategoryName}
               selectedSubCategory={selectedSubCategory}
               onMentorClick={handleMentorClick}
