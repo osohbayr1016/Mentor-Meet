@@ -1,10 +1,16 @@
 import { Router } from "express";
-import { MentorTokenChecker } from "../middleware/token-checker";
+import { verifyToken } from "../middleware/token-checker";
+import { isMentor } from "../middleware/mentor-authorization";
 import { UpdateMentorAvailability } from "../controller/mentor-calendar";
 import { getMentorCalendar } from "../controller/mentor-get-calendar";
 
 export const CalendarRouter = Router();
 
-CalendarRouter.post("/Calendar", MentorTokenChecker, UpdateMentorAvailability);
+CalendarRouter.post(
+  "/Calendar",
+  verifyToken,
+  isMentor,
+  UpdateMentorAvailability
+);
 
 CalendarRouter.get("/calendar/:mentorId", getMentorCalendar);

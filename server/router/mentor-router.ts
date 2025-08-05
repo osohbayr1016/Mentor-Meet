@@ -5,7 +5,8 @@ import {
   MentorSignUp,
 } from "../controller/mentor-register";
 import { MentorLogin } from "../controller/mentor-login";
-import { MentorTokenChecker } from "../middleware/token-checker";
+import { verifyToken } from "../middleware/token-checker";
+import { isMentor } from "../middleware/mentor-authorization";
 import { MentorCreateProfile1 } from "../controller/mentor-create-profile-1";
 import { mentorForgetPass } from "../controller/mentor-forget-Password";
 import { MentorGetProfile } from "../controller/mentor-get-profile";
@@ -26,40 +27,32 @@ MentorRouter.post("/mentorSignup", MentorSignUp);
 
 MentorRouter.post(
   "/mentorProfile/step1",
-  MentorTokenChecker,
+  verifyToken,
+  isMentor,
   MentorCreateProfile1
 );
 MentorRouter.patch(
   "/mentorProfile/step2",
-  MentorTokenChecker,
+  verifyToken,
+  isMentor,
   MentorCreateProfileStep2
 );
 MentorRouter.patch(
   "/mentorProfile/step3",
-  MentorTokenChecker,
+  verifyToken,
+  isMentor,
   MentorCreateProfileStep3
 );
-MentorRouter.get("/mentorProfile", MentorTokenChecker, MentorGetProfile);
-MentorRouter.post(
-  "/mentorProfile/step1",
-  MentorTokenChecker,
-  MentorCreateProfile1
-);
-MentorRouter.patch(
-  "/mentorProfile/step2",
-  MentorTokenChecker,
-  MentorCreateProfileStep2
-);
-MentorRouter.patch(
-  "/mentorProfile/step3",
-  MentorTokenChecker,
-  MentorCreateProfileStep3
-);
-MentorRouter.get("/mentorProfile", MentorTokenChecker, MentorGetProfile);
+MentorRouter.get("/mentorProfile", verifyToken, isMentor, MentorGetProfile);
 MentorRouter.post("/mentorLogin", MentorLogin);
 MentorRouter.put("/mentorResetPassword", mentorForgetPass);
 MentorRouter.post("/findMail", findmail);
-MentorRouter.put("/mentorEditProfile", MentorTokenChecker, editMentorProfile);
+MentorRouter.put(
+  "/mentorEditProfile",
+  verifyToken,
+  isMentor,
+  editMentorProfile
+);
 MentorRouter.post("/mentorVerify", mentorVerify);
 MentorRouter.get("/mentor/:id", getMentorById);
 MentorRouter.get("/mentors", getAllMentors);
