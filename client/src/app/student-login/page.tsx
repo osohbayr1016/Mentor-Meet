@@ -30,21 +30,15 @@ const StudentLoginPage = () => {
     setError("");
 
     try {
-      const response = await axios.post<{
-        token: string;
-        user: { email: string };
-        message: string;
-      }>(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/studentLogin`,
-        {
-          email,
-          password,
-        }
-      );
+      const response = await fetch(`http://localhost:8000/studentLogin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-      const data = response.data;
+      const data = await response.json();
 
       if (response.status === 200) {
         // Store student data and redirect

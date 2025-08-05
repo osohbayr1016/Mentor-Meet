@@ -90,9 +90,7 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
         setLoading(true);
 
         const response = await axios.get<CategoriesResponse>(
-          `${
-            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-          }/mentor-get-category`
+          "http://localhost:8000/mentor-get-category"
         );
 
         const categories = response.data?.categories;

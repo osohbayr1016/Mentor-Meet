@@ -12,11 +12,11 @@ import FourthStudentSignup from "./_components/FourthStudentSignup";
 type SignupStep = "email" | "otp" | "password" | "profile";
 
 const StudentSignupPage = () => {
+  const router = useRouter();
+  const [googleUserData, setGoogleUserData] = useState<any>(null);
   const [currentStep, setCurrentStep] = useState<SignupStep>("email");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const router = useRouter();
-  const [googleUserData, setGoogleUserData] = useState<any>(null);
 
   // Form data
   const [email, setEmail] = useState("");
@@ -33,27 +33,20 @@ const StudentSignupPage = () => {
 
     try {
       // Check if student already exists with this email
-      const checkResponse = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/Checkemail`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: userData.email }),
-        }
-      );
+      const checkResponse = await fetch(`http://localhost:8000/Checkemail`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: userData.email }),
+      });
 
       const checkData = await checkResponse.json();
 
       if (checkResponse.ok) {
         // Student doesn't exist, create new student with Google data
         const signupResponse = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-          }/StudentNameNumber`,
+          "http://localhost:8000/StudentNameNumber",
           {
             method: "POST",
             headers: {
@@ -114,18 +107,13 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/Checkemail`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        }
-      );
+      const response = await fetch("http://localhost:8000/Checkemail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
 
       const data = await response.json();
 
@@ -152,18 +140,13 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/checkOtp`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, code: otp }),
-        }
-      );
+      const response = await fetch("http://localhost:8000/checkOtp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, code: otp }),
+      });
 
       const data = await response.json();
 
@@ -200,18 +183,13 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/createPassword`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const response = await fetch("http://localhost:8000/createPassword", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
       const data = await response.json();
 
@@ -243,27 +221,31 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/StudentNameNumber`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, nickname, phoneNumber }),
-        }
-      );
+      const response = await fetch("http://localhost:8000/StudentNameNumber", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, nickname, phoneNumber }),
+      });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Store student data and redirect
-        localStorage.setItem("studentUser", JSON.stringify(data.user));
+        // Store student data
+        const studentData = {
+          email,
+          nickname,
+          phoneNumber,
+        };
+
+        localStorage.setItem("studentUser", JSON.stringify(studentData));
+        localStorage.setItem("studentEmail", email);
+
+        // Redirect to student dashboard
         router.push("/student-dashboard");
       } else {
-        setError(data.message || "Профайл хадгалахад алдаа гарлаа");
+        setError(data.message || "Профайл үүсгэхэд алдаа гарлаа");
       }
     } catch (error) {
       setError("Сүлжээний алдаа гарлаа");
@@ -276,53 +258,116 @@ const StudentSignupPage = () => {
     switch (currentStep) {
       case "email":
         return (
-          <FirstStudentSignup
-            email={email}
-            setEmail={setEmail}
-            onSubmit={handleEmailSubmit}
-            loading={loading}
-            error={error}
-            onGoogleSignIn={handleGoogleSignIn}
-          />
+          <div className="space-y-6">
+            <div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Имэйл хаяг"
+                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-[40px] text-white placeholder-white/50 focus:outline-none focus:border-white/50"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleEmailSubmit}
+              disabled={loading}
+              className="w-full bg-white text-black rounded-[40px] py-3 font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
+            >
+              {loading ? "Илгээж байна..." : "Үргэлжлүүлэх"}
+            </button>
+          </div>
         );
 
       case "otp":
         return (
-          <SecondStudentSignup
-            otp={otp}
-            setOtp={setOtp}
-            onSubmit={handleOtpSubmit}
-            loading={loading}
-            error={error}
-          />
+          <div className="space-y-6">
+            <div>
+              <input
+                type="text"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="OTP код"
+                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-[40px] text-white placeholder-white/50 focus:outline-none focus:border-white/50"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleOtpSubmit}
+              disabled={loading}
+              className="w-full bg-white text-black rounded-[40px] py-3 font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
+            >
+              {loading ? "Шалгаж байна..." : "Баталгаажуулах"}
+            </button>
+          </div>
         );
 
       case "password":
         return (
-          <ThirdStudentSignUp
-            password={password}
-            confirmPassword={confirmPassword}
-            setPassword={setPassword}
-            setConfirmPassword={setConfirmPassword}
-            onSubmit={handlePasswordSubmit}
-            loading={loading}
-            error={error}
-          />
+          <div className="space-y-6">
+            <div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Нууц үг"
+                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-[40px] text-white placeholder-white/50 focus:outline-none focus:border-white/50"
+              />
+            </div>
+            <div>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Нууц үг давтах"
+                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-[40px] text-white placeholder-white/50 focus:outline-none focus:border-white/50"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handlePasswordSubmit}
+              disabled={loading}
+              className="w-full bg-white text-black rounded-[40px] py-3 font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
+            >
+              {loading ? "Үүсгэж байна..." : "Үргэлжлүүлэх"}
+            </button>
+          </div>
         );
 
       case "profile":
         return (
-          <FourthStudentSignup
-            nickname={nickname}
-            phoneNumber={phoneNumber}
-            setNickname={setNickname}
-            setPhoneNumber={setPhoneNumber}
-            onSubmit={handleProfileSubmit}
-            loading={loading}
-            error={error}
-            googleUserData={googleUserData}
-          />
+          <div className="space-y-6">
+            <div>
+              <input
+                type="text"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder="Хоч нэр"
+                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-[40px] text-white placeholder-white/50 focus:outline-none focus:border-white/50"
+              />
+            </div>
+            <div>
+              <input
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="Утасны дугаар"
+                className="w-full px-4 py-3 bg-white/10 border border-white/30 rounded-[40px] text-white placeholder-white/50 focus:outline-none focus:border-white/50"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleProfileSubmit}
+              disabled={loading}
+              className="w-full bg-white text-black rounded-[40px] py-3 font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
+            >
+              {loading ? "Үүсгэж байна..." : "Бүртгүүлэх"}
+            </button>
+          </div>
         );
+
+      default:
+        return null;
     }
   };
 
@@ -352,46 +397,62 @@ const StudentSignupPage = () => {
               <p className="font-[700] text-[22px] text-white">Mentor Meet</p>
             </div>
 
-            {/* Step Progress */}
-            <div className="flex gap-2 mb-8">
-              <div
-                className={`h-1 w-8 rounded-full ${
-                  currentStep === "email" ? "bg-white" : "bg-gray-500"
-                }`}
-              ></div>
-              <div
-                className={`h-1 w-8 rounded-full ${
-                  currentStep === "otp" ? "bg-white" : "bg-gray-500"
-                }`}
-              ></div>
-              <div
-                className={`h-1 w-8 rounded-full ${
-                  currentStep === "password" ? "bg-white" : "bg-gray-500"
-                }`}
-              ></div>
-              <div
-                className={`h-1 w-8 rounded-full ${
-                  currentStep === "profile" ? "bg-white" : "bg-gray-500"
-                }`}
-              ></div>
-            </div>
+            {/* Signup Form */}
+            <div className="w-full max-w-md px-8">
+              <div className="text-center mb-8">
+                <h2 className="font-[600] text-[24px] text-white mb-4">
+                  Суралцагч бүртгүүлэх
+                </h2>
+                <p className="text-white/80 text-sm">
+                  {currentStep === "email" && "Имэйл хаягаа оруулна уу"}
+                  {currentStep === "otp" &&
+                    "Имэйлд илгээсэн OTP кодыг оруулна уу"}
+                  {currentStep === "password" && "Нууц үгээ тохируулна уу"}
+                  {currentStep === "profile" && "Профайл мэдээллээ оруулна уу"}
+                </p>
+              </div>
 
-            {/* Content */}
-            <div className="w-full max-w-md px-8">{renderStep()}</div>
+              {error && (
+                <div className="text-red-400 text-sm text-center mb-4">
+                  {error}
+                </div>
+              )}
 
-            {/* Back to Login */}
-            <div className="mt-8">
-              <Link href="/student-login">
-                <button className="px-6 py-3 text-white border border-white/30 rounded-[40px] hover:bg-white/10 transition-colors">
-                  Байгаа хэрэглэгч? Нэвтрэх
+              {renderStep()}
+
+              {/* Back button */}
+              {currentStep !== "email" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (currentStep === "otp") setCurrentStep("email");
+                    if (currentStep === "password") setCurrentStep("otp");
+                    if (currentStep === "profile") setCurrentStep("password");
+                    setError("");
+                  }}
+                  className="w-full mt-4 text-white/70 hover:text-white transition-colors"
+                >
+                  ← Буцах
                 </button>
-              </Link>
+              )}
+
+              {/* Login link */}
+              <div className="text-center mt-6">
+                <p className="text-white/70 text-sm">
+                  Бүртгэлтэй юу?{" "}
+                  <Link
+                    href="/student-login"
+                    className="text-white hover:underline"
+                  >
+                    Нэвтрэх
+                  </Link>
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Copyright Footer */}
       <div className="fixed bottom-2 left-6 text-xs text-white/60 z-30">
         <div>Copyright © 2025 Mentor Meet</div>
         <div>All rights reserved.</div>

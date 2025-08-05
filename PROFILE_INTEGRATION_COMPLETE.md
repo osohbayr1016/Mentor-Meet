@@ -196,12 +196,12 @@ Body: {
 
 ```bash
 # Test authentication
-curl -X POST https://mentor-meet-o3rp.onrender.com/mentorLogin \
+    curl -X POST http://localhost:8000/mentorLogin \
   -H "Content-Type: application/json" \
   -d '{"email":"test@test.com","password":"password"}'
 
 # Test profile step 1 (requires token)
-curl -X POST https://mentor-meet-o3rp.onrender.com/mentorProfile/step1 \
+curl -X POST http://localhost:8000/mentorProfile/step1 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{"firstName":"Test","lastName":"T","profession":"Developer",...}'

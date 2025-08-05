@@ -98,9 +98,7 @@ const FormContainer = () => {
     const loadCategories = async () => {
       try {
         const response = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-          }/mentor-get-category`
+          "http://localhost:8000/mentor-get-category"
         );
         const result = await response.json();
 
@@ -250,9 +248,7 @@ const FormContainer = () => {
 
         // Call Step 1 API
         const response = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-          }/mentorProfile/step1`,
+          "http://localhost:8000/mentorProfile/step1",
           {
             method: "POST",
             headers: {
@@ -297,9 +293,7 @@ const FormContainer = () => {
 
         // Call Step 2 API
         const response = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-          }/mentorProfile/step2`,
+          "http://localhost:8000/mentorProfile/step2",
           {
             method: "PATCH",
             headers: {
@@ -367,9 +361,7 @@ const FormContainer = () => {
 
       // Call Step 3 API
       const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/mentorProfile/step3`,
+        "http://localhost:8000/mentorProfile/step3",
         {
           method: "PATCH",
           headers: {
