@@ -15,5 +15,5 @@ CalendarRouter.post(
 );
 
 CalendarRouter.get("/calendar/:mentorId", getMentorCalendar);
-CalendarRouter.post("/booking", createBooking)
+
 
