@@ -116,7 +116,6 @@ const BottomNavigation = () => {
   const hideNavigationPages = [
     "/role-selection",
     "/create-profile",
-    "/mentor-dashboard",
     "/mentor-signup",
     "/student-signup",
     "/mentor-login",

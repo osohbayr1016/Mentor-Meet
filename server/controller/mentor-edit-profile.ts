@@ -19,23 +19,20 @@ export const editMentorProfile = async (req: Request, res: Response) => {
     specialization,
     achievements,
     bankAccount,
+    hourlyPrice,
   } = req.body;
 
   try {
-
     if (!firstName || !lastName) {
       return res
         .status(400)
         .json({ message: "Заавал бөглөх талбарууд дутуу байна." });
     }
 
-
-
     const foundCategory = await CategoryModel.findById(category.categoryId);
     if (!foundCategory) {
       return res.status(404).json({ message: "Ангилал олдсонгүй." });
     }
-
 
     const updatedMentor = await MentorModel.findByIdAndUpdate(
       mentorId,
@@ -47,14 +44,25 @@ export const editMentorProfile = async (req: Request, res: Response) => {
         subcategory: subcategory || "",
         bio: bio || "",
         image: image || "",
-        category: "",
+        category: category
+          ? {
+              categoryId: category.categoryId,
+              price: hourlyPrice || category.price || 0,
+            }
+          : "",
         experience: {
           careerDuration,
         },
         specialization,
         achievements,
-        socialLinks: typeof socialLinks === "string" ? JSON.parse(socialLinks) : socialLinks,
-        bankAccount: typeof bankAccount === "string" ? JSON.parse(bankAccount) : bankAccount,
+        socialLinks:
+          typeof socialLinks === "string"
+            ? JSON.parse(socialLinks)
+            : socialLinks,
+        bankAccount:
+          typeof bankAccount === "string"
+            ? JSON.parse(bankAccount)
+            : bankAccount,
         updatedAt: new Date(),
       },
       { new: true }
