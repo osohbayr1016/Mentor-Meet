@@ -14,19 +14,25 @@ import MeetingRouter from "./router/meeting.router";
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 
 const uri = process.env.MONGODB_URI;
 const dataBaseConnection = async () => {
-  await mongoose.connect(uri || "");
-  console.log("DB connected");
+  try {
+    await mongoose.connect(uri || "", {
+      maxPoolSize: 10, // Limit connection pool size
+      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+      socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+      bufferCommands: false, // Disable mongoose buffering
+    });
+    console.log("DB connected");
+  } catch (error) {
+    console.error("Database connection failed:", error);
+    process.exit(1);
+  }
 };
 
 dataBaseConnection();
-if (!uri) {
-  console.error("❌ MONGODB_URI not defined in .env");
-  process.exit(1);
-}
 
 app.use(MentorRouter);
 app.use(StudentRouter);
@@ -40,4 +46,3 @@ const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
-

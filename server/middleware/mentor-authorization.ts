@@ -18,13 +18,14 @@ export const isMentor = async (
 
     if (user.role === UserRoleEnum.MENTOR) {
       console.log(user.role, "MENTOR verified");
-      return next();
+      next();
+      return;
     }
-
-    return response.status(401).send({ message: "Unauthorized user" });
+    response.status(401).send({ message: "Unauthorized user" });
+    return;
   } catch (error: any) {
     console.error("Token verification error:", error.message);
-    return response.status(400).send({ message: "Token is invalid" });
+    response.status(400).send({ message: "Token is invalid" });
+    return;
   }
 };
-

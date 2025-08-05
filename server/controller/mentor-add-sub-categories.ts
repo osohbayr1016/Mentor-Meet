@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { CategoryModel } from "../model/category-model";
-import {} from "node-fetch";
 import mongoose from "mongoose";
 
 export const addSubCategories = async (req: Request, res: Response) => {
