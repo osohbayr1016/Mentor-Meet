@@ -10,8 +10,6 @@ export const createBooking = async (req: Request, res: Response) => {
       studentId,
       date,
       time,
-
-
       price,
       category,
       notes,
@@ -49,7 +47,6 @@ export const createBooking = async (req: Request, res: Response) => {
       studentId,
       date: new Date(date),
       time,
-
       price,
       category,
       notes,
