@@ -70,21 +70,19 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
+      const response = await axios.post<LoginResponse>(
         `${process.env.NEXT_PUBLIC_API_URL}/mentorLogin`,
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
+          email,
+          password,
         }
       );
 
-      // Parse the response as JSON since fetch does not have a .data property
-      const data = await response.json();
-      console.log("Login response:", data);
-      const { token, mentorId, message } = data;
+      console.log("Login response:", response.data);
+
+      // Axios already parses JSON and puts it in response.data
+      const { token, mentorId, message } = response.data;
+      console.log("Login response:", response.data);
 
       if (token && mentorId) {
         console.log("Login successful, fetching mentor data...");
