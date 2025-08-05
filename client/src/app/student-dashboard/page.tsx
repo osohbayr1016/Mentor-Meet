@@ -255,7 +255,7 @@ const StudentDashboard = () => {
     window.dispatchEvent(new Event("authChange"));
 
     // Redirect to login page
-    router.push("/student-login");
+    router.push("/");
   };
 
   // Show loading while fetching data

@@ -195,7 +195,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   const logout = () => {
     localStorage.removeItem("mentorToken");
     localStorage.removeItem("mentorUser");
-    localStorage.removeItem("mentorEmail"); // Email-г устгах
+    // localStorage.removeItem("mentorEmail"); // Email-г устгах
     setMentor(null);
     router.push("/");
   };
