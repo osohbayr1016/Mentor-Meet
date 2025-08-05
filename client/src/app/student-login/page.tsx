@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const StudentLoginPage = () => {
   const [email, setEmail] = useState("");
@@ -29,20 +30,18 @@ const StudentLoginPage = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        "https://mentor-meet-o3rp.onrender.com/studentLogin",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const response = await axios.post<{
+        token: string;
+        user: { email: string };
+        message: string;
+      }>(`${process.env.NEXT_PUBLIC_API_URL}/studentLogin`, {
+        email,
+        password,
+      });
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (response.ok) {
+      if (response.status === 200) {
         // Store student data and redirect
         localStorage.setItem("studentToken", data.token);
         localStorage.setItem("studentUser", JSON.stringify(data.user));
