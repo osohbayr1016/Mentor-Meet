@@ -10,7 +10,7 @@ export const createBooking = async (req: Request, res: Response) => {
       studentId,
       date,
       time,
-      duration,
+
       price,
       category,
       notes,
@@ -43,13 +43,12 @@ export const createBooking = async (req: Request, res: Response) => {
       });
     }
 
-    // Create the booking
     const booking = new Booking({
       mentorId,
       studentId,
       date: new Date(date),
       time,
-      duration: duration || 60,
+
       price,
       category,
       notes,
@@ -67,7 +66,7 @@ export const createBooking = async (req: Request, res: Response) => {
         studentId: booking.studentId,
         date: booking.date,
         time: booking.time,
-        duration: booking.duration,
+
         price: booking.price,
         category: booking.category,
         status: booking.status,
