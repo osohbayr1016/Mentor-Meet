@@ -5,14 +5,7 @@ import { MentorModel } from "../model/mentor-model";
 
 export const createBooking = async (req: Request, res: Response) => {
   try {
-    const {
-      mentorId,
-      studentId,
-      date,
-      times,
-      price,
-      category,
-    } = req.body;
+    const { mentorId, studentId, date, times, price, category } = req.body;
 
     if (!mentorId || !studentId || !date || !times || !price || !category) {
       return res.status(400).json({
@@ -47,12 +40,11 @@ export const createBooking = async (req: Request, res: Response) => {
 
     const bookings = [];
 
-    // Create one booking with all times
     const booking = new Booking({
       mentorId,
       studentId,
       date: new Date(date),
-      times, // Use times array
+      times,
       price: Number(price),
       category,
       status: "PENDING",
@@ -69,7 +61,7 @@ export const createBooking = async (req: Request, res: Response) => {
         mentorId: b.mentorId,
         studentId: b.studentId,
         date: b.date,
-        times: b.times, 
+        times: b.times,
         price: b.price,
         category: b.category,
         status: b.status,
