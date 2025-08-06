@@ -56,7 +56,7 @@ export const createBooking = async (req: Request, res: Response) => {
     bookings.push(booking);
 
     const notification = new NotificationModel({
-      userId: new mongoose.Types.ObjectId(mentorId),
+      userId: mentorId,
       bookingId: booking._id,
     });
 
