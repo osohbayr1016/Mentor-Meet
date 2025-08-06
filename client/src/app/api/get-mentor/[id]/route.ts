@@ -15,7 +15,8 @@ export async function GET(
     }
 
     // Call the server API
-    const response = await axios.get(`http://localhost:8000/mentor/${id}`);
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const response = await axios.get(`${API_BASE_URL}/mentor/${id}`);
 
     if (response.status !== 200) {
       const errorData = response.data as { error: string };

@@ -15,8 +15,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
     const response = await fetch(
-      `http://localhost:8000/bookings/${bookingId}/join`,
+      `${API_BASE_URL}/bookings/${bookingId}/join`,
       {
         method: "POST",
         headers: {
