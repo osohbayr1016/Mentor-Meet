@@ -12,11 +12,11 @@ export type BookingType = {
   mentorId: mongoose.Types.ObjectId;
   studentId: mongoose.Types.ObjectId;
   date: Date;
-  time: string;
+  times: string[];
   status: BookingStatus;
+
   price: number;
   category: string;
-  notes?: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -25,7 +25,7 @@ const BookingSchema = new Schema<BookingType>({
   mentorId: { type: Schema.Types.ObjectId, ref: "Mentor", required: true },
   studentId: { type: Schema.Types.ObjectId, ref: "Student", required: true },
   date: { type: Date, required: true },
-  time: { type: String, required: true },
+  times: [{ type: String, required: true }],
   status: {
     type: String,
     enum: Object.values(BookingStatus),
@@ -33,7 +33,6 @@ const BookingSchema = new Schema<BookingType>({
   },
   price: { type: Number, required: true },
   category: { type: String, required: true },
-  notes: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

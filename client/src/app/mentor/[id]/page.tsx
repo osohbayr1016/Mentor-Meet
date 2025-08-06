@@ -8,6 +8,8 @@ import MentorCalendar from "../../../components/MentorCalendar";
 import BookingModal from "../../../components/BookingModal";
 import axios from "axios";
 
+
+
 interface Mentor {
   id: string;
   firstName: string;
@@ -48,10 +50,10 @@ interface CalendarResponse {
 }
 
 interface CalendarSlot {
+  _id: string;
   date: string;
   times: string[];
 }
-
 
 const MentorDetailPage = () => {
   const router = useRouter();
@@ -68,6 +70,7 @@ const MentorDetailPage = () => {
   const [selectedBookingTime, setSelectedBookingTime] = useState<string>("");
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [calendar, setCalendar] = useState<CalendarSlot[]>([]);
+
 
 
   useEffect(() => {
@@ -94,11 +97,11 @@ const MentorDetailPage = () => {
 
 
 useEffect(() => {
-
   const fetchCalendar = async () => {
     try {
       const res = await axios.get<any>(`http://localhost:8000/calendar/${mentorId}`);
-        setCalendar(res.data.availabilities);
+      console.log("Calendar data:", res.data.availabilities);
+      setCalendar(res.data.availabilities);
     } catch (error) {
       console.error("Calendar fetch алдаа:", error);
     }
@@ -107,24 +110,10 @@ useEffect(() => {
   if (mentorId) {
     fetchCalendar();
   }
-}, [mentorId]); 
+}, [mentorId]);
 
-
-
-// const handleTimeSelect = async (date: string, time: string) => {
-
-//   try {
-  
-//     const res = await axios.get(`http://localhost:8000/calendar/${mentorId}`);
-
-//     const mentorCal = res.data;
-//     console.log("Mentor calendar data:", mentorCal);
-//   } catch (err) {
-//     console.error("Calendar fetch error:", err);
-//   }
-//   setSelectedDate(date);
+// const handleTimeSelect = (date: string, time: string) => {
 //   const currentTimesForDate = selectedTimesByDate[date] || [];
-
 //   const newTimesForDate = currentTimesForDate.includes(time)
 //     ? currentTimesForDate.filter((t) => t !== time)
 //     : [...currentTimesForDate, time];
@@ -133,23 +122,38 @@ useEffect(() => {
 //     ...prev,
 //     [date]: newTimesForDate,
 //   }));
+
+//   setSelectedBookingDate(date);
+//   setSelectedBookingTime(time);
 // };
 
-  const handleTimeSelect = (date: string, time: string) => {
-    const currentTimesForDate = selectedTimesByDate[date] || [];
-    const newTimesForDate = currentTimesForDate.includes(time)
-      ? currentTimesForDate.filter((t) => t !== time)
-      : [...currentTimesForDate, time];
+const handleTimeSelect = (date: string, time: string) => {
+  const currentTimesForDate = selectedTimesByDate[date] || [];
+  const newTimesForDate = currentTimesForDate.includes(time)
+    ? currentTimesForDate.filter((t) => t !== time)
+    : [...currentTimesForDate, time];
 
-    setSelectedTimesByDate((prev) => ({
-      ...prev,
-      [date]: newTimesForDate,
-    }));
+  setSelectedTimesByDate((prev) => ({
+    ...prev,
+    [date]: newTimesForDate,
+  }));
 
-    setSelectedBookingDate(date);
-    setSelectedBookingTime(time);
-  };
+  setSelectedBookingDate(date);
 
+  const calendarId = findCalendarId(date, time);
+  if (calendarId) {
+    localStorage.setItem("calendarId", calendarId);
+  } else {
+    console.error("No calendarId found for date:", date, "time:", time);
+  }
+};
+
+const findCalendarId = (date: string, time: string): string | null => {
+  const calendarSlot = calendar.find(
+    (slot) => slot.date === date && slot.times.includes(time)
+  );
+  return calendarSlot ? calendarSlot._id : null;
+};
   useEffect(() => {
     if (mentor) {
       const allSelectedTimes = Object.values(selectedTimesByDate).flat();
@@ -159,23 +163,48 @@ useEffect(() => {
     }
   }, [selectedTimesByDate, mentor]);
 
-const handleBooking = async (date: string, time: string) => {
+const handleMultiBooking = async () => {
+
   const token = localStorage.getItem("studentToken");
-  const mentorId = localStorage.getItem("MentorUser"); 
+  const mentorId = params?.id;
+
+const studentUser = JSON.parse(localStorage.getItem("studentUser") || "{}");
+console.log("studentUser", studentUser);
+  const times = getAllSelectedTimes();
+  console.log("Selected times:", times);
+  const studentId = studentUser.id;
 
   if (!token) {
-    alert("Нэвтрэх эсвэл mentor сонгогдоогүй байна!");
+    alert("Please log in to make a booking.");
+    return;
+  }
+  if (!mentorId || !studentId || !/^[0-9a-fA-F]{24}$/.test(studentId)) {
+    alert("Invalid mentor or student ID.");
+    return;
+  }
+  if (times.length === 0) {
+    alert("Please select at least one time slot.");
+    return;
+  }
+  if (!selectedBookingDate) {
+    alert("Please select a valid date.");
     return;
   }
 
   try {
-    const res = await axios.post<CalendarResponse>(
+    const payload = {
+      mentorId,
+      studentId,
+      date: selectedBookingDate,
+      times,
+      price: totalPrice,
+      category: mentor?.category?.categoryId || "Тодорхойгүй",
+    };
+    console.log("Booking payload:", payload);
+
+    const response = await axios.post(
       "http://localhost:8000/booking",
-      {
-        mentorId,
-        date,
-        time,
-      },
+      payload,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -183,21 +212,15 @@ const handleBooking = async (date: string, time: string) => {
       }
     );
 
-    console.log("Амжилттай хадгаллаа:", res.data);
-    const bookingId = res.data?.booking?._id;
-
-    if (bookingId) {
-      localStorage.setItem("bookingId", bookingId);
-    }
-
-    setSelectedBookingDate(date);
-    setSelectedBookingTime(time);
+    console.log("Захиалга амжилттай:", response.data);
     setShowBookingModal(true);
-  } catch (err) {
-    console.error("Алдаа:", err);
-    alert("Захиалга хийхэд алдаа гарлаа!");
+  } catch (error: any) {
+    console.error("Booking алдаа:", error.response?.data || error.message);
+    alert(`Захиалга амжилтгүй боллоо: ${error.response?.data?.message || error.message}`);
   }
 };
+
+
 
   // Get total selected hours across all dates
   const getTotalSelectedHours = () => {
@@ -283,13 +306,10 @@ const handleBooking = async (date: string, time: string) => {
                 </div>
 
                 {/* Book Session Button */}
-             <button
+ <button
   onClick={() => {
-    const times = getAllSelectedTimes();
-    if (getTotalSelectedHours() > 0 && times.length > 0) {
-       times.forEach((time) => {
-      handleBooking(selectedDate, time); 
-    });
+    if (getTotalSelectedHours() > 0) {
+      handleMultiBooking(); // ✅ зөв
     }
   }}
   disabled={getTotalSelectedHours() === 0}
@@ -297,6 +317,7 @@ const handleBooking = async (date: string, time: string) => {
 >
   Захиалга хийх ({getTotalSelectedHours()} цаг)
 </button>
+
               </div>
             </div>
 

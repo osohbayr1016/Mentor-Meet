@@ -88,7 +88,7 @@ const MentorPayment = () => {
     fetchMentor();
   }, [mentorId]);
 
-  // Parse selected times from URL parameters
+
   useEffect(() => {
     const timesParam = searchParams.get("times");
     if (timesParam) {
@@ -96,7 +96,7 @@ const MentorPayment = () => {
         const parsedTimes = JSON.parse(decodeURIComponent(timesParam));
         setSelectedTimesByDate(parsedTimes);
 
-        // Calculate total price
+ 
         if (mentor) {
           const totalHours = Object.values(parsedTimes).flat().length;
           setTotalPrice(totalHours * mentor.hourlyPrice);
@@ -134,8 +134,6 @@ useEffect(() => {
 }, []);
 
 
-
-
   // Get total selected hours
   const getTotalSelectedHours = () => {
     return Object.values(selectedTimesByDate).flat().length;
@@ -152,30 +150,45 @@ useEffect(() => {
     return formattedTimes;
   };
 
-    const savePayment = async () => {
-      const token = localStorage.getItem("studentToken");
-const studentId = JSON.parse(localStorage.getItem("studentUser") || "{}")
-const calendarId = localStorage.getItem("calendarId")
-const paymentStatus = "pending"
-const studentEmail = localStorage.getItem("studentEmail")
 
-      try{
+const savePayment = async () => {
+  const token = localStorage.getItem("studentToken");
+  const student = JSON.parse(localStorage.getItem("studentUser") || "{}")?.id;
+  const calendarId = searchParams.get("calendarId") || localStorage.getItem("calendarId")
+  const paymentStatus = "pending";
+  const studentEmail = localStorage.getItem("studentEmail");
+  const studentId = localStorage.getItem("studentUser");
 
-   const response = await axios.post(`http://localhost:8000/payment${studentId}`, {
+
+  try {
+    const response = await axios.post(
+      `http://localhost:8000/payment/${student}`,
+      {
         mentorId,
-        calendarId,
-        price:totalPrice,
+        studentId: student,
+        price: totalPrice,
         paymentStatus,
-        email:studentEmail
-  
-      });
-        console.log(response.data, "savepayment")
-        setPaymentSuccess(true)
-    } catch (err){
-    console.error("Төлбөр илгээхэд алдаа гарлаа:", err);
+        email: studentEmail,
+       calendarId,
       }
-    }
+    );
+
+    setPaymentSuccess(true);
+
+    console.log("REQUEST DATA:", {
+      studentId: student,
+      mentorId,
+      price: totalPrice,
+      paymentStatus,
+      email: studentEmail,
+      calendarId,
+    });
+  } catch (err) {
+    console.error("Төлбөр илгээхэд алдаа гарлаа:", err);
+  }
+};
   
+
   return (
     <div className="relative w-full h-screen">
       <div className="absolute inset-0 bg-black/30 -z-10" />
@@ -350,5 +363,4 @@ const studentEmail = localStorage.getItem("studentEmail")
 };
 
 export default MentorPayment;
-
 

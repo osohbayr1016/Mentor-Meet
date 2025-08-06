@@ -26,8 +26,12 @@ export const Payment = async (req: Request, res: Response) => {
     return res.status(401).send({ message: "Та нэвтэрнэ үү" });
   }
 
+  if (!studentId || !mentorId || !price || !paymentStatus || !email) {
+    return res.status(400).send({ message: "Missing required fields" });
+  }
+
   try {
-    const existingPayment = await PaymentModel.findOne({ studentId, calendarId });
+    const existingPayment = await PaymentModel.findOne({ studentId,calendarId });
 
     if (existingPayment) {
       return res.status(400).send({
@@ -38,10 +42,10 @@ export const Payment = async (req: Request, res: Response) => {
     const newPayment = await PaymentModel.create({
       studentId,
       mentorId,
-      calendarId,
       price,
       paymentStatus,
       email,
+      calendarId
     });
 
     if (paymentStatus === "pending") {
@@ -65,7 +69,7 @@ export const Payment = async (req: Request, res: Response) => {
         await EmailModel.create({ email, mail: studentMessage });
       }
 
-      // Менторт и-мэйл илгээх
+    
       if (mentor) {
         await transporter.sendMail({
           from: "baabarmx@gmail.com",

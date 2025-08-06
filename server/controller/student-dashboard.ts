@@ -10,33 +10,58 @@ export const getStudentBookings = async (req: Request, res: Response) => {
 
     const bookings = await Booking.find({ studentId })
       .populate("mentorId", "firstName lastName image profession rating")
-      .sort({ date: 1, time: 1 });
+      .sort({ date: 1 });
 
     // Separate upcoming and past bookings
     const now = new Date();
     const upcomingBookings = bookings.filter((booking) => {
+      // Use the earliest time slot for comparison
+      const earliestTime = booking.times[0]; // Or sort times if needed
+      if (!earliestTime) return false;
+
+      const [hour, minute] = earliestTime.split(":").map((part) => parseInt(part));
       const bookingDate = new Date(booking.date);
-      bookingDate.setHours(
-        parseInt(booking.time.split(":")[0]),
-        parseInt(booking.time.split(":")[1])
-      );
+      bookingDate.setHours(hour, minute);
       return bookingDate > now && booking.status !== BookingStatus.CANCELLED;
     });
 
     const pastBookings = bookings.filter((booking) => {
+      const earliestTime = booking.times[0]; // Or sort times if needed
+      if (!earliestTime) return true;
+
+      const [hour, minute] = earliestTime.split(":").map((part) => parseInt(part));
       const bookingDate = new Date(booking.date);
-      bookingDate.setHours(
-        parseInt(booking.time.split(":")[0]),
-        parseInt(booking.time.split(":")[1])
-      );
+      bookingDate.setHours(hour, minute);
       return bookingDate <= now || booking.status === BookingStatus.CANCELLED;
     });
 
     res.json({
       success: true,
       data: {
-        upcoming: upcomingBookings,
-        past: pastBookings,
+        upcoming: upcomingBookings.map((b) => ({
+          _id: b._id,
+          mentorId: b.mentorId,
+          studentId: b.studentId,
+          date: b.date,
+          times: b.times, 
+          status: b.status,
+          price: b.price,
+          category: b.category,
+          createdAt: b.createdAt,
+          updatedAt: b.updatedAt,
+        })),
+        past: pastBookings.map((b) => ({
+          _id: b._id,
+          mentorId: b.mentorId,
+          studentId: b.studentId,
+          date: b.date,
+          times: b.times, 
+          status: b.status,
+          price: b.price,
+          category: b.category,
+          createdAt: b.createdAt,
+          updatedAt: b.updatedAt,
+        })),
       },
     });
   } catch (error) {
@@ -47,6 +72,7 @@ export const getStudentBookings = async (req: Request, res: Response) => {
     });
   }
 };
+
 
 // Cancel a booking
 export const cancelBooking = async (req: Request, res: Response) => {
