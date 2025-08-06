@@ -12,6 +12,7 @@ import { CalendarRouter } from "./router/calendar-router";
 import { PaymentRouter } from "./router/payment-router";
 import MeetingRouter from "./router/meeting.router";
 import { BookingRouter } from "./router/booking-router";
+import { NotificationRouter } from "./router/notification-router";
 
 const app = express();
 app.use(
@@ -47,7 +48,7 @@ const dataBaseConnection = async () => {
 
 const startServer = async () => {
   try {
-    await dataBaseConnection(); 
+    await dataBaseConnection();
 
     app.use(MentorRouter);
     app.use(StudentRouter);
@@ -57,6 +58,7 @@ const startServer = async () => {
     app.use(PaymentRouter);
     app.use(MeetingRouter);
     app.use(BookingRouter);
+    app.use(NotificationRouter);
 
     const PORT = process.env.PORT || 8000;
     app.listen(PORT, () => {
@@ -67,10 +69,9 @@ const startServer = async () => {
   }
 };
 
-startServer(); 
+startServer();
 
 //  dataBaseConnection();
-
 
 // app.use(MentorRouter);
 // app.use(StudentRouter);
@@ -84,4 +85,3 @@ startServer();
 // const PORT = process.env.PORT || 8000;
 // app.listen(PORT, () => {
 //   console.log(`🚀 Server running on http://localhost:${PORT}`);
-

@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { useAuth } from "../app/_components/MentorUserProvider";
 import { useEffect, useState } from "react";
+import { Bell } from "lucide-react";
+import axios from "axios";
 
 interface StudentData {
   studentId: string;
@@ -17,7 +19,10 @@ const BottomNavigation = () => {
   const pathname = usePathname();
   const { mentor, isLoading } = useAuth();
   const [student, setStudent] = useState<StudentData | null>(null);
-
+  const [notification, setNotification] = useState([]);
+  const [unRead, setUnRead] = useState(false);
+  const params = useParams();
+  const mentorId = params.id as string;
   // Check for student authentication
   useEffect(() => {
     const checkStudentAuth = () => {
@@ -130,6 +135,27 @@ const BottomNavigation = () => {
 
   // Show notification bell only when either mentor or student is logged in
   const isLoggedIn = mentor || student;
+
+  useEffect(() => {
+    const fetchBooking = async () => {
+      const userId = mentor?.mentorId || student?.studentId;
+      if (!userId) return;
+
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/notification/${userId}`
+        );
+        const data: any = response?.data;
+
+        setNotification(data.notification);
+        setUnRead(data.notification?.length > 0);
+      } catch (err) {
+        console.error({ message: "Алдаа гарлаа" });
+      }
+    };
+
+    fetchBooking();
+  }, [mentor, student]);
 
   return (
     <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-40 rounded-full overflow-hidden bg-[#737373]/60 backdrop-blur-2xl">
