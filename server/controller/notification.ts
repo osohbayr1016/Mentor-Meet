@@ -1,12 +1,15 @@
 import { Request, Response } from "express";
-import { Mongoose } from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 import { NotificationModel } from "../model/student-booking-model";
 
 export const getNotification = async (req: Request, res: Response) => {
   const { userId } = req.params;
 
+  const userIdObj = new mongoose.Types.ObjectId(userId);
   try {
-    const notification = await NotificationModel.find({ userId }).sort({
+    const notification = await NotificationModel.find({
+      userId: userIdObj,
+    }).sort({
       createdAt: -1,
     });
     res.status(200).send({ notification, success: true });
