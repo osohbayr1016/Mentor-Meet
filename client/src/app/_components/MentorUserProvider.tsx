@@ -107,10 +107,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             console.log("Mentor data received:", mentorData);
             // Store token and user data
             localStorage.setItem("mentorToken", token);
-            localStorage.setItem(
-              "mentorUser",
-              JSON.stringify(mentorData.mentorId)
-            );
+            localStorage.setItem("mentorUser", JSON.stringify(mentorData));
             localStorage.setItem("mentorEmail", mentorData.email); // Email-г тусад нь хадгалах
 
             setMentor(mentorData);
