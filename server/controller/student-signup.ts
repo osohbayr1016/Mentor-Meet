@@ -147,7 +147,10 @@ export const StudentNameNumber = async (req: Request, res: Response) => {
       });
 
       if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET not defined");
-      const token = jwt.sign({ userId: student._id }, process.env.JWT_SECRET);
+      const token = jwt.sign(
+        { studentId: student._id, email: student.email },
+        process.env.JWT_SECRET
+      );
 
       return res.status(200).json({
         message: "Successfully created student with Google OAuth",
@@ -196,7 +199,10 @@ export const StudentNameNumber = async (req: Request, res: Response) => {
     await TempUserModel.deleteOne({ email });
 
     if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET not defined");
-    const token = jwt.sign({ userId: student._id }, process.env.JWT_SECRET);
+    const token = jwt.sign(
+      { studentId: student._id, email: student.email },
+      process.env.JWT_SECRET
+    );
 
     return res.status(200).json({
       message: "Successfully updated name and number",
