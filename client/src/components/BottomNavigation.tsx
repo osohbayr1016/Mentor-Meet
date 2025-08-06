@@ -129,33 +129,36 @@ const BottomNavigation = () => {
     "/student-resPass",
   ];
 
-  if (hideNavigationPages.includes(pathname)) {
-    return null;
-  }
-
   // Show notification bell only when either mentor or student is logged in
   const isLoggedIn = mentor || student;
 
   useEffect(() => {
-    const fetchBooking = async () => {
+    const fetchNotifications = async () => {
       const userId = mentor?.mentorId || student?.studentId;
+
       if (!userId) return;
 
       try {
         const response = await axios.get(
           `http://localhost:8000/notification/${userId}`
         );
-        const data: any = response?.data;
+        const data: any = response.data;
+
+        console.log("Notifications fetched:", data.notification);
 
         setNotification(data.notification);
-        setUnRead(data.notification?.length > 0);
+        setUnRead(data.notification?.some((n: any) => !n.checked));
       } catch (err) {
-        console.error({ message: "Алдаа гарлаа" });
+        console.error("Error fetching notifications", err);
       }
     };
 
-    fetchBooking();
+    fetchNotifications();
   }, [mentor, student]);
+
+  if (hideNavigationPages.includes(pathname)) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-40 rounded-full overflow-hidden bg-[#737373]/60 backdrop-blur-2xl">
@@ -197,7 +200,7 @@ const BottomNavigation = () => {
             >
               {thirdButton.text}
             </Link>
-            {isLoggedIn && (
+            {/* {isLoggedIn && (
               <div className="flex items-center">
                 <button className="p-2 text-white/70 hover:text-white transition-colors">
                   <svg
@@ -215,6 +218,14 @@ const BottomNavigation = () => {
                   </svg>
                 </button>
               </div>
+            )} */}
+            {isLoggedIn && (
+              <button className="relative p-2 text-white/70 hover:text-white transition-colors">
+                {unRead && (
+                  <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full animate-ping" />
+                )}
+                <Bell size={20} />
+              </button>
             )}
           </div>
 

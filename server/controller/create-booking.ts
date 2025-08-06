@@ -3,6 +3,7 @@ import { Booking } from "../model/booking-model";
 import { StudentModel } from "../model/student-model";
 import { MentorModel } from "../model/mentor-model";
 import { NotificationModel } from "../model/student-booking-model";
+import mongoose from "mongoose";
 
 export const createBooking = async (req: Request, res: Response) => {
   try {
@@ -55,11 +56,24 @@ export const createBooking = async (req: Request, res: Response) => {
     bookings.push(booking);
 
     const notification = new NotificationModel({
-      userId: mentorId,
+      userId: new mongoose.Types.ObjectId(mentorId),
       bookingId: booking._id,
     });
 
     await notification.save();
+
+    if (!mongoose.Types.ObjectId.isValid(mentorId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid mentorId" });
+    }
+
+    try {
+      await notification.save();
+      console.log("Notification saved:", notification);
+    } catch (error) {
+      console.error("Error saving notification:", error);
+    }
 
     return res.status(201).json({
       success: true,
