@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import MeetingCard from "../../components/MeetingCard";
+import axios from "axios";
 
 interface MentorProfile {
   id: string;
@@ -55,10 +56,23 @@ const MentorDashboard = () => {
   const [totalIncome] = useState(20000); // Mock data
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
+    firstName: "",
+    lastName: "",
     nickName: "",
     hourlyPrice: 0,
     bio: "",
     profession: "",
+    image: "",
+    experience: {
+      work: "",
+      position: "",
+      careerDuration: "",
+    },
+    education: {
+      schoolName: "",
+      major: "",
+      endedYear: "",
+    },
   });
 
   // Mock meeting data
@@ -115,29 +129,42 @@ const MentorDashboard = () => {
 
       try {
         const token = localStorage.getItem("mentorToken");
-        const response = await fetch(`http://localhost:8000/mentorProfile`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const response = await axios.get<{ mentor: MentorProfile }>(
+          `http://localhost:8000/mentorProfile`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = response.data;
+        setMentorProfile(data.mentor);
+        setEditForm({
+          firstName: data.mentor.firstName || "",
+          lastName: data.mentor.lastName || "",
+          nickName: data.mentor.nickName || "",
+          hourlyPrice: data.mentor.category?.price || 0,
+          bio: data.mentor.bio || "",
+          profession: data.mentor.profession || "",
+          image: data.mentor.image || "",
+          experience: {
+            work: data.mentor.experience?.work || "",
+            position: data.mentor.experience?.position || "",
+            careerDuration: data.mentor.experience?.careerDuration || "",
+          },
+          education: {
+            schoolName: data.mentor.education?.schoolName || "",
+            major: data.mentor.education?.major || "",
+            endedYear: data.mentor.education?.endedYear || "",
           },
         });
-        const data = await response.json();
-
-        if (response.ok) {
-          setMentorProfile(data.mentor);
-          setEditForm({
-            nickName: data.mentor.nickName || "",
-            hourlyPrice: data.mentor.category?.price || 0,
-            bio: data.mentor.bio || "",
-            profession: data.mentor.profession || "",
-          });
-        } else {
-          setProfileError(
-            data.error || "Профайл мэдээлэл ачаалахад алдаа гарлаа"
-          );
-        }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching mentor profile:", error);
-        setProfileError("Профайл мэдээлэл ачаалахад алдаа гарлаа");
+        setProfileError(
+          error.response?.data?.message ||
+            "Профайл мэдээлэл ачаалахад алдаа гарлаа"
+        );
       } finally {
         setProfileLoading(false);
       }
@@ -165,48 +192,130 @@ const MentorDashboard = () => {
   const handleSaveProfile = async () => {
     if (!mentor?.mentorId) return;
 
+    // Frontend validation
+    const requiredFields = [];
+    if (!editForm.firstName?.trim()) requiredFields.push("Нэр");
+    if (!editForm.lastName?.trim()) requiredFields.push("Овог");
+    if (!editForm.profession?.trim()) requiredFields.push("Мэргэжил");
+
+    if (requiredFields.length > 0) {
+      alert(
+        `Заавал бөглөх талбарууд дутуу байна: ${requiredFields.join(", ")}`
+      );
+      return;
+    }
+
     try {
       const token = localStorage.getItem("mentorToken");
-      const response = await fetch(`http://localhost:8000/mentorEditProfile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+
+      const requestData = {
+        firstName: editForm.firstName,
+        lastName: editForm.lastName,
+        nickName: editForm.nickName,
+        bio: editForm.bio,
+        profession: editForm.profession,
+        hourlyPrice: editForm.hourlyPrice,
+        image: editForm.image,
+        experience: {
+          work: editForm.experience.work,
+          position: editForm.experience.position,
+          careerDuration: editForm.experience.careerDuration,
         },
-        body: JSON.stringify({
-          nickName: editForm.nickName,
-          bio: editForm.bio,
-          profession: editForm.profession,
+        education: {
+          schoolName: editForm.education.schoolName,
+          major: editForm.education.major,
+          endedYear: editForm.education.endedYear,
+        },
+        ...(mentorProfile?.category?.categoryId && {
           category: {
-            categoryId: mentorProfile?.category?.categoryId || "",
+            categoryId: mentorProfile.category.categoryId,
             price: editForm.hourlyPrice,
           },
         }),
-      });
+      };
 
-      if (response.ok) {
-        const updatedProfile = await response.json();
-        setMentorProfile((prev) =>
-          prev ? { ...prev, ...updatedProfile.mentor } : null
-        );
-        setIsEditing(false);
-        alert("Профайл амжилттай шинэчлэгдлээ!");
-      } else {
-        alert("Профайл шинэчлэхэд алдаа гарлаа");
-      }
-    } catch (error) {
+      console.log("Sending profile update data:", requestData);
+
+      const response = await axios.put<{ mentor: MentorProfile }>(
+        `http://localhost:8000/mentorEditProfile`,
+        requestData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const updatedProfile = response.data;
+      console.log("Updated profile response:", updatedProfile);
+      console.log("Updated mentor data:", updatedProfile.mentor);
+      setMentorProfile(updatedProfile.mentor);
+      setIsEditing(false);
+      alert("Профайл амжилттай шинэчлэгдлээ!");
+
+      // Refresh the profile data to ensure consistency
+      setTimeout(() => {
+        const fetchMentorProfile = async () => {
+          try {
+            const token = localStorage.getItem("mentorToken");
+            const response = await axios.get<{ mentor: MentorProfile }>(
+              `http://localhost:8000/mentorProfile`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            const data = response.data;
+            setMentorProfile(data.mentor);
+          } catch (error: any) {
+            console.error("Error refreshing profile:", error);
+          }
+        };
+        fetchMentorProfile();
+      }, 1000);
+    } catch (error: any) {
       console.error("Error updating profile:", error);
-      alert("Профайл шинэчлэхэд алдаа гарлаа");
+      alert(error.response?.data?.message || "Профайл шинэчлэхэд алдаа гарлаа");
+    }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setEditForm((prev) => ({
+          ...prev,
+          image: result,
+        }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const handleCancelEdit = () => {
     if (mentorProfile) {
       setEditForm({
+        firstName: mentorProfile.firstName || "",
+        lastName: mentorProfile.lastName || "",
         nickName: mentorProfile.nickName || "",
         hourlyPrice: mentorProfile.category?.price || 0,
         bio: mentorProfile.bio || "",
         profession: mentorProfile.profession || "",
+        image: mentorProfile.image || "",
+        experience: {
+          work: mentorProfile.experience?.work || "",
+          position: mentorProfile.experience?.position || "",
+          careerDuration: mentorProfile.experience?.careerDuration || "",
+        },
+        education: {
+          schoolName: mentorProfile.education?.schoolName || "",
+          major: mentorProfile.education?.major || "",
+          endedYear: mentorProfile.education?.endedYear || "",
+        },
       });
     }
     setIsEditing(false);
@@ -384,45 +493,112 @@ const MentorDashboard = () => {
                           {/* Profile Image and Basic Info */}
                           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                             <div className="flex items-center gap-4 mb-4">
-                              <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-600">
-                                {mentorProfile.image ? (
-                                  <Image
-                                    src={mentorProfile.image}
-                                    alt="Profile"
-                                    width={80}
-                                    height={80}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center text-white text-2xl">
-                                    {mentorProfile.firstName?.[0]}
-                                    {mentorProfile.lastName?.[0]}
-                                  </div>
+                              <div className="relative">
+                                <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-600">
+                                  {(
+                                    isEditing
+                                      ? editForm.image
+                                      : mentorProfile.image
+                                  ) ? (
+                                    <Image
+                                      src={
+                                        isEditing
+                                          ? editForm.image
+                                          : mentorProfile.image
+                                      }
+                                      alt="Profile"
+                                      width={80}
+                                      height={80}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-white text-2xl">
+                                      {mentorProfile.firstName?.[0]}
+                                      {mentorProfile.lastName?.[0]}
+                                    </div>
+                                  )}
+                                </div>
+                                {isEditing && (
+                                  <label className="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-1 cursor-pointer hover:bg-blue-700 transition-colors">
+                                    <svg
+                                      className="w-4 h-4"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                                      />
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                                      />
+                                    </svg>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={handleImageUpload}
+                                      className="hidden"
+                                    />
+                                  </label>
                                 )}
                               </div>
                               <div>
-                                <h4 className="text-white text-xl font-semibold">
-                                  {mentorProfile.firstName}{" "}
-                                  {mentorProfile.lastName}
-                                </h4>
                                 {isEditing ? (
-                                  <input
-                                    type="text"
-                                    value={editForm.nickName}
-                                    onChange={(e) =>
-                                      setEditForm((prev) => ({
-                                        ...prev,
-                                        nickName: e.target.value,
-                                      }))
-                                    }
-                                    placeholder="Nickname"
-                                    className="mt-2 px-3 py-1 bg-white/20 border border-white/30 rounded text-white placeholder-gray-300"
-                                  />
+                                  <div className="space-y-2">
+                                    <input
+                                      type="text"
+                                      value={editForm.firstName}
+                                      onChange={(e) =>
+                                        setEditForm((prev) => ({
+                                          ...prev,
+                                          firstName: e.target.value,
+                                        }))
+                                      }
+                                      placeholder="Нэр"
+                                      className="w-full px-3 py-1 bg-white/20 border border-white/30 rounded text-white placeholder-gray-300"
+                                    />
+                                    <input
+                                      type="text"
+                                      value={editForm.lastName}
+                                      onChange={(e) =>
+                                        setEditForm((prev) => ({
+                                          ...prev,
+                                          lastName: e.target.value,
+                                        }))
+                                      }
+                                      placeholder="Овог"
+                                      className="w-full px-3 py-1 bg-white/20 border border-white/30 rounded text-white placeholder-gray-300"
+                                    />
+                                    <input
+                                      type="text"
+                                      value={editForm.nickName}
+                                      onChange={(e) =>
+                                        setEditForm((prev) => ({
+                                          ...prev,
+                                          nickName: e.target.value,
+                                        }))
+                                      }
+                                      placeholder="Nickname"
+                                      className="w-full px-3 py-1 bg-white/20 border border-white/30 rounded text-white placeholder-gray-300"
+                                    />
+                                  </div>
                                 ) : (
-                                  <p className="text-gray-300">
-                                    {mentorProfile.nickName ||
-                                      "Nickname оруулаагүй"}
-                                  </p>
+                                  <div>
+                                    <h4 className="text-white text-xl font-semibold">
+                                      {mentorProfile.firstName}{" "}
+                                      {mentorProfile.lastName}
+                                    </h4>
+                                    <p className="text-gray-300">
+                                      {mentorProfile.nickName ||
+                                        "Nickname оруулаагүй"}
+                                    </p>
+                                  </div>
                                 )}
                               </div>
                             </div>
@@ -516,19 +692,119 @@ const MentorDashboard = () => {
                                 <label className="text-gray-300 text-sm">
                                   Туршлага:
                                 </label>
-                                <p className="text-white">
-                                  {mentorProfile.experience?.careerDuration ||
-                                    "Туршлага оруулаагүй"}
-                                </p>
+                                {isEditing ? (
+                                  <div className="space-y-2">
+                                    <input
+                                      type="text"
+                                      value={editForm.experience.work}
+                                      onChange={(e) =>
+                                        setEditForm((prev) => ({
+                                          ...prev,
+                                          experience: {
+                                            ...prev.experience,
+                                            work: e.target.value,
+                                          },
+                                        }))
+                                      }
+                                      placeholder="Ажилласан газар"
+                                      className="mt-1 w-full px-3 py-1 bg-white/20 border border-white/30 rounded text-white placeholder-gray-300"
+                                    />
+                                    <input
+                                      type="text"
+                                      value={editForm.experience.position}
+                                      onChange={(e) =>
+                                        setEditForm((prev) => ({
+                                          ...prev,
+                                          experience: {
+                                            ...prev.experience,
+                                            position: e.target.value,
+                                          },
+                                        }))
+                                      }
+                                      placeholder="Албан тушаал"
+                                      className="w-full px-3 py-1 bg-white/20 border border-white/30 rounded text-white placeholder-gray-300"
+                                    />
+                                    <input
+                                      type="text"
+                                      value={editForm.experience.careerDuration}
+                                      onChange={(e) =>
+                                        setEditForm((prev) => ({
+                                          ...prev,
+                                          experience: {
+                                            ...prev.experience,
+                                            careerDuration: e.target.value,
+                                          },
+                                        }))
+                                      }
+                                      placeholder="Ажилласан жил"
+                                      className="w-full px-3 py-1 bg-white/20 border border-white/30 rounded text-white placeholder-gray-300"
+                                    />
+                                  </div>
+                                ) : (
+                                  <p className="text-white">
+                                    {mentorProfile.experience?.careerDuration ||
+                                      "Туршлага оруулаагүй"}
+                                  </p>
+                                )}
                               </div>
                               <div>
                                 <label className="text-gray-300 text-sm">
                                   Боловсрол:
                                 </label>
-                                <p className="text-white">
-                                  {mentorProfile.education?.schoolName} -{" "}
-                                  {mentorProfile.education?.major}
-                                </p>
+                                {isEditing ? (
+                                  <div className="space-y-2">
+                                    <input
+                                      type="text"
+                                      value={editForm.education.schoolName}
+                                      onChange={(e) =>
+                                        setEditForm((prev) => ({
+                                          ...prev,
+                                          education: {
+                                            ...prev.education,
+                                            schoolName: e.target.value,
+                                          },
+                                        }))
+                                      }
+                                      placeholder="Сургуулийн нэр"
+                                      className="mt-1 w-full px-3 py-1 bg-white/20 border border-white/30 rounded text-white placeholder-gray-300"
+                                    />
+                                    <input
+                                      type="text"
+                                      value={editForm.education.major}
+                                      onChange={(e) =>
+                                        setEditForm((prev) => ({
+                                          ...prev,
+                                          education: {
+                                            ...prev.education,
+                                            major: e.target.value,
+                                          },
+                                        }))
+                                      }
+                                      placeholder="Мэргэжлийн нэр"
+                                      className="w-full px-3 py-1 bg-white/20 border border-white/30 rounded text-white placeholder-gray-300"
+                                    />
+                                    <input
+                                      type="text"
+                                      value={editForm.education.endedYear}
+                                      onChange={(e) =>
+                                        setEditForm((prev) => ({
+                                          ...prev,
+                                          education: {
+                                            ...prev.education,
+                                            endedYear: e.target.value,
+                                          },
+                                        }))
+                                      }
+                                      placeholder="Төгссөн он"
+                                      className="w-full px-3 py-1 bg-white/20 border border-white/30 rounded text-white placeholder-gray-300"
+                                    />
+                                  </div>
+                                ) : (
+                                  <p className="text-white">
+                                    {mentorProfile.education?.schoolName} -{" "}
+                                    {mentorProfile.education?.major}
+                                  </p>
+                                )}
                               </div>
                               <div>
                                 <label className="text-gray-300 text-sm">
