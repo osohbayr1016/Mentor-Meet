@@ -1,31 +1,25 @@
 import { model, models, ObjectId, Schema } from "mongoose";
 
-export type StudentCalendar = {
+export type NotificationType = {
   _id: ObjectId;
-  studentId: Schema.Types.ObjectId;
-  mentorId: Schema.Types.ObjectId;
-  date: string;
-  time: string;
-  status: "PENDING" | "CONFIRMED" | "CANCELLED";
+  userId: Schema.Types.ObjectId;
   createdAt: string;
   updatedAt: string;
+  checked: boolean;
+  bookingId: Schema.Types.ObjectId;
 };
 
-const StudentSchema = new Schema<StudentCalendar>(
+const NotificationSchema = new Schema<NotificationType>(
   {
-    studentId: { type: Schema.Types.ObjectId, ref: "Student", required: true },
-    mentorId: { type: Schema.Types.ObjectId, ref: "Mentor", required: true },
-    date: { type: String, required: true },
-    time: { type: String, required: true },
-    status: {
-      type: String,
-      enum: ["PENDING", "CONFIRMED", "CANCELLED"],
-      default: "PENDING",
-    },
+    userId: { type: Schema.Types.ObjectId, ref: "Mentor" },
+    bookingId: { type: Schema.Types.ObjectId, ref: "Booking" },
+    checked: { type: Boolean, default: false },
   },
+
   { timestamps: true }
 );
 
-
-export const StudentBookingModel =
-  models.Booking || model<StudentCalendar>("Booking", StudentSchema);
+export const NotificationModel = model<NotificationType>(
+  "Notification",
+  NotificationSchema
+);

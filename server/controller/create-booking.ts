@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Booking } from "../model/booking-model";
 import { StudentModel } from "../model/student-model";
 import { MentorModel } from "../model/mentor-model";
+import { NotificationModel } from "../model/student-booking-model";
 
 export const createBooking = async (req: Request, res: Response) => {
   try {
@@ -52,6 +53,13 @@ export const createBooking = async (req: Request, res: Response) => {
 
     await booking.save();
     bookings.push(booking);
+
+    const notification = new NotificationModel({
+      userId: mentorId,
+      bookingId: booking._id,
+    });
+
+    await notification.save();
 
     return res.status(201).json({
       success: true,
