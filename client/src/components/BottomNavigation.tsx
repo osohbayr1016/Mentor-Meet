@@ -12,7 +12,6 @@ interface StudentData {
   email: string;
   firstName: string;
   lastName: string;
-  // Add other student fields as needed
 }
 
 const BottomNavigation = () => {
@@ -29,9 +28,17 @@ const BottomNavigation = () => {
       try {
         const studentToken = localStorage.getItem("studentToken");
         const studentUserStr = localStorage.getItem("studentUser");
+        console.log(studentUserStr, "student id");
+        
 
         if (studentToken && studentUserStr) {
-          const studentData = JSON.parse(studentUserStr) as StudentData;
+          // const studentData = JSON.parse(studentUserStr) as StudentData;
+          const studentDataRaw = JSON.parse(studentUserStr);
+const studentData: StudentData = {
+  ...studentDataRaw,
+  studentId: studentDataRaw.id, 
+};
+
           setStudent(studentData);
         } else {
           setStudent(null);
@@ -134,11 +141,13 @@ const BottomNavigation = () => {
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      const userId = mentor?.mentorId || student?.studentId;
+      const userId = mentor?.mentorId
 
       if (!userId) return;
 
       try {
+
+        console.log(mentor?.mentorId, "id")
         const response = await axios.get(
           `http://localhost:8000/notification/${userId}`
         );
@@ -154,7 +163,7 @@ const BottomNavigation = () => {
     };
 
     fetchNotifications();
-  }, [mentor, student]);
+  }, [mentor]);
 
   if (hideNavigationPages.includes(pathname)) {
     return null;
@@ -219,17 +228,17 @@ const BottomNavigation = () => {
                 </button>
               </div>
             )} */}
+
             {isLoggedIn && (
               <button className="relative p-2 text-white/70 hover:text-white transition-colors">
                 {unRead && (
-                  <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full animate-ping" />
+                  <span className="absolute top-1 right-1 w-3 h-3 bg-red-600 rounded-full" />
                 )}
                 <Bell size={20} />
               </button>
             )}
           </div>
 
-          {/* Notification Bell - Only show when logged in */}
         </div>
       </div>
     </div>
