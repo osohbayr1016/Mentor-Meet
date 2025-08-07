@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useAuth } from "../app/_components/MentorUserProvider";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import {
   Bell,
   X,
@@ -72,14 +72,36 @@ const BottomNavigation = () => {
         console.log(studentUserStr, "student id");
 
         if (studentToken && studentUserStr) {
-          // const studentData = JSON.parse(studentUserStr) as StudentData;
-          const studentDataRaw = JSON.parse(studentUserStr);
-          const studentData: StudentData = {
-            ...studentDataRaw,
-            studentId: studentDataRaw.id,
-          };
+          try {
+            const studentDataRaw = JSON.parse(studentUserStr);
+            
+            // Validate required fields
+            if (studentDataRaw && typeof studentDataRaw === 'object') {
+              const studentData: StudentData = {
+                studentId: studentDataRaw.id || studentDataRaw.studentId || '',
+                email: studentDataRaw.email || '',
+                firstName: studentDataRaw.firstName || '',
+                lastName: studentDataRaw.lastName || '',
+                ...studentDataRaw,
+              };
 
-          setStudent(studentData);
+              // Only set student if we have essential data
+              if (studentData.studentId && studentData.email) {
+                setStudent(studentData);
+              } else {
+                console.warn("Student data missing essential fields:", studentData);
+                setStudent(null);
+              }
+            } else {
+              console.warn("Invalid student data format:", studentDataRaw);
+              setStudent(null);
+            }
+          } catch (parseError) {
+            console.error("Error parsing student data:", parseError);
+            // Clear invalid data
+            localStorage.removeItem("studentUser");
+            setStudent(null);
+          }
         } else {
           setStudent(null);
         }
@@ -180,9 +202,12 @@ const BottomNavigation = () => {
   const isLoggedIn = mentor || student;
 
   // Fetch notifications
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     const userId = mentor?.mentorId;
-    if (!userId) return;
+    if (!userId) {
+      console.warn("No mentor ID available for fetching notifications");
+      return;
+    }
 
     setIsLoadingNotifications(true);
     try {
@@ -190,22 +215,36 @@ const BottomNavigation = () => {
       const response = await axios.get(
         `${
           process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/notification/${userId}`
+        }/notification/${userId}`,
+        {
+          timeout: 10000, // 10 second timeout
+        }
       );
-      const data: any = response.data;
+      
+      if (response.status === 200 && response.data) {
+        const data: any = response.data;
+        console.log("Notifications fetched:", data.notification);
 
-      console.log("Notifications fetched:", data.notification);
-
-      setNotifications(data.notification || []);
-      const unread =
-        data.notification?.filter((n: Notification) => !n.checked) || [];
-      setUnreadCount(unread.length);
-    } catch (err) {
-      console.error("Error fetching notifications", err);
+        const notifications = Array.isArray(data.notification) ? data.notification : [];
+        setNotifications(notifications);
+        
+        const unread = notifications.filter((n: Notification) => !n.checked);
+        setUnreadCount(unread.length);
+      } else {
+        console.warn("Unexpected response format for notifications");
+        setNotifications([]);
+        setUnreadCount(0);
+      }
+    } catch (err: any) {
+      console.error("Error fetching notifications:", err.message || err);
+      // Don't clear existing notifications on error, just log it
+      if (err.code === 'ECONNABORTED') {
+        console.error("Request timeout - notification server may be slow");
+      }
     } finally {
       setIsLoadingNotifications(false);
     }
-  };
+  }, [mentor?.mentorId]);
 
   // Mark notification as read
   const markAsRead = async (notificationId: string) => {
@@ -330,10 +369,10 @@ const BottomNavigation = () => {
 
   // Fetch notifications when popover opens
   useEffect(() => {
-    if (isNotificationOpen && mentor) {
+    if (isNotificationOpen && mentor?.mentorId) {
       fetchNotifications();
     }
-  }, [isNotificationOpen, mentor]);
+  }, [isNotificationOpen, mentor?.mentorId, fetchNotifications]);
 
   if (hideNavigationPages.includes(pathname) || pathname.startsWith('/admin')) {
     return null;
@@ -407,7 +446,7 @@ const BottomNavigation = () => {
                   </button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-80 p-0 border-0 shadow-2xl bg-[#333333]/60 backdrop-blur-md border border-white/30 rounded-[20px]"
+                  className="w-80 p-0 shadow-2xl bg-[#333333]/60 backdrop-blur-md border border-white/30 rounded-[20px]"
                   align="end"
                   side="top"
                   sideOffset={8}
