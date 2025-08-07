@@ -49,11 +49,7 @@ const StudentLoginPage = () => {
       } else {
         setError(
           data.message ||
-<<<<<<< HEAD
             "Google-р нэвтрэхэд алдаа гарлаа. Эхлээд Google-р бүртгүүлнэ үү."
-=======
-            "Google-р нэвтрэхэд алдаа гарлаа. Эхлээд бүртгүүлнэ үү."
->>>>>>> 2cb9e37a208a15145424c69249c26170eab01daf
         );
       }
     } catch (error) {
