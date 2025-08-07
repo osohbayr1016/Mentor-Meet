@@ -30,6 +30,14 @@ export const HomeChat = () => {
     const studentUser = localStorage.getItem("studentUser");
     const mentorUser = localStorage.getItem("mentorUser");
 
+    console.log("localStorage debug:");
+    console.log("studentToken:", studentToken);
+    console.log("mentorToken:", mentorToken);
+    console.log("studentEmail:", studentEmail);
+    console.log("mentorEmail:", mentorEmail);
+    console.log("studentUser:", studentUser);
+    console.log("mentorUser:", mentorUser);
+
     setToken(studentToken || mentorToken);
 
    
@@ -58,15 +66,12 @@ export const HomeChat = () => {
 
     fetch(
       `${
-        process.env.NEXT_PUBLIC_API_URL ||
-        "https://mentor-meet-h0tx.onrender.com"
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
       }/getMessages`,
       {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${studentToken || mentorToken}`,
         },
-        credentials: "include",
       }
     )
       .then((res) => res.json())
@@ -107,12 +112,13 @@ export const HomeChat = () => {
     
     };
 
+    console.log("Sending message with email:", userEmail);
+
     try {
       const local = localStorage.getItem("studentUser");
       const res = await fetch(
         `${
-          process.env.NEXT_PUBLIC_API_URL ||
-          "https://mentor-meet-h0tx.onrender.com"
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
         }/createMessage`,
         {
           method: "POST",
@@ -121,11 +127,11 @@ export const HomeChat = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(newMsg),
-          credentials: "include",
         }
       );
 
       const data = await res.json();
+      console.log("API Response:", data);
 
       if (!res.ok) {
         console.error("API Error:", data);
@@ -133,6 +139,7 @@ export const HomeChat = () => {
         return;
       }
 
+      console.log("Messages received:", data.messages);
       setMessages((prev) => [...prev, ...data.messages]);
       setInput("");
     } catch (error) {
