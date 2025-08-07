@@ -4,11 +4,6 @@ import nodemailer from "nodemailer";
 import { OtpModel } from "../model/Otp-model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-
-export const Hello = async (_req: Request, res: Response) => {
-  res.send({ message: "hello" });
-};
 
 export const Checkemail = async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -125,12 +120,6 @@ export const StudentNameNumber = async (req: Request, res: Response) => {
   try {
     // For Google OAuth users, skip temp user verification
     if (googleAuth) {
-      console.log("Processing Google OAuth student signup:", {
-        email,
-        nickname,
-        phoneNumber,
-      });
-
       // Check if student already exists
       const existingStudent = await StudentModel.findOne({ email });
       if (existingStudent) {

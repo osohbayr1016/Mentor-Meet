@@ -1,5 +1,6 @@
 import React from "react";
 import { Search } from "lucide-react";
+import Image from "next/image";
 
 interface Category {
   _id: string;
@@ -31,22 +32,28 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <div className="w-80 h-full p-6 flex flex-col overflow-hidden">
+    <div className="w-70 h-full p-6 flex flex-col overflow-hidden">
       {/* Logo */}
-      <div className="flex items-center gap-3 mb-8 flex-shrink-0">
-        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-          <span className="text-black font-bold text-lg">M</span>
+      <div className="flex justify-center items-center gap-3 mb-8 pt-[50px]">
+        <div className="flex gap-3 items-center justify-center">
+          <Image
+            src="https://res.cloudinary.com/dg2soqaow/image/upload/v1753978167/image_723_nuhvy3.png"
+            alt="logo"
+            width={24}
+            height={24}
+            className="rounded-full"
+          />
+          <p className="text-white text-[22px] font-bold">Mentor Meet</p>
         </div>
-        <span className="text-white text-xl font-semibold">Mentor Meet</span>
       </div>
 
       {/* Search Bar */}
       <div className="relative mb-6 flex-shrink-0">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
         <input
           type="text"
           placeholder="Хайх..."
-          className="w-full pl-10 pr-4 py-3 backdrop-blur-xl border border-gray-300/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-gray-500"
+          className="w-full pl-10 pr-4 h-9 border border-gray-300/40 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-gray-500"
         />
       </div>
 

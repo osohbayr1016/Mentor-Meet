@@ -48,8 +48,14 @@ export interface StepProps {
   isLoading: boolean;
 }
 
+export interface Category {
+  _id: string;
+  categoryName: string;
+}
+
 export interface Step1Props extends StepProps {
   onNext: () => void;
+  categories: Category[];
 }
 
 export interface Step2Props extends StepProps {

@@ -1,8 +1,9 @@
-import { model, models, ObjectId, Schema } from "mongoose";
+import { model, ObjectId, Schema } from "mongoose";
 
 export type NotificationType = {
   _id: ObjectId;
-  userId: Schema.Types.ObjectId;
+  // userId: Schema.Types.ObjectId;
+  mentorId: Schema.Types.ObjectId;
   createdAt: string;
   updatedAt: string;
   checked: boolean;
@@ -11,7 +12,8 @@ export type NotificationType = {
 
 const NotificationSchema = new Schema<NotificationType>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "Mentor" },
+    // userId: { type: Schema.Types.ObjectId, ref: "Mentor" },
+    mentorId: { type: Schema.Types.ObjectId, ref: "Mentor" },
     bookingId: { type: Schema.Types.ObjectId, ref: "Booking" },
     checked: { type: Boolean, default: false },
   },

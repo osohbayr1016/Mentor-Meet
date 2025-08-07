@@ -56,25 +56,18 @@ export const editMentorProfile = async (req: Request, res: Response) => {
     };
 
     // Handle category and price
-    console.log("Received hourlyPrice:", hourlyPrice);
-    console.log("Received category:", category);
 
     if (category && category.categoryId && category.categoryId.trim() !== "") {
       updateData.category = {
         categoryId: category.categoryId,
         price: hourlyPrice || category.price || 0,
       };
-      console.log("Setting category with price:", updateData.category.price);
     } else if (hourlyPrice && hourlyPrice > 0) {
       // If no category but there's a price, create a category with just the price
       updateData.category = {
         categoryId: null,
         price: hourlyPrice,
       };
-      console.log(
-        "Setting category with only price:",
-        updateData.category.price
-      );
     }
 
     // Add optional fields if they exist
@@ -135,8 +128,6 @@ export const editMentorProfile = async (req: Request, res: Response) => {
       image: updatedMentor.image || "",
       rating: updatedMentor.rating || 0,
     };
-
-    console.log("Updated mentor data being sent:", mentorData);
 
     return res.status(200).json({
       message: "Профайл амжилттай шинэчлэгдлээ.",

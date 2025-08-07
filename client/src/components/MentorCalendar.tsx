@@ -10,14 +10,14 @@ interface MentorCalendarProps {
 }
 
 interface StudentProps {
-  studentId?:string;
+  studentId?: string;
 }
 
 interface CalendarResponse {
   calendarId?: string;
   _id?: string;
   message?: string;
-  [key: string]: any; 
+  [key: string]: any;
 }
 
 const MentorCalendar: React.FC<MentorCalendarProps> = ({
@@ -88,18 +88,16 @@ const MentorCalendar: React.FC<MentorCalendarProps> = ({
   };
 
   const handleTimeClick = async (time: string, date: string) => {
+    // const studentId = localStorage.getItem("studentUser")
+    // if(!studentId) return
 
-// const studentId = localStorage.getItem("studentUser")
-// if(!studentId) return
-  
-//   const token = localStorage.getItem("studentToken")
-// if(!token) return alert("Нэвтрэх шаардлагатай!")
+    //   const token = localStorage.getItem("studentToken")
+    // if(!token) return alert("Нэвтрэх шаардлагатай!")
 
-   
     onTimeSelect?.(date, time);
 
     // шинэчилж сонгосон цагуудаа энэ дотор задалж бэлдээд байгаа юм уу даа.
-  
+
     const newTimes = { ...selectedTimesByDate };
     const times = newTimes[date] || [];
     // асуух?
@@ -110,16 +108,17 @@ const MentorCalendar: React.FC<MentorCalendarProps> = ({
     newTimes[date] = updatedTimes;
 
     const availabilities = Object.entries(newTimes).map(([date, times]) => ({
-
       date: `2025-08-${date.padStart(2, "0")}`,
       times,
     }));
 
-    const token = localStorage.getItem("mentorToken")
+    const token = localStorage.getItem("mentorToken");
 
     try {
       const res = await axios.post<CalendarResponse>(
-        "http://localhost:8000/Calendar",
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/Calendar`,
         { availabilities },
         {
           headers: {
@@ -129,16 +128,15 @@ const MentorCalendar: React.FC<MentorCalendarProps> = ({
       );
 
       console.log("Амжилттай хадгаллаа:", res.data);
-      const calendarId = res.data?.calendarId
+      const calendarId = res.data?.calendarId;
 
-      if(calendarId){
-        localStorage.setItem(calendarId, "calendarId")
+      if (calendarId) {
+        localStorage.setItem(calendarId, "calendarId");
       }
     } catch (err) {
       console.error("Алдаа:", err);
     }
   };
-
 
   const renderTimeSlots = (date: string) => (
     <div className="grid grid-cols-6 gap-1.5">

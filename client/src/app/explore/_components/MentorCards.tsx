@@ -24,7 +24,7 @@ interface Category {
 interface MentorCardsProps {
   selectedCategory?: string;
   selectedSubCategory?: string;
-  categories:Category[];
+  categories: Category[];
   onMentorClick?: (mentor: Mentor) => void;
 }
 
@@ -52,12 +52,16 @@ const MentorCards: React.FC<MentorCardsProps> = ({
       try {
         setLoading(true);
         setError(null);
-    
+
         // Query params бэлдэх
         const params: Record<string, string> = {};
-    
+
         // Always filter by category if selected
-        if (selectedCategory && selectedCategory !== "" && selectedCategory !== "all") {
+        if (
+          selectedCategory &&
+          selectedCategory !== "" &&
+          selectedCategory !== "all"
+        ) {
           const selectedCategoryName = categories.find(
             (cat) => cat._id === selectedCategory
           )?.categoryName;
@@ -65,23 +69,36 @@ const MentorCards: React.FC<MentorCardsProps> = ({
             params.category = selectedCategoryName;
           }
         }
-    
+
         // Add subcategory filter if selected
         if (selectedSubCategory) {
           params.subCategory = selectedSubCategory;
         }
 
-        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-        
-        console.log("🔍 Fetching mentors with params:", params);
-        console.log("🔍 Selected category ID:", selectedCategory);
-        console.log("🔍 Selected subcategory:", selectedSubCategory);
-        console.log("🔍 API URL:", `${API_BASE_URL}/mentors`);
-                const response = await axios.get<Mentor[]>(`${API_BASE_URL}/mentors`, {
-          params,
+        const API_BASE_URL = "http://localhost:8000";
+
+        // Try with fetch instead of axios
+        const queryString = new URLSearchParams(params).toString();
+        const url = `${API_BASE_URL}/mentors${
+          queryString ? `?${queryString}` : ""
+        }`;
+
+        console.log("🔗 Fetching from:", url);
+
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
         });
 
-        setMentors(response.data as Mentor[]);  
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("✅ Data received:", data);
+        setMentors(data as Mentor[]);
       } catch (error) {
         console.error("Error fetching mentors:", error);
         setError("Менторуудыг авахад алдаа гарлаа.");
@@ -91,8 +108,6 @@ const MentorCards: React.FC<MentorCardsProps> = ({
         setLoading(false);
       }
     };
-    
-    
 
     fetchMentors();
   }, [mounted, selectedCategory, selectedSubCategory, categories]);
@@ -271,17 +286,28 @@ const MentorCards: React.FC<MentorCardsProps> = ({
   // Filter mentors based on category and subcategory
   const filteredMentors = mentors.filter((mentor: Mentor) => {
     // If no filters are selected, show all mentors
-    if ((!selectedCategory || selectedCategory === "" || selectedCategory === "all") && !selectedSubCategory) {
+    if (
+      (!selectedCategory ||
+        selectedCategory === "" ||
+        selectedCategory === "all") &&
+      !selectedSubCategory
+    ) {
       return true;
     }
 
     // Check category filter
     let matchesCategory = true;
-    if (selectedCategory && selectedCategory !== "" && selectedCategory !== "all") {
+    if (
+      selectedCategory &&
+      selectedCategory !== "" &&
+      selectedCategory !== "all"
+    ) {
       const selectedCategoryName = categories.find(
         (cat) => cat._id === selectedCategory
       )?.categoryName;
-      matchesCategory = selectedCategoryName ? mentor.category === selectedCategoryName : true;
+      matchesCategory = selectedCategoryName
+        ? mentor.category === selectedCategoryName
+        : true;
     }
 
     // Check subcategory filter
@@ -298,24 +324,27 @@ const MentorCards: React.FC<MentorCardsProps> = ({
     <div className="flex-1 h-full flex flex-col">
       {/* Fixed Title */}
       <div className="p-6 pb-4 flex-shrink-0">
-        <h1 className="text-white text-3xl font-bold">
+        <h1 className="text-white text-[24px] font-semibold">
           Менторуудтайгаа танилцана уу!
         </h1>
         {selectedSubCategory && (
-          <p className="text-gray-300 text-sm mt-2">
-            {selectedSubCategory}
-          </p>
+          <p className="text-gray-300 text-sm mt-2">{selectedSubCategory}</p>
         )}
-        {!selectedSubCategory && selectedCategory && selectedCategory !== "" && selectedCategory !== "all" && (
-          <p className="text-gray-300 text-sm mt-2">
-            {categories.find(cat => cat._id === selectedCategory)?.categoryName || selectedCategory}
-          </p>
-        )}
-        {!selectedSubCategory && (!selectedCategory || selectedCategory === "" || selectedCategory === "all") && (
-          <p className="text-gray-300 text-sm mt-2">
-            Бүх Ментор
-          </p>
-        )}
+        {!selectedSubCategory &&
+          selectedCategory &&
+          selectedCategory !== "" &&
+          selectedCategory !== "all" && (
+            <p className="text-gray-300 text-sm mt-2">
+              {categories.find((cat) => cat._id === selectedCategory)
+                ?.categoryName || selectedCategory}
+            </p>
+          )}
+        {!selectedSubCategory &&
+          (!selectedCategory ||
+            selectedCategory === "" ||
+            selectedCategory === "all") && (
+            <p className="text-gray-300 text-sm mt-2">Бүх Ментор</p>
+          )}
       </div>
 
       {/* Scrollable Mentor Cards Area */}

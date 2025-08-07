@@ -15,7 +15,8 @@ export async function GET(
     }
 
     // Call the server API
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const API_BASE_URL =
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
     const response = await axios.get(`${API_BASE_URL}/mentor/${id}`);
 
     if (response.status !== 200) {

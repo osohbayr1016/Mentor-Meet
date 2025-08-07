@@ -80,7 +80,7 @@ const FirstMentorSignup = ({
             <div className="w-full h-full flex flex-col justify-center items-center">
               <div className="w-[300px] flex flex-col gap-[32px]">
                 {/* Google Sign-In Button */}
-                <div className="flex flex-col gap-4">
+                {/* <div className="flex flex-col gap-4">
                   <button
                     onClick={handleGoogleSignIn}
                     className="flex items-center justify-center gap-3 bg-white text-gray-700 rounded-[40px] py-[12px] px-[20px] w-full font-medium hover:bg-gray-50 transition-colors"
@@ -105,13 +105,13 @@ const FirstMentorSignup = ({
                     </svg>
                     Google-р бүртгүүлэх
                   </button>
-
+                  
                   <div className="flex items-center gap-3">
                     <div className="flex-1 h-px bg-white/30"></div>
                     <span className="text-white/60 text-sm">эсвэл</span>
                     <div className="flex-1 h-px bg-white/30"></div>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="flex gap-1 flex-col">
                   <p className="font-[500] text-[14px] text-white">Email</p>

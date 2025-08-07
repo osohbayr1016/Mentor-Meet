@@ -12,19 +12,19 @@ export const createBooking = async (req: Request, res: Response) => {
       category,
     } = req.body;
 
-    // 🛡 Шалгах 1: Заавал бөглөх талбарууд
+    
     if (!mentorId || !studentId || !date || !times || !price || !category) {
       return res.status(400).json({ message: "Бүх талбарыг бүрэн бөглөнө үү." });
     }
 
-    // 🛡 Шалгах 2: times нь массив мөн эсэх
+    
     if (!Array.isArray(times) || times.length === 0) {
       return res.status(400).json({ message: "Цагийн мэдээлэл буруу байна." });
     }
 
     const bookingDate = new Date(date);
 
-    // 🧠 Duplicate booking шалгах
+    
     const existingBooking = await Booking.findOne({
       mentorId,
       date: bookingDate,
@@ -37,7 +37,7 @@ export const createBooking = async (req: Request, res: Response) => {
       });
     }
 
-    // ✅ Booking үүсгэх
+    
     const newBooking = new Booking({
       mentorId,
       studentId,
@@ -55,7 +55,7 @@ export const createBooking = async (req: Request, res: Response) => {
       booking: newBooking,
     });
   } catch (error) {
-    console.error("❌ Захиалга үүсгэхэд алдаа гарлаа:", error);
+    console.error(" Захиалга үүсгэхэд алдаа гарлаа:", error);
     return res.status(500).json({
       message: "Сервер дээр алдаа гарлаа. Та дахин оролдоно уу.",
     });

@@ -51,8 +51,6 @@ export const MentorGetProfile = async (
       rating: mentor.rating || 0,
     };
 
-    console.log("Mentor data being sent:", mentorData);
-
     return res.status(200).send({ mentor: mentorData });
   } catch (err: any) {
     console.error("Get profile error:", err.message);

@@ -35,9 +35,9 @@ const StudentDashboard = () => {
   const router = useRouter();
   const [bookings, setBookings] = useState<BookingsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"upcoming" | "history" | "mentor-profile">(
-    "upcoming"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "upcoming" | "history" | "mentor-profile"
+  >("upcoming");
   const [totalSpent, setTotalSpent] = useState(0);
 
   // Get student ID from localStorage
@@ -49,14 +49,16 @@ const StudentDashboard = () => {
       const studentUser = localStorage.getItem("studentUser");
       if (studentUser) {
         const studentData = JSON.parse(studentUser);
-        setStudentId(studentData.id || studentData._id || studentData.studentId || "");
+        setStudentId(
+          studentData.id || studentData._id || studentData.studentId || ""
+        );
       }
     } catch (error) {
       console.error("Error parsing student data:", error);
     }
   }, []);
 
-  useEffect(() => { 
+  useEffect(() => {
     if (studentId) {
       fetchBookings();
     }
@@ -67,49 +69,63 @@ const StudentDashboard = () => {
       setLoading(true);
       console.log("Fetching bookings for studentId:", studentId);
       const response = await fetch(
-        `http://localhost:8000/get-booking-mentor/${studentId}`
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/get-booking-mentor/${studentId}`
       );
       const data = await response.json();
       console.log("Booking data received:", data);
 
       if (data.success) {
         // Transform the data to match the existing interface
-        const transformedData = data.data.reduce((acc: any, booking: any) => {
-          const bookingItem = {
-            _id: booking._id,
-            mentorId: {
-              _id: booking.mentorId,
-              firstName: booking.mentorName.split(' ')[0] || '',
-              lastName: booking.mentorName.split(' ').slice(1).join(' ') || '',
-              image: booking.mentorImage || "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face",
-              profession: booking.mentorProfession || "Ментор",
-              rating: booking.mentorRating || 0,
-            },
-            date: booking.meetingDate,
-            time: booking.meetingTime,
-            status: booking.status || "PENDING",
-            price: booking.price,
-            category: booking.category || "Ерөнхий",
-          };
+        const transformedData = data.data.reduce(
+          (acc: any, booking: any) => {
+            const bookingItem = {
+              _id: booking._id,
+              mentorId: {
+                _id: booking.mentorId,
+                firstName: booking.mentorName.split(" ")[0] || "",
+                lastName:
+                  booking.mentorName.split(" ").slice(1).join(" ") || "",
+                image:
+                  booking.mentorImage ||
+                  "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face",
+                profession: booking.mentorProfession || "Ментор",
+                rating: booking.mentorRating || 0,
+              },
+              date: booking.meetingDate,
+              time: booking.meetingTime,
+              status: booking.status || "PENDING",
+              price: booking.price,
+              category: booking.category || "Ерөнхий",
+            };
 
-          // Separate upcoming and past bookings
-          const meetingDate = new Date(booking.meetingDate);
-          const now = new Date();
-          
-          if (meetingDate > now && booking.status !== "CANCELLED") {
-            acc.upcoming.push(bookingItem);
-          } else {
-            acc.past.push(bookingItem);
-          }
-          
-          return acc;
-        }, { upcoming: [], past: [] });
+            // Separate upcoming and past bookings
+            const meetingDate = new Date(booking.meetingDate);
+            const now = new Date();
+
+            if (meetingDate > now && booking.status !== "CANCELLED") {
+              acc.upcoming.push(bookingItem);
+            } else {
+              acc.past.push(bookingItem);
+            }
+
+            return acc;
+          },
+          { upcoming: [], past: [] }
+        );
 
         setBookings(transformedData);
-        
+
         // Calculate total spent from all bookings
-        const allBookings = [...transformedData.upcoming, ...transformedData.past];
-        const total = allBookings.reduce((sum, booking) => sum + (booking.price || 0), 0);
+        const allBookings = [
+          ...transformedData.upcoming,
+          ...transformedData.past,
+        ];
+        const total = allBookings.reduce(
+          (sum, booking) => sum + (booking.price || 0),
+          0
+        );
         setTotalSpent(total);
       } else {
         console.error("Failed to fetch bookings:", data.message);
@@ -326,25 +342,30 @@ const StudentDashboard = () => {
 
                     {/* Content Section */}
                     <div className="flex-1 flex flex-col">
-                                              {activeTab === "mentor-profile" ? (
+                      {activeTab === "mentor-profile" ? (
                         // Mentor Profile Section
                         <div className="flex-1 flex flex-col">
                           <h3 className="text-white text-lg font-semibold mb-4">
                             Таны товлосон уулзалтууд:
                           </h3>
-                          
+
                           <div className="flex gap-4 flex-1 overflow-x-auto">
                             {(() => {
-                              const allBookings = [...(bookings?.upcoming || []), ...(bookings?.past || [])];
-                              
+                              const allBookings = [
+                                ...(bookings?.upcoming || []),
+                                ...(bookings?.past || []),
+                              ];
+
                               return allBookings.length > 0 ? (
-                                allBookings.slice(0, 2).map((booking) => (
-                                  <MentorCard 
-                                    key={booking._id}
-                                    booking={booking}
-                                    onCancel={handleCancelBooking}
-                                  />
-                                ))
+                                allBookings
+                                  .slice(0, 2)
+                                  .map((booking) => (
+                                    <MentorCard
+                                      key={booking._id}
+                                      booking={booking}
+                                      onCancel={handleCancelBooking}
+                                    />
+                                  ))
                               ) : (
                                 <div className="flex items-center justify-center h-64 w-full">
                                   <div className="text-center text-gray-400">
@@ -371,10 +392,11 @@ const StudentDashboard = () => {
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto">
                             {(() => {
-                              const currentBookings = activeTab === "upcoming" 
-                                ? bookings?.upcoming || []
-                                : bookings?.past || [];
-                              
+                              const currentBookings =
+                                activeTab === "upcoming"
+                                  ? bookings?.upcoming || []
+                                  : bookings?.past || [];
+
                               return currentBookings.length > 0 ? (
                                 currentBookings.map((booking) => (
                                   <BookingCard
@@ -397,13 +419,13 @@ const StudentDashboard = () => {
                                 <div className="col-span-2 flex items-center justify-center h-64">
                                   <div className="text-center text-gray-400">
                                     <p className="text-lg font-medium mb-2">
-                                      {activeTab === "upcoming" 
-                                        ? "Товлосон уулзалт байхгүй байна" 
+                                      {activeTab === "upcoming"
+                                        ? "Товлосон уулзалт байхгүй байна"
                                         : "Уулзалтын түүх байхгүй байна"}
                                     </p>
                                     <p className="text-sm">
-                                      {activeTab === "upcoming" 
-                                        ? "Ментор хайж уулзалт захиалаарай" 
+                                      {activeTab === "upcoming"
+                                        ? "Ментор хайж уулзалт захиалаарай"
                                         : "Уулзалтын түүх энд харагдана"}
                                     </p>
                                   </div>

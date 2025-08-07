@@ -1,6 +1,14 @@
-
 import { OpenAI } from "openai";
 import { IntentType } from "./detectIntent";
+
+// Create single OpenAI client instance to avoid memory leaks
+let openaiClient: OpenAI | null = null;
+const getOpenAIClient = (): OpenAI => {
+  if (!openaiClient && process.env.OPENAI_API_KEY) {
+    openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openaiClient!;
+};
 
 // =======================
 // Interfaces
@@ -16,9 +24,9 @@ export interface StudentProfile {
 export interface Feedback {
   studentEmail: string;
   mentorId: string;
-  rating: number; // 1-5
+  rating: number; 
   comment?: string;
-  date: string; // ISO date string
+  date: string; 
 }
 
 export interface MentorInfo {
@@ -32,11 +40,9 @@ export interface MentorInfo {
   category?: {
     categoryId?: string;
   };
-   feedbacks?: Feedback[]; 
+  feedbacks?: Feedback[];
   averageRating?: number;
 }
-
-
 
 export const calculateAverageRating = (feedbacks?: Feedback[]): number => {
   if (!feedbacks || feedbacks.length === 0) return 0;
@@ -44,85 +50,59 @@ export const calculateAverageRating = (feedbacks?: Feedback[]): number => {
   return parseFloat((sum / feedbacks.length).toFixed(2));
 };
 
-
-
-
-const analyzeMentorQuality = async (feedbacks: Feedback[]): Promise<string> => {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
-  const comments = feedbacks.map(fb => fb.comment).filter(Boolean).join("\n");
-
-  const prompt = `
-  Та дараах менторын сэтгэгдэлүүдийг уншаад чанарын талаар товч дүгнэлт өгнө үү:
-  ${comments}
-  `;
-
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [
-      { role: "system", content: "Та менторын чанарын шинжээч юм." },
-      { role: "user", content: prompt },
-    ],
-    temperature: 0.5,
-  });
-
-  return response.choices[0].message.content || "Дүгнэлт авах боломжгүй байна.";
-};
-
 // =======================
-// Category keyword map
+// Optimized Category keyword map - Reduced for memory efficiency
 // =======================
 export const categoryKeywordMap: Record<string, string[]> = {
-  "Программчлал ба Технологи": ["программ", "код", "technology", "developer", "software", "технологи", "javascript", "python"],
-  "Дизайн": ["дизайн", "график", "ux", "ui", "design"],
-  "Бизнес ба Менежмент": ["бизнес", "менежмент", "startup", "business"],
-  "Маркетинг": ["маркетинг", "зар", "сошиал", "marketing"],
-  "Санхүү": ["санхүү", "мөнгө", "төсөв", "finance"],
-  "Инженерчлэл": ["инженер", "инженерчлэл"],
-  "Урлаг": ["урлаг", "уран", "art"],
-  "Computer Science": ["computer", "cs", "informatics", "informatics"],
-  "Хууль ба Эрх зүй": ["хууль", "эрх", "law"],
-  "Спорт ба Фитнес": ["спорт", "фитнес", "exercise", "биеийн"],
-  "Захиргаа, хүний нөөц": ["захиргаа", "hr", "хүний нөөц"],
-  "Барилга ба Архитектур": ["барилга", "архитектур"],
-  "Уул уурхай": ["уул", "уурхай", "mining"],
-  "Аялал жуулчлал, хоол үйлдвэрлэл": ["аялал", "хоол", "жуулчлал"],
-  "Гэрэл зураг": ["гэрэл", "зураг", "фото", "photo"],
-  "Эрүүл мэнд ба Анагаах ухаан": ["эрүүл", "анагаах", "health", "эмч"],
-  "Боловсрол ба Сургалт": ["сургалт", "боловсрол", "сургууль"],
-  "Хөдөө аж ахуй": ["хөдөө", "мал", "тарилга", "farmer"],
-  "Байгаль орчин": ["байгаль", "eco", "эколог", "тогтвортой"],
-  "Тээвэр ба Логистик": ["тээвэр", "логистик", "ачаалал"],
-  "Үйлчилгээ ба Худалдаа": ["үйлчилгээ", "худалдаа", "sales"],
-  "Мэдээлэл ба Хэвлэл": ["мэдээлэл", "хэвлэл", "сэтгүүл"],
-  "Үйлдвэрлэл ба Технологи": ["үйлдвэр", "технологи", "техник"],
-  "Сэргээгдэх эрчим хүч": ["сэргээгдэх", "эрчим", "нар", "цахилгаан"],
-  "Боловсрол, шинжлэх ухаан": ["шинжлэх", "science", "боловсрол"],
+  "Программчлал ба Технологи": [
+    "программ",
+    "код",
+    "technology",
+    "developer",
+    "software",
+    "javascript",
+    "python",
+    "web",
+    "app",
+  ],
+  Дизайн: ["дизайн", "ux", "ui", "design", "figma"],
+  "Бизнес ба Менежмент": ["бизнес", "менежмент", "business", "management"],
+  Маркетинг: ["маркетинг", "marketing", "зар", "social"],
+  Санхүү: ["санхүү", "finance", "мөнгө", "banking"],
+  Инженерчлэл: ["инженер", "engineer", "engineering"],
+  "Хууль ба Эрх зүй": ["хууль", "law", "legal", "lawyer"],
+  "Спорт ба Фитнес": ["спорт", "fitness", "exercise"],
+  "Эрүүл мэнд": ["эрүүл", "health", "medical", "doctor"],
+  Боловсрол: ["боловсрол", "education", "teacher"],
 };
-
-
 
 // =======================
 // MAIN ENTRY
 // =======================
-// export const getAiReply = async (
-//   userMessage: string,
-//   intent?: IntentType,
-//   studentProfile?: StudentProfile,
-//   mentors?: MentorInfo[]
-// ): Promise<string> => {
-//   const messageLower = userMessage.toLowerCase();
+export const getAiReply = async (
+  userMessage: string,
+  intent?: IntentType,
+  studentProfile?: StudentProfile,
+  mentors?: MentorInfo[]
+): Promise<string> => {
+  const messageLower = userMessage.toLowerCase();
 
-//   try {
-//     if (process.env.OPENAI_API_KEY && mentors && mentors.length > 0) {
-//       return await getAIResponse(userMessage, intent, studentProfile, mentors);
-//     }
+  try {
+  
+    if (isComplaintOrFeedback(messageLower)) {
+      return getComplaintResponse();
+    }
 
-//     return getRuleBasedResponseWithMentors(messageLower, mentors);
-//   } catch (error) {
-//     console.error("Error in getAiReply:", error);
-//     return getRuleBasedResponseWithMentors(messageLower, mentors);
-//   }
-// };
+    if (process.env.OPENAI_API_KEY && mentors && mentors.length > 0) {
+      return await getAIResponse(userMessage, intent, studentProfile, mentors);
+    }
+
+    return getRuleBasedResponseWithMentors(messageLower, mentors);
+  } catch (error) {
+    console.error("Error in getAiReply:", error);
+    return getRuleBasedResponseWithMentors(messageLower, mentors);
+  }
+};
 
 const complaintKeywords = [
   "гомдол",
@@ -145,32 +125,6 @@ const getComplaintResponse = (): string => {
   return `Таны санал, гомдлыг хүлээн авлаа. Бид үүнийг сайжруулахад анхааралтай хандах болно. Таны үнэлгээ, зөвлөгөөг бид үнэлж байна. Баярлалаа!`;
 };
 
-
-export const getAiReply = async (
-  userMessage: string,
-  intent?: IntentType,
-  studentProfile?: StudentProfile,
-  mentors?: MentorInfo[]
-): Promise<string> => {
-  const messageLower = userMessage.toLowerCase();
-
-  try {
-    // Хэрвээ гомдол, санал байвал шууд тусгай хариу буцаах
-    if (isComplaintOrFeedback(messageLower)) {
-      return getComplaintResponse();
-    }
-
-    if (process.env.OPENAI_API_KEY && mentors && mentors.length > 0) {
-      return await getAIResponse(userMessage, intent, studentProfile, mentors);
-    }
-
-    return getRuleBasedResponseWithMentors(messageLower, mentors);
-  } catch (error) {
-    console.error("Error in getAiReply:", error);
-    return getRuleBasedResponseWithMentors(messageLower, mentors);
-  }
-};
-
 // =======================
 // Detect category dynamically
 // =======================
@@ -191,13 +145,76 @@ const getRelevantMentors = (
   mentors?: MentorInfo[]
 ): MentorInfo[] => {
   const matchedCategory = getCategoryFromMessage(message);
-  if (!mentors || !matchedCategory) return mentors?.slice(0, 3) || [];
+  if (!mentors) return [];
 
-  return mentors
-    .filter((m) =>
-      m.category?.categoryId?.toLowerCase() === matchedCategory.toLowerCase()
-    )
-    .slice(0, 3);
+
+  if (matchedCategory) {
+    const categoryMentors = mentors.filter(
+      (m) =>
+        m.category?.categoryId?.toLowerCase() === matchedCategory.toLowerCase()
+    );
+
+
+    if (categoryMentors.length > 0) {
+      return categoryMentors.slice(0, 3);
+    }
+  }
+
+  const messageLower = message.toLowerCase();
+
+ 
+  const scoredMentors = mentors.map((mentor) => {
+    let score = 0;
+
+ 
+    const mentorText = [
+      mentor.profession || "",
+      mentor.bio || "",
+      mentor.category?.categoryId || "",
+      `${mentor.firstName || ""} ${mentor.lastName || ""}`,
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    for (const [category, keywords] of Object.entries(categoryKeywordMap)) {
+      for (const keyword of keywords) {
+        if (messageLower.includes(keyword) && mentorText.includes(keyword)) {
+         
+          if (keyword.length > 3) {
+            score += 3;
+          } else {
+            score += 1;
+          }
+        }
+      }
+    }
+
+    if (
+      matchedCategory &&
+      mentor.category?.categoryId?.toLowerCase() ===
+        matchedCategory.toLowerCase()
+    ) {
+      score += 10; 
+    }
+
+    if (mentor.experience?.careerDuration) {
+      const years = parseInt(mentor.experience.careerDuration);
+      if (years >= 5) score += 2;
+      else if (years >= 3) score += 1;
+    }
+
+    if (mentor.averageRating && mentor.averageRating >= 4.0) {
+      score += 1;
+    }
+
+    return { mentor, score };
+  });
+
+
+  return scoredMentors
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((item) => item.mentor);
 };
 
 // =======================
@@ -255,13 +272,21 @@ const getAIResponse = async (
   studentProfile?: StudentProfile,
   mentors?: MentorInfo[]
 ): Promise<string> => {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+  const openai = getOpenAIClient();
 
   const studentInfo = studentProfile
-    ? `Сурагчийн мэдээлэл:\n${JSON.stringify(studentProfile, null, 2)}`
+    ? `Сурагчийн мэдээлэл: ${studentProfile.name || "Нэргүй"}, ${
+        studentProfile.email || ""
+      }`
     : "Сурагчийн мэдээлэл байхгүй.";
 
-  const mentorsInfo = JSON.stringify(mentors || [], null, 2);
+  // Limit mentors info to prevent memory issues
+  const limitedMentors = (mentors || []).slice(0, 5).map((m) => ({
+    name: `${m.firstName || ""} ${m.lastName || ""}`.trim(),
+    profession: m.profession || "",
+    category: m.category?.categoryId || "",
+  }));
+  const mentorsInfo = JSON.stringify(limitedMentors);
 
   const prompt = `
 ${studentInfo}
@@ -288,7 +313,8 @@ Intent: ${intent || "unknown"}
   });
 
   return (
-    response.choices[0].message.content || "AI хариу боловсруулахад алдаа гарлаа."
+    response.choices[0].message.content ||
+    "AI хариу боловсруулахад алдаа гарлаа."
   );
 };
 
@@ -298,4 +324,3 @@ Intent: ${intent || "unknown"}
 export const getSimpleResponse = (message: string): string => {
   return getRuleBasedResponseWithMentors(message.toLowerCase());
 };
-
