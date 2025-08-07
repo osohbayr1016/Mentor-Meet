@@ -177,8 +177,8 @@ const StudentDashboard = () => {
     }
   };
 
-  // Function to join meeting (generate Google Meet link and open it)
-  const handleJoinMeeting = async (booking: Booking) => {
+  // Function to generate and join meeting (create Google Meet link and open it)
+  const handleGenerateAndJoinMeeting = async (booking: Booking) => {
     setGeneratingMeetLink(booking._id);
     
     try {
@@ -404,7 +404,7 @@ const StudentDashboard = () => {
                     key={booking._id}
                     booking={booking}
                     onCancel={handleCancelBooking}
-                    onGenerateTestMeetLink={handleJoinMeeting}
+                    onGenerateTestMeetLink={handleGenerateAndJoinMeeting}
                     isGeneratingMeetLink={generatingMeetLink === booking._id}
                   />
                                   ))
