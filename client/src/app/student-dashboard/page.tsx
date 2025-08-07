@@ -177,8 +177,8 @@ const StudentDashboard = () => {
     }
   };
 
-  // Test function to generate Google Meet links
-  const handleGenerateTestMeetLink = async (booking: Booking) => {
+  // Function to join meeting (generate Google Meet link and open it)
+  const handleJoinMeeting = async (booking: Booking) => {
     setGeneratingMeetLink(booking._id);
     
     try {
@@ -200,15 +200,16 @@ const StudentDashboard = () => {
       const result = await response.json();
       
       if (result.success) {
-        alert(`Google Meet link generated! ${result.data.meetingLink}`);
+        // Directly open the Google Meet link in a new tab
+        window.open(result.data.meetingLink, '_blank');
         // Refresh bookings to get the updated data with meeting link
         fetchBookings();
       } else {
-        alert(`Failed to generate meeting link: ${result.message}`);
+        alert(`Failed to join meeting: ${result.message}`);
       }
     } catch (error) {
-      console.error('Error generating meeting link:', error);
-      alert('Error generating meeting link. Please try again.');
+      console.error('Error joining meeting:', error);
+      alert('Error joining meeting. Please try again.');
     } finally {
       setGeneratingMeetLink(null);
     }
@@ -403,7 +404,7 @@ const StudentDashboard = () => {
                     key={booking._id}
                     booking={booking}
                     onCancel={handleCancelBooking}
-                    onGenerateTestMeetLink={handleGenerateTestMeetLink}
+                    onGenerateTestMeetLink={handleJoinMeeting}
                     isGeneratingMeetLink={generatingMeetLink === booking._id}
                   />
                                   ))

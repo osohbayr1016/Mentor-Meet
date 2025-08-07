@@ -222,14 +222,15 @@ const MentorCard: React.FC<MentorCardProps> = ({
               Цуцлах
             </button>
             
-            {/* Test Generate Meet Link Button */}
+            {/* Join Meeting Button */}
             {onGenerateTestMeetLink && (
               <button
                 onClick={() => onGenerateTestMeetLink(booking)}
                 disabled={isGeneratingMeetLink}
-                className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-600/50 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
               >
-                {isGeneratingMeetLink ? "Үүсгэж байна..." : "Meet холбоос үүсгэх"}
+                <Video size={16} />
+                {isGeneratingMeetLink ? "Холбогдож байна..." : "Уулзалтанд орох"}
               </button>
             )}
           </>
@@ -241,14 +242,15 @@ const MentorCard: React.FC<MentorCardProps> = ({
               Google Meet холбоос үүсгэгдэж байна...
             </div>
             
-            {/* Test Generate Meet Link Button for confirmed bookings without links */}
+            {/* Join Meeting Button for confirmed bookings without links */}
             {onGenerateTestMeetLink && (
               <button
                 onClick={() => onGenerateTestMeetLink(booking)}
                 disabled={isGeneratingMeetLink}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
               >
-                {isGeneratingMeetLink ? "..." : "Холбоос үүсгэх"}
+                <Video size={16} />
+                {isGeneratingMeetLink ? "Холбогдож байна..." : "Уулзалтанд орох"}
               </button>
             )}
           </div>
