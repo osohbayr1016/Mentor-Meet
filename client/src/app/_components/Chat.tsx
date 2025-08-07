@@ -58,12 +58,15 @@ export const HomeChat = () => {
 
     fetch(
       `${
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        process.env.NEXT_PUBLIC_API_URL ||
+        "https://mentor-meet-h0tx.onrender.com"
       }/getMessages`,
       {
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${studentToken || mentorToken}`,
         },
+        credentials: "include",
       }
     )
       .then((res) => res.json())
@@ -108,7 +111,8 @@ export const HomeChat = () => {
       const local = localStorage.getItem("studentUser");
       const res = await fetch(
         `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+          process.env.NEXT_PUBLIC_API_URL ||
+          "https://mentor-meet-h0tx.onrender.com"
         }/createMessage`,
         {
           method: "POST",
@@ -117,6 +121,7 @@ export const HomeChat = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(newMsg),
+          credentials: "include",
         }
       );
 

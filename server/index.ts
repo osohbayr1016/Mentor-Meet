@@ -23,16 +23,23 @@ if (process.env.NODE_ENV === "production") {
   process.env.NODE_OPTIONS = "--max-old-space-size=512";
 }
 
+// CORS configuration
 app.use(
   cors({
-    origin: ["*"],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    origin: true,
+    credentials: false,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["*"],
   })
 );
-app.use(express.json({ limit: "5mb" })); // Reduced from 10mb to 5mb to save memory
 
+// Logging middleware
+app.use((req, res, next) => {
+  console.log(`🌐 ${req.method} ${req.url} - Origin: ${req.headers.origin}`);
+  next();
+});
+
+app.use(express.json());
 // Request timeout middleware
 app.use((req, res, next) => {
   req.setTimeout(30000); // 30 second timeout
@@ -58,6 +65,15 @@ const dataBaseConnection = async () => {
 const startServer = async () => {
   try {
     await dataBaseConnection();
+
+    // Test endpoint to verify CORS
+    app.get("/test-cors", (req, res) => {
+      console.log("🧪 Test CORS endpoint hit");
+      res.json({
+        message: "CORS is working!",
+        timestamp: new Date().toISOString(),
+      });
+    });
 
     app.use(MentorRouter);
     app.use(StudentRouter);
