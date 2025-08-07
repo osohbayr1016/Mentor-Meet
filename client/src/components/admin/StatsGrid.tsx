@@ -67,11 +67,9 @@ function StatCard({
 
 export default function StatsGrid({ stats }: StatsGridProps) {
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("mn-MN", {
-      style: "currency",
-      currency: "MNT",
-      minimumFractionDigits: 0,
-    }).format(amount);
+    // Use a consistent format that works the same on server and client
+    const formattedNumber = amount.toLocaleString("en-US");
+    return `₮ ${formattedNumber}`;
   };
 
   const formatPercentage = (value: number) => {
@@ -84,7 +82,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Нийт хэрэглэгч"
-          value={stats.totalUsers.toLocaleString()}
+          value={stats.totalUsers.toLocaleString("en-US")}
           icon={Users}
           color="text-blue-600"
           change="+12% энэ сарын"
@@ -92,7 +90,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
         />
         <StatCard
           title="Нийт багш"
-          value={stats.totalMentors.toLocaleString()}
+          value={stats.totalMentors.toLocaleString("en-US")}
           icon={UserCheck}
           color="text-purple-600"
           change="+8% энэ сарын"

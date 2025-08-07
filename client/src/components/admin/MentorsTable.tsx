@@ -82,11 +82,9 @@ export default function MentorsTable({ mentors }: MentorsTableProps) {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("mn-MN", {
-      style: "currency",
-      currency: "MNT",
-      minimumFractionDigits: 0,
-    }).format(amount);
+    // Use a consistent format that works the same on server and client
+    const formattedNumber = amount.toLocaleString("en-US");
+    return `₮ ${formattedNumber}`;
   };
 
   return (
