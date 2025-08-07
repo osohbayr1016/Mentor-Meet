@@ -30,9 +30,16 @@ interface Booking {
 interface MentorCardProps {
   booking: Booking;
   onCancel: (bookingId: string) => void;
+  onGenerateTestMeetLink?: (booking: Booking) => void;
+  isGeneratingMeetLink?: boolean;
 }
 
-const MentorCard: React.FC<MentorCardProps> = ({ booking, onCancel }) => {
+const MentorCard: React.FC<MentorCardProps> = ({ 
+  booking, 
+  onCancel, 
+  onGenerateTestMeetLink,
+  isGeneratingMeetLink = false 
+}) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = async () => {
@@ -207,17 +214,43 @@ const MentorCard: React.FC<MentorCardProps> = ({ booking, onCancel }) => {
       {/* Action Buttons */}
       <div className="flex gap-2 pt-2">
         {booking.status === "PENDING" && (
-          <button
-            onClick={() => onCancel(booking._id)}
-            className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors"
-          >
-            Цуцлах
-          </button>
+          <>
+            <button
+              onClick={() => onCancel(booking._id)}
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+            >
+              Цуцлах
+            </button>
+            
+            {/* Test Generate Meet Link Button */}
+            {onGenerateTestMeetLink && (
+              <button
+                onClick={() => onGenerateTestMeetLink(booking)}
+                disabled={isGeneratingMeetLink}
+                className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-600/50 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+              >
+                {isGeneratingMeetLink ? "Үүсгэж байна..." : "Meet холбоос үүсгэх"}
+              </button>
+            )}
+          </>
         )}
         
         {booking.status === "CONFIRMED" && !booking.meetingLink && (
-          <div className="flex-1 bg-yellow-600/20 border border-yellow-600/40 text-yellow-300 py-2 px-4 rounded-lg text-sm text-center">
-            Google Meet холбоос үүсгэгдэж байна...
+          <div className="flex gap-2 w-full">
+            <div className="flex-1 bg-yellow-600/20 border border-yellow-600/40 text-yellow-300 py-2 px-4 rounded-lg text-sm text-center">
+              Google Meet холбоос үүсгэгдэж байна...
+            </div>
+            
+            {/* Test Generate Meet Link Button for confirmed bookings without links */}
+            {onGenerateTestMeetLink && (
+              <button
+                onClick={() => onGenerateTestMeetLink(booking)}
+                disabled={isGeneratingMeetLink}
+                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+              >
+                {isGeneratingMeetLink ? "..." : "Холбоос үүсгэх"}
+              </button>
+            )}
           </div>
         )}
       </div>
