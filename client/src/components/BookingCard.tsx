@@ -73,7 +73,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
         return "";
     }
   };
-  const [section,setSection]=useState(false)
+  const [section, setSection] = useState(false);
 
   return (
     // <div className="bg-gray-700/50 rounded-xl p-4 border border-gray-600 h-[300px]">
@@ -109,36 +109,32 @@ const BookingCard: React.FC<BookingCardProps> = ({
     //       </div>
     //     </div>
     //   </div>
-        <div className="bg-black/40 rounded-[20px] p-4 w-[360px] h-[220px] flex flex-row gap-4  ">
-   <div className="w-[136px] h-[180px] rounded-[20px]">
-            <Image
-            src={booking.mentorId.image || "https://via.placeholder.com/64"}
-            alt={`${booking.mentorId.firstName} ${booking.mentorId.lastName}`}
-            width={136}
-            height={144}
-            className="w-full h-full object-cover rounded-[20px]"
-          />
-   </div>
-
-
-      <div className="space-y-2 text-white   ">
-            <div className="flex flex-col gap-16 ">
-        <p className="flex flex-col">
-          <span className="text-gray-400 text-[12px]">Уулзалтын өдөр:</span> 
-          <span className="font-semibold"> 
-              {new Date(booking.date).toLocaleDateString("mn-MN")}
-          </span>
-          <span className="font-semibold" >{booking.mentorId.profession}</span>
-        </p>
-        <p className="flex flex-col">
-          <span className="text-gray-400 text-[12px]">Уулзалтын цаг:</span>
-          <span className="font-semibold"> {booking.time}</span>
-        </p>
-        </div>
-    
-   
+    <div className="bg-black/40 rounded-[20px] p-4 w-[360px] h-[220px] flex flex-row gap-4  ">
+      <div className="w-[136px] h-[180px] rounded-[20px]">
+        <Image
+          src={booking.mentorId.image || "https://via.placeholder.com/64"}
+          alt={`${booking.mentorId.firstName} ${booking.mentorId.lastName}`}
+          width={136}
+          height={144}
+          className="w-full h-full object-cover rounded-[20px]"
+        />
       </div>
 
+      <div className="space-y-2 text-white   ">
+        <div className="flex flex-col gap-16 ">
+          <p className="flex flex-col">
+            <span className="text-gray-400 text-[12px]">Уулзалтын өдөр:</span>
+            <span className="font-semibold">
+              {new Date(booking.date).toLocaleDateString("mn-MN")}
+            </span>
+            <span className="font-semibold">{booking.mentorId.profession}</span>
+          </p>
+          <p className="flex flex-col">
+            <span className="text-gray-400 text-[12px]">Уулзалтын цаг:</span>
+            <span className="font-semibold"> {booking.time}</span>
+          </p>
+        </div>
+      </div>
 
       {showActions && (
         <div className="flex gap-2">

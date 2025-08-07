@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import { verifyToken as verifyJwtToken } from "../utils/jwt-utils";
 
 export const verifyToken = (
   req: Request,
@@ -9,7 +9,9 @@ export const verifyToken = (
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Access token is missing or invalid" });
+    return res
+      .status(401)
+      .json({ message: "Access token is missing or invalid" });
   }
 
   const token = authHeader.split(" ")[1];
@@ -20,7 +22,7 @@ export const verifyToken = (
   }
 
   try {
-    const decoded = jwt.verify(token, secret) as {
+    const decoded = verifyJwtToken(token) as {
       studentId?: string;
       mentorId?: string;
       email: string;
