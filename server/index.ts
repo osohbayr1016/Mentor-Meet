@@ -15,20 +15,29 @@ import { BookingRouter } from "./router/booking-router";
 import { NotificationRouter } from "./router/notification-router";
 
 const app = express();
+
+// Memory optimization
+process.setMaxListeners(0);
+if (process.env.NODE_ENV === "production") {
+  // Set memory limit for production
+  process.env.NODE_OPTIONS = "--max-old-space-size=512";
+}
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://127.0.0.1:3000",
-      "http://127.0.0.1:3001",
-    ],
+    origin: ["*"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "5mb" })); // Reduced from 10mb to 5mb to save memory
+
+// Request timeout middleware
+app.use((req, res, next) => {
+  req.setTimeout(30000); // 30 second timeout
+  next();
+});
 
 const uri = process.env.MONGODB_URI;
 const dataBaseConnection = async () => {
@@ -39,7 +48,7 @@ const dataBaseConnection = async () => {
       socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
       bufferCommands: false, // Disable mongoose buffering
     });
-    console.log("DB connected");
+    // DB connected
   } catch (error) {
     console.error("Database connection failed:", error);
     process.exit(1);
@@ -62,7 +71,7 @@ const startServer = async () => {
 
     const PORT = process.env.PORT || 8000;
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      // Server running on port ${PORT}
     });
   } catch (error) {
     console.error("❌ Failed to start server:", error);
@@ -70,18 +79,3 @@ const startServer = async () => {
 };
 
 startServer();
-
-//  dataBaseConnection();
-
-// app.use(MentorRouter);
-// app.use(StudentRouter);
-// app.use(CategoryRouter);
-// app.use(chatRouter);
-// app.use(CalendarRouter);
-// app.use(PaymentRouter);
-// app.use(MeetingRouter);
-// app.use(BookingRouter);
-
-// const PORT = process.env.PORT || 8000;
-// app.listen(PORT, () => {
-//   console.log(`🚀 Server running on http://localhost:${PORT}`);

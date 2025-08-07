@@ -8,8 +8,6 @@ import MentorCalendar from "../../../components/MentorCalendar";
 import BookingModal from "../../../components/BookingModal";
 import axios from "axios";
 
-
-
 interface Mentor {
   id: string;
   firstName: string;
@@ -71,20 +69,18 @@ const MentorDetailPage = () => {
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [calendar, setCalendar] = useState<CalendarSlot[]>([]);
 
-
-
   useEffect(() => {
     const fetchMentor = async () => {
-
       try {
-        const response = await axios.get(`http://localhost:8000/mentor/${mentorId}`);
+        const response = await axios.get(
+          `http://localhost:8000/mentor/${mentorId}`
+        );
 
-        const mentorData:any = response?.data
+        const mentorData: any = response?.data;
 
         if (response.data) {
-      
           setMentor(mentorData);
-        } 
+        }
       } catch (error) {
         console.error("Error fetching mentor:", error);
       }
@@ -95,65 +91,66 @@ const MentorDetailPage = () => {
     }
   }, [mentorId]);
 
+  useEffect(() => {
+    const fetchCalendar = async () => {
+      try {
+        const res = await axios.get<any>(
+          `http://localhost:8000/calendar/${mentorId}`
+        );
 
-useEffect(() => {
-  const fetchCalendar = async () => {
-    try {
-      const res = await axios.get<any>(`http://localhost:8000/calendar/${mentorId}`);
-      console.log("Calendar data:", res.data.availabilities);
-      setCalendar(res.data.availabilities);
-    } catch (error) {
-      console.error("Calendar fetch алдаа:", error);
+        setCalendar(res.data.availabilities);
+      } catch (error) {
+        console.error("Calendar fetch алдаа:", error);
+      }
+    };
+
+    if (mentorId) {
+      fetchCalendar();
+    }
+  }, [mentorId]);
+
+  // const handleTimeSelect = (date: string, time: string) => {
+  //   const currentTimesForDate = selectedTimesByDate[date] || [];
+  //   const newTimesForDate = currentTimesForDate.includes(time)
+  //     ? currentTimesForDate.filter((t) => t !== time)
+  //     : [...currentTimesForDate, time];
+
+  //   setSelectedTimesByDate((prev) => ({
+  //     ...prev,
+  //     [date]: newTimesForDate,
+  //   }));
+
+  //   setSelectedBookingDate(date);
+  //   setSelectedBookingTime(time);
+  // };
+
+  const handleTimeSelect = (date: string, time: string) => {
+    const currentTimesForDate = selectedTimesByDate[date] || [];
+    const newTimesForDate = currentTimesForDate.includes(time)
+      ? currentTimesForDate.filter((t) => t !== time)
+      : [...currentTimesForDate, time];
+
+    setSelectedTimesByDate((prev) => ({
+      ...prev,
+      [date]: newTimesForDate,
+    }));
+
+    setSelectedBookingDate(date);
+
+    const calendarId = findCalendarId(date, time);
+    if (calendarId) {
+      localStorage.setItem("calendarId", calendarId);
+    } else {
+      console.error("No calendarId found for date:", date, "time:", time);
     }
   };
 
-  if (mentorId) {
-    fetchCalendar();
-  }
-}, [mentorId]);
-
-// const handleTimeSelect = (date: string, time: string) => {
-//   const currentTimesForDate = selectedTimesByDate[date] || [];
-//   const newTimesForDate = currentTimesForDate.includes(time)
-//     ? currentTimesForDate.filter((t) => t !== time)
-//     : [...currentTimesForDate, time];
-
-//   setSelectedTimesByDate((prev) => ({
-//     ...prev,
-//     [date]: newTimesForDate,
-//   }));
-
-//   setSelectedBookingDate(date);
-//   setSelectedBookingTime(time);
-// };
-
-const handleTimeSelect = (date: string, time: string) => {
-  const currentTimesForDate = selectedTimesByDate[date] || [];
-  const newTimesForDate = currentTimesForDate.includes(time)
-    ? currentTimesForDate.filter((t) => t !== time)
-    : [...currentTimesForDate, time];
-
-  setSelectedTimesByDate((prev) => ({
-    ...prev,
-    [date]: newTimesForDate,
-  }));
-
-  setSelectedBookingDate(date);
-
-  const calendarId = findCalendarId(date, time);
-  if (calendarId) {
-    localStorage.setItem("calendarId", calendarId);
-  } else {
-    console.error("No calendarId found for date:", date, "time:", time);
-  }
-};
-
-const findCalendarId = (date: string, time: string): string | null => {
-  const calendarSlot = calendar.find(
-    (slot) => slot.date === date && slot.times.includes(time)
-  );
-  return calendarSlot ? calendarSlot._id : null;
-};
+  const findCalendarId = (date: string, time: string): string | null => {
+    const calendarSlot = calendar.find(
+      (slot) => slot.date === date && slot.times.includes(time)
+    );
+    return calendarSlot ? calendarSlot._id : null;
+  };
   useEffect(() => {
     if (mentor) {
       const allSelectedTimes = Object.values(selectedTimesByDate).flat();
@@ -163,64 +160,63 @@ const findCalendarId = (date: string, time: string): string | null => {
     }
   }, [selectedTimesByDate, mentor]);
 
-const handleMultiBooking = async () => {
+  const handleMultiBooking = async () => {
+    const token = localStorage.getItem("studentToken");
+    const mentorId = params?.id;
 
-  const token = localStorage.getItem("studentToken");
-  const mentorId = params?.id;
+    const studentUser = JSON.parse(localStorage.getItem("studentUser") || "{}");
 
-const studentUser = JSON.parse(localStorage.getItem("studentUser") || "{}");
-console.log("studentUser", studentUser);
-  const times = getAllSelectedTimes();
-  console.log("Selected times:", times);
-  const studentId = studentUser.id;
+    const times = getAllSelectedTimes();
 
-  if (!token) {
-    alert("Please log in to make a booking.");
-    return;
-  }
-  if (!mentorId || !studentId || !/^[0-9a-fA-F]{24}$/.test(studentId)) {
-    alert("Invalid mentor or student ID.");
-    return;
-  }
-  if (times.length === 0) {
-    alert("Please select at least one time slot.");
-    return;
-  }
-  if (!selectedBookingDate) {
-    alert("Please select a valid date.");
-    return;
-  }
+    const studentId = studentUser.id;
 
-  try {
-    const payload = {
-      mentorId,
-      studentId,
-      date: selectedBookingDate,
-      times,
-      price: totalPrice,
-      category: mentor?.category?.categoryId || "Тодорхойгүй",
-    };
-    console.log("Booking payload:", payload);
+    if (!token) {
+      alert("Please log in to make a booking.");
+      return;
+    }
+    if (!mentorId || !studentId || !/^[0-9a-fA-F]{24}$/.test(studentId)) {
+      alert("Invalid mentor or student ID.");
+      return;
+    }
+    if (times.length === 0) {
+      alert("Please select at least one time slot.");
+      return;
+    }
+    if (!selectedBookingDate) {
+      alert("Please select a valid date.");
+      return;
+    }
 
-    const response = await axios.post(
-      "http://localhost:8000/booking",
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    try {
+      const payload = {
+        mentorId,
+        studentId,
+        date: selectedBookingDate,
+        times,
+        price: totalPrice,
+        category: mentor?.category?.categoryId || "Тодорхойгүй",
+      };
 
-    console.log("Захиалга амжилттай:", response.data);
-    setShowBookingModal(true);
-  } catch (error: any) {
-    console.error("Booking алдаа:", error.response?.data || error.message);
-    alert(`Захиалга амжилтгүй боллоо: ${error.response?.data?.message || error.message}`);
-  }
-};
+      const response = await axios.post(
+        "http://localhost:8000/booking",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-
+      setShowBookingModal(true);
+    } catch (error: any) {
+      console.error("Booking алдаа:", error.response?.data || error.message);
+      alert(
+        `Захиалга амжилтгүй боллоо: ${
+          error.response?.data?.message || error.message
+        }`
+      );
+    }
+  };
 
   // Get total selected hours across all dates
   const getTotalSelectedHours = () => {
@@ -306,18 +302,17 @@ console.log("studentUser", studentUser);
                 </div>
 
                 {/* Book Session Button */}
- <button
-  onClick={() => {
-    if (getTotalSelectedHours() > 0) {
-      handleMultiBooking(); // ✅ зөв
-    }
-  }}
-  disabled={getTotalSelectedHours() === 0}
-  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
->
-  Захиалга хийх ({getTotalSelectedHours()} цаг)
-</button>
-
+                <button
+                  onClick={() => {
+                    if (getTotalSelectedHours() > 0) {
+                      handleMultiBooking(); // ✅ зөв
+                    }
+                  }}
+                  disabled={getTotalSelectedHours() === 0}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+                >
+                  Захиалга хийх ({getTotalSelectedHours()} цаг)
+                </button>
               </div>
             </div>
 
@@ -364,27 +359,30 @@ console.log("studentUser", studentUser);
                   />
                 </div> */}
 
-   {calendar.map((slot) => (
-  <div key={slot.date} className="mb-4">
-    <h4 className="font-medium">{slot.date}</h4>
-    <div className="flex gap-2 flex-wrap">
-      {slot.times.map((time) => {
-        const isSelected = selectedTimesByDate[slot.date]?.includes(time);
-        return (
-          <button
-            key={time}
-            onClick={() => handleTimeSelect(slot.date, time)}
-            className={`px-3 py-1 rounded ${
-              isSelected ? "bg-blue-500 text-white" : "bg-gray-200"
-            }`}
-          >
-            {time}
-          </button>
-        );
-      })}
-    </div>
-  </div>
-))}
+                {calendar.map((slot) => (
+                  <div key={slot.date} className="mb-4">
+                    <h4 className="font-medium">{slot.date}</h4>
+                    <div className="flex gap-2 flex-wrap">
+                      {slot.times.map((time) => {
+                        const isSelected =
+                          selectedTimesByDate[slot.date]?.includes(time);
+                        return (
+                          <button
+                            key={time}
+                            onClick={() => handleTimeSelect(slot.date, time)}
+                            className={`px-3 py-1 rounded ${
+                              isSelected
+                                ? "bg-blue-500 text-white"
+                                : "bg-gray-200"
+                            }`}
+                          >
+                            {time}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
 
                 {/* Price */}
                 <div className="bg-white/10 rounded-lg p-2.5">

@@ -234,8 +234,6 @@ const MentorDashboard = () => {
         }),
       };
 
-      console.log("Sending profile update data:", requestData);
-
       const response = await axios.put<{ mentor: MentorProfile }>(
         `http://localhost:8000/mentorEditProfile`,
         requestData,
@@ -248,8 +246,7 @@ const MentorDashboard = () => {
       );
 
       const updatedProfile = response.data;
-      console.log("Updated profile response:", updatedProfile);
-      console.log("Updated mentor data:", updatedProfile.mentor);
+
       setMentorProfile(updatedProfile.mentor);
       setIsEditing(false);
       alert("Профайл амжилттай шинэчлэгдлээ!");

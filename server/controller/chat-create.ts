@@ -80,7 +80,6 @@ export const createMessage = async (req: Request, res: Response) => {
       try {
         // MongoDB-оос mentor-уудыг авах
         mentors = await MentorModel.find({});
-        console.log(`Found ${mentors.length} mentors from database`);
 
         // Use the new getAiReply utility function
         aiReply = await getAiReply(
@@ -98,7 +97,6 @@ export const createMessage = async (req: Request, res: Response) => {
       // Mentor-уудыг эхлээд авах
       if (mentors.length === 0) {
         mentors = await MentorModel.find({}).limit(5);
-        console.log(`Found ${mentors.length} mentors for general chat`);
       }
       aiReply = await getAiReply(message, intent, finalStudentProfile, mentors);
     }

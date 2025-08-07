@@ -78,10 +78,6 @@ const MentorCards: React.FC<MentorCardsProps> = ({
         const API_BASE_URL =
           process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-        console.log("🔍 Fetching mentors with params:", params);
-        console.log("🔍 Selected category ID:", selectedCategory);
-        console.log("🔍 Selected subcategory:", selectedSubCategory);
-        console.log("🔍 API URL:", `${API_BASE_URL}/mentors`);
         const response = await axios.get<Mentor[]>(`${API_BASE_URL}/mentors`, {
           params,
         });

@@ -61,11 +61,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   ): Promise<{ success: boolean; message: string }> => {
     // Prevent multiple simultaneous login attempts
     if (isLoggingIn) {
-      console.log("Login already in progress, ignoring request");
       return { success: false, message: "Нэвтрэх үйлдэл хийгдэж байна..." };
     }
 
-    console.log("Starting login process for:", email);
     setIsLoggingIn(true);
     setIsLoading(true);
 
@@ -78,15 +76,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         }
       );
 
-      console.log("Login response:", response.data);
-
       // Axios already parses JSON and puts it in response.data
       const { token, mentorId, message } = response.data;
-      console.log("Login response:", response.data);
 
       if (token && mentorId) {
-        console.log("Login successful, fetching mentor data...");
-
         try {
           // Fetch mentor profile data using the token
           const profileResponse = await axios.get<ProfileResponse>(
@@ -100,26 +93,21 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
             }
           );
 
-          console.log("Profile fetch successful:", profileResponse.data);
           const mentorData = profileResponse.data.mentor;
 
           if (mentorData) {
-            console.log("Mentor data received:", mentorData);
             // Store token and user data
             localStorage.setItem("mentorToken", token);
             localStorage.setItem("mentorUser", JSON.stringify(mentorData));
             localStorage.setItem("mentorEmail", mentorData.email); // Email-г тусад нь хадгалах
 
             setMentor(mentorData);
-            console.log("Mentor state updated, login complete");
 
             // Optional redirect only if explicitly requested
             if (redirectTo) {
-              console.log("Redirecting to:", redirectTo);
               setTimeout(() => {
                 try {
                   router.push(redirectTo);
-                  console.log("Router.push executed");
                 } catch (error) {
                   console.error(
                     "Router.push failed, using window.location:",
@@ -135,7 +123,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
               message: message || "Амжилттай нэвтэрлээ!",
             };
           } else {
-            console.log("Failed to fetch mentor profile");
             return { success: false, message: "Профайл мэдээлэл олдсонгүй" };
           }
         } catch (profileError: any) {
@@ -163,11 +150,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
           // Optional redirect only if explicitly requested
           if (redirectTo) {
-            console.log("Redirecting to:", redirectTo);
             setTimeout(() => {
               try {
                 router.push(redirectTo);
-                console.log("Router.push executed");
               } catch (error) {
                 console.error(
                   "Router.push failed, using window.location:",
@@ -181,11 +166,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
           return { success: true, message: message || "Амжилттай нэвтэрлээ!" };
         }
       } else {
-        console.log("Login failed - no token or user");
         return { success: false, message: message || "Нэвтрэхэд алдаа гарлаа" };
       }
     } catch (error: any) {
-      console.error("Login error:", error);
       const message = error.response?.data?.message || "Нэвтрэхэд алдаа гарлаа";
       return { success: false, message };
     } finally {
@@ -224,7 +207,6 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         return false;
       }
     } catch (error) {
-      console.error("Auth check error:", error);
       logout();
       return false;
     }

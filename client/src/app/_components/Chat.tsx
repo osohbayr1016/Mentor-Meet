@@ -30,15 +30,6 @@ export const HomeChat = () => {
     const studentUser = localStorage.getItem("studentUser");
     const mentorUser = localStorage.getItem("mentorUser");
 
-    // Debug: localStorage-ийн мэдээлийг харах
-    console.log("localStorage debug:");
-    console.log("studentToken:", studentToken);
-    console.log("mentorToken:", mentorToken);
-    console.log("studentEmail:", studentEmail);
-    console.log("mentorEmail:", mentorEmail);
-    console.log("studentUser:", studentUser);
-    console.log("mentorUser:", mentorUser);
-
     setToken(studentToken || mentorToken);
 
     // Email-г олж авах - эхлээд тусад нь хадгалагдсан email-г шалгах
@@ -113,8 +104,6 @@ export const HomeChat = () => {
       // Intent-г backend-д detect хийх болгоно
     };
 
-    console.log("Sending message with email:", userEmail);
-
     try {
       const local = localStorage.getItem("studentUser");
       const res = await fetch(
@@ -132,7 +121,6 @@ export const HomeChat = () => {
       );
 
       const data = await res.json();
-      console.log("API Response:", data);
 
       if (!res.ok) {
         console.error("API Error:", data);
@@ -140,7 +128,6 @@ export const HomeChat = () => {
         return;
       }
 
-      console.log("Messages received:", data.messages);
       setMessages((prev) => [...prev, ...data.messages]);
       setInput("");
     } catch (error) {

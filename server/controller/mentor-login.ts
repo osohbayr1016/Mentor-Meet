@@ -46,7 +46,6 @@ export const MentorLogin = async (req: Request, res: Response) => {
     }
 
     const secret = process.env.JWT_SECRET;
-    console.log(secret, "login secter");
 
     if (!secret)
       return res.status(500).send({ message: "JWT тохиргоо алга байна!" });
