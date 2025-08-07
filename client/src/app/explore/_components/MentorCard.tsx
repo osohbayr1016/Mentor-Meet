@@ -26,7 +26,7 @@ const MentorCard: React.FC<MentorCardProps> = ({ mentor, onClick }) => {
 
   return (
     <div
-      className="backdrop-blur-xl border border-gray-600/50 rounded-[20px] p-2 hover:bg-gray-700/50 transition-colors cursor-pointer w-[420px] h-[160px]"
+      className="backdrop-blur-xl border border-gray-600/50 rounded-[20px] p-2 hover:bg-gray-700/50 transition-colors cursor-pointer flex "
       onClick={handleClick}
     >
       <div className="flex items-start gap-4">
@@ -42,7 +42,7 @@ const MentorCard: React.FC<MentorCardProps> = ({ mentor, onClick }) => {
         </div>
 
         {/* Mentor Info */}
-        <div className="flex-1  flex flex-col gap-15 ">
+        <div className="flex-1  flex flex-col gap-15 justify-center ">
           <div>
             <h3 className="text-white font-semibold text-[16px] mb-1">
               {mentor.name}
@@ -51,8 +51,8 @@ const MentorCard: React.FC<MentorCardProps> = ({ mentor, onClick }) => {
               {mentor.profession}
             </p>
           </div>
-          <div className="flex flex-row justify-between pb-1 pr-[10px] ">
-            <p className="text-white font-semibold text-[16px] mb-1">
+          <div className="flex flex-row justify-between pr-[10px] items-center">
+            <p className="text-white font-semibold text-[16px]">
               {mentor.experience} жил
             </p>
             <div className="flex items-center justify-between"></div>

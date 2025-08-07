@@ -17,7 +17,7 @@ const ExplorePage = () => {
   // };
 
   return (
-    <div className="relative w-full h-screen">
+    <div className="relative w-full min-h-screen">
       {/* Background image */}
       <div className="absolute inset-0 bg-black/30 -z-10" />
       <Image
@@ -25,6 +25,7 @@ const ExplorePage = () => {
         alt="background image"
         fill
         className="absolute inset-0 -z-20 object-cover"
+        priority
       />
 
       {/* Navigation */}

@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-
-
 @font-face {
   font-family: "GIP";
   src: url("../assets/fonts/GIP-LIGHT.OTF") format("opentype");
