@@ -1,11 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: ["class"],
   content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   prefix: "",
   theme: {
@@ -19,6 +18,15 @@ module.exports = {
     extend: {
       fontFamily: {
         gip: ["GIP", "sans-serif"],
+      },
+      width: {
+        "6/10": "60%",
+      },
+      height: {
+        "7/10": "70%",
+      },
+      borderWidth: {
+        '1': '1px',
       },
       colors: {
         border: "hsl(var(--border))",
