@@ -15,7 +15,7 @@ import {
   EditFormType,
   MentorProfile,
   Meeting,
-  MeetingStatus, // 👈 enum import
+  MeetingStatus,
 } from "@/app/types/mentor";
 import { useMentorBookings } from "../hooks/useMentorBookings";
 
@@ -48,29 +48,28 @@ export default function MentorDashboard() {
     },
   });
 
-  const [totalIncome] = useState(20000); // mock
+  const [totalIncome] = useState(20000); 
 
   const { bookings: fetchedBookings, loading: meetingsLoading } = useMentorBookings(mentor?.mentorId || "");
   const [bookings, setBookings] = useState<Meeting[]>([]);
 
-useEffect(() => {
-  if (fetchedBookings.length > 0) {
-    const converted: Meeting[] = fetchedBookings.map((b) => {
-      const dateObj = new Date(b.date);
-      const day = format(dateObj, "EEEE"); // Monday, Tuesday гэх мэт
-
-      return {
-        id: b.id,
-        date: b.date,
-        day,
-        time: b.time,
-        studentEmail: b.studentEmail,
-        status: b.status as MeetingStatus,
-      };
-    });
-    setBookings(converted);
-  }
-}, [fetchedBookings]);
+  useEffect(() => {
+    if (fetchedBookings.length > 0) {
+      const converted: Meeting[] = fetchedBookings.map((b) => {
+        const dateObj = new Date(b.date);
+        const day = format(dateObj, "EEEE");
+        return {
+          id: b.id,
+          date: b.date,
+          day,
+          time: b.time,
+          studentEmail: b.studentEmail,
+          status: b.status as MeetingStatus,
+        };
+      });
+      setBookings(converted);
+    }
+  }, [fetchedBookings]);
 
   useEffect(() => {
     if (!isLoading && !mentor) {
@@ -101,6 +100,7 @@ useEffect(() => {
           education: { ...data.education },
         });
       } catch (error: any) {
+        console.error("❌ Профайл ачааллах алдаа:", error);
         setProfileError(error?.response?.data?.message || "Профайл ачаалахад алдаа гарлаа");
       } finally {
         setProfileLoading(false);
@@ -161,6 +161,7 @@ useEffect(() => {
       setIsEditing(false);
       alert("Профайл амжилттай шинэчлэгдлээ!");
     } catch (err: any) {
+      console.error("❌ Профайл шинэчлэх алдаа:", err);
       alert(err?.response?.data?.message || "Профайл шинэчлэхэд алдаа гарлаа");
     }
   };
@@ -184,19 +185,38 @@ useEffect(() => {
 
   const handleCancelMeeting = async (meetingId: string) => {
     try {
+      console.log("🚀 Цуцлах гэж байгаа уулзалтын ID:", meetingId);
+
       const token = localStorage.getItem("mentorToken");
-      await axios.patch(
+      console.log("🔑 LocalStorage-с авсан токен:", token);
+
+      const response = await axios.patch(
         `http://localhost:8000/bookings/${meetingId}/cancel`,
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
       );
+
+      console.log("✅ PATCH /cancel response:", response.data);
+
       alert("Уулзалт амжилттай цуцлагдлаа!");
 
       const updated = bookings.map((m) =>
         m.id === meetingId ? { ...m, status: "cancelled" as MeetingStatus } : m
       );
+      console.log("📦 Шинэчилсэн bookings:", updated);
       setBookings(updated);
     } catch (err: any) {
+      console.error("❌ Уулзалт цуцлах алдаа:", err);
+      console.log("📛 Алдаа дэлгэрэнгүй:", {
+        status: err?.response?.status,
+        message: err?.response?.data?.message,
+        fullError: err,
+      });
       alert(err?.response?.data?.message || "Уулзалт цуцлахад алдаа гарлаа");
     }
   };
@@ -245,7 +265,7 @@ useEffect(() => {
                     <div className="mb-6">
                       <p className="text-sm text-gray-300">Таны нийт орлого:</p>
                       <p className="text-2xl font-bold text-green-400">
-                        ¥{totalIncome.toLocaleString()}
+                        ₮{totalIncome.toLocaleString()}
                       </p>
                     </div>
                     <MeetingList
