@@ -26,7 +26,7 @@ module.exports = {
         "7/10": "70%",
       },
       borderWidth: {
-        '1': '1px',
+        1: "1px",
       },
       colors: {
         border: "hsl(var(--border))",
