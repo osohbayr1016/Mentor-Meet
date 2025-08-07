@@ -7,7 +7,8 @@ import FirstStudentForgotPassword from "./_components/FirstStudentForgotPassword
 import SecondStudentForgotPassword from "./_components/SecondStudentForgotPassword";
 import ThirdStudentForgotPassword from "./_components/ThirdStudentForgotPassword";
 
-const BACKEND_URL = "http://localhost:8000";
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://mentor-meet-h0tx.onrender.com";
 
 const ForgotPasswordPage = () => {
   const [step, setStep] = useState(0);
@@ -75,7 +76,10 @@ const ForgotPasswordPage = () => {
     setError("");
     try {
       const res = await axios.put(
-        `http://localhost:8000/studentResetPassword`,
+        `${
+          process.env.NEXT_PUBLIC_API_URL ||
+          "https://mentor-meet-h0tx.onrender.com"
+        }/studentResetPassword`,
         {
           email: form.email,
           password: form.newPassword,

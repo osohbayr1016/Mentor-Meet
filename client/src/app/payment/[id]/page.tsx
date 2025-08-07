@@ -76,7 +76,12 @@ const MentorPayment = () => {
 
     const fetchMentor = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/mentor/${mentorId}`);
+        const res = await fetch(
+          `${
+            process.env.NEXT_PUBLIC_API_URL ||
+            "https://mentor-meet-h0tx.onrender.com"
+          }/mentor/${mentorId}`
+        );
         if (!res.ok) {
           throw new Error("Mentor олдсонгүй");
         }
@@ -109,7 +114,12 @@ const MentorPayment = () => {
     try {
       const response = await axios.get<{
         availabilities: { date: string; times: string[] }[];
-      }>(`http://localhost:8000/calendar/${mentorId}`);
+      }>(
+        `${
+          process.env.NEXT_PUBLIC_API_URL ||
+          "https://mentor-meet-h0tx.onrender.com"
+        }/calendar/${mentorId}`
+      );
 
       const allTimes = response.data.availabilities.flatMap((a) => a.times);
       return allTimes;
@@ -155,7 +165,10 @@ const MentorPayment = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:8000/payment/${student}`,
+        `${
+          process.env.NEXT_PUBLIC_API_URL ||
+          "https://mentor-meet-h0tx.onrender.com"
+        }/payment/${student}`,
         {
           mentorId,
           studentId: student,
