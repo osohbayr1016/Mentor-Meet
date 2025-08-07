@@ -55,15 +55,9 @@ const MentorCard: React.FC<MentorCardProps> = ({ mentor, onClick }) => {
             <p className="text-white font-semibold text-[16px] mb-1">
               {mentor.experience} жил
             </p>
-            <div className="flex items-center justify-between">
-              {/* <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 text-yellow-400 fill-current" />
-              <span className="text-white text-sm font-medium">
-                {mentor.rating}
-              </span>
-            </div> */}
-            </div>
+            <div className="flex items-center justify-between"></div>
           </div>
+<<<<<<< HEAD
 
           {/* Category and Subcategory */}
           {/* {(mentor.category || mentor.subCategory) && (
@@ -82,6 +76,8 @@ const MentorCard: React.FC<MentorCardProps> = ({ mentor, onClick }) => {
           {/* )}  */}
 
           {/* Rating and Price */}
+=======
+>>>>>>> c571238 (zassan)
         </div>
       </div>
     </div>
