@@ -12,7 +12,7 @@ function generateReportsData(period: string = "30d") {
     const monthName = month.toLocaleDateString("en-US", { month: "short" });
     const baseStudents = 120 + (5 - i) * 30 + Math.floor(Math.random() * 20);
     const baseMentors = 25 + (5 - i) * 5 + Math.floor(Math.random() * 5);
-    
+
     userGrowth.push({
       month: monthName,
       students: baseStudents,
@@ -28,7 +28,7 @@ function generateReportsData(period: string = "30d") {
     const monthName = month.toLocaleDateString("en-US", { month: "short" });
     const baseRevenue = 2400000 + (5 - i) * 1200000 + Math.floor(Math.random() * 500000);
     const bookings = Math.floor(baseRevenue / 50000) + Math.floor(Math.random() * 20);
-    
+
     revenueData.push({
       month: monthName,
       revenue: baseRevenue,
@@ -69,7 +69,7 @@ function generateReportsData(period: string = "30d") {
     const baseBookings = 85 - (index * 12) + Math.floor(Math.random() * 10);
     const baseRevenue = baseBookings * (120000 + Math.floor(Math.random() * 80000));
     const percentage = Math.floor((baseBookings / 300) * 100);
-    
+
     return {
       category: category.name,
       bookings: baseBookings,

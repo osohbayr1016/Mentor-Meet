@@ -19,18 +19,16 @@ const StudentLoginPage = () => {
   // Handle Google OAuth success
   const handleGoogleSuccess = async (session: any) => {
     try {
-      // Check if student exists with this Google account
+      // Use the existing studentLogin endpoint with googleAuth flag
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const response = await fetch(`${API_BASE_URL}/studentGoogleLogin`, {
+      const response = await fetch(`${API_BASE_URL}/studentLogin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: session.user?.email,
-          name: session.user?.name,
-          image: session.user?.image,
-          accessToken: session.accessToken,
+          googleAuth: true,
         }),
       });
 
@@ -48,9 +46,10 @@ const StudentLoginPage = () => {
         // Redirect to student dashboard
         router.push("/student-dashboard");
       } else {
-        setError(data.message || "Google-р нэвтрэхэд алдаа гарлаа. Эхлээд бүртгүүлнэ үү.");
+        setError(data.message || "Google-р нэвтрэхэд алдаа гарлаа. Эхлээд Google-р бүртгүүлнэ үү.");
       }
     } catch (error) {
+      console.error("Google login error:", error);
       setError("Google-р нэвтрэхэд алдаа гарлаа");
     }
   };

@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn, useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FcGoogle } from "react-icons/fc";
 
 interface GoogleOAuthButtonProps {
@@ -20,35 +20,50 @@ export default function GoogleOAuthButton({
   disabled = false,
 }: GoogleOAuthButtonProps) {
   const [loading, setLoading] = useState(false);
-  const { data: session } = useSession();
+  const [pendingAuth, setPendingAuth] = useState(false);
+  const { data: session, status } = useSession();
+
+  // Handle session changes after OAuth
+  useEffect(() => {
+    if (pendingAuth && status === "authenticated" && session) {
+      setPendingAuth(false);
+      setLoading(false);
+      onSuccess?.(session);
+    } else if (pendingAuth && status === "unauthenticated") {
+      setPendingAuth(false);
+      setLoading(false);
+      onError?.("Authentication failed");
+    }
+  }, [session, status, pendingAuth, onSuccess, onError]);
 
   const handleGoogleSignIn = async () => {
     if (disabled || loading) return;
 
     setLoading(true);
+    setPendingAuth(true);
     
     try {
       const result = await signIn("google", {
         redirect: false,
-        callbackUrl: window.location.origin,
+        callbackUrl: window.location.href,
       });
 
       if (result?.error) {
         console.error("Google sign-in error:", result.error);
+        setPendingAuth(false);
+        setLoading(false);
         onError?.(result.error);
-      } else if (result?.ok) {
-        // Wait a moment for session to be available
-        setTimeout(() => {
-          if (session) {
-            onSuccess?.(session);
-          }
-        }, 1000);
+      } else if (!result?.ok) {
+        setPendingAuth(false);
+        setLoading(false);
+        onError?.("Google authentication failed");
       }
+      // If result.ok is true, we wait for the session to update via useEffect
     } catch (error: any) {
       console.error("Google OAuth error:", error);
-      onError?.(error.message || "Google-р нэвтрэхэд алдаа гарлаа");
-    } finally {
+      setPendingAuth(false);
       setLoading(false);
+      onError?.(error.message || "Google-р нэвтрэхэд алдаа гарлаа");
     }
   };
 
