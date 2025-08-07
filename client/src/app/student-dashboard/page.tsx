@@ -37,7 +37,7 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
     "upcoming" | "history" | "mentor-profile"
-  >("upcoming");
+  >("mentor-profile");
   const [totalSpent, setTotalSpent] = useState(0);
 
   // Get student ID from localStorage
@@ -255,7 +255,7 @@ const StudentDashboard = () => {
                   <div className="w-72 flex flex-col h-full justify-between">
                     <div className="space-y-2">
                       <button
-                        onClick={() => setActiveTab("upcoming")}
+                      onClick={() => setActiveTab("mentor-profile")}
                         className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
                           activeTab === "upcoming"
                             ? "bg-gray-600 text-white"
@@ -273,16 +273,6 @@ const StudentDashboard = () => {
                         }`}
                       >
                         Уулзалтын түүх
-                      </button>
-                      <button
-                        onClick={() => setActiveTab("mentor-profile")}
-                        className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
-                          activeTab === "mentor-profile"
-                            ? "bg-gray-600 text-white"
-                            : "text-gray-300 hover:bg-gray-700/50"
-                        }`}
-                      >
-                        Ментор профиль
                       </button>
                     </div>
 
@@ -384,7 +374,7 @@ const StudentDashboard = () => {
                       ) : (
                         // Meetings Section
                         <div className="flex-1 flex flex-col  ">
-                          <h3 className="text-white text-lg font-semibold mb-4">
+                          <h3  className="text-white text-lg font-semibold mb-4">
                             {activeTab === "upcoming"
                               ? "Таны товлосон уулзалтууд:"
                               : "Уулзалтын түүх:"}
