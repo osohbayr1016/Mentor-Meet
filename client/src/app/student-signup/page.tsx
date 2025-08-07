@@ -49,9 +49,11 @@ const StudentSignupPage = () => {
       });
 
       const checkData = await checkResponse.json();
+      console.log("Checkemail response:", checkData);
 
       if (checkResponse.ok) {
         // Student doesn't exist, proceed with Google signup
+        console.log("Email available, proceeding with Google signup");
         setGoogleUserData({
           email: session.user?.email,
           name: session.user?.name,
@@ -62,10 +64,43 @@ const StudentSignupPage = () => {
         setNickname(session.user?.name?.split(" ")[0] || "Student");
         setCurrentStep("profile"); // Skip to profile step for Google users
       } else {
-        // Student already exists, redirect to login
-        setError(
-          "Энэ имэйл хаягтай хэрэглэгч аль хэдийн бүртгэгдсэн байна. Нэвтрэх хэсэг рүү шилжинэ үү."
-        );
+        // Student already exists, try to login with Google
+        console.log("Student already exists, attempting Google login");
+        try {
+          const loginResponse = await fetch(`${API_BASE_URL}/studentLogin`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: session.user?.email,
+              googleAuth: true,
+            }),
+          });
+
+          const loginData = await loginResponse.json();
+          console.log("Google login response:", loginData);
+
+          if (loginResponse.ok && loginData.token) {
+            // Store the authentication data
+            localStorage.setItem("studentToken", loginData.token);
+            localStorage.setItem("studentEmail", session.user?.email || "");
+            localStorage.setItem("studentUser", JSON.stringify(loginData.user));
+            
+            console.log("Google login successful, redirecting to dashboard");
+            router.push("/student-dashboard");
+            return; // Exit early on successful login
+          } else {
+            setError(
+              "Google аккаунт олдсон боловч нэвтрэхэд алдаа гарлаа. Гарын авлагаар нэвтэрнэ үү."
+            );
+          }
+        } catch (loginError: any) {
+          console.error("Google login error:", loginError);
+          setError(
+            "Google-р нэвтрэхэд алдаа гарлаа. Гарын авлагаар нэвтэрнэ үү."
+          );
+        }
       }
     } catch (error: any) {
       console.error("Google sign-up error:", error);

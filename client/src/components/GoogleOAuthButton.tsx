@@ -25,11 +25,15 @@ export default function GoogleOAuthButton({
 
   // Handle session changes after OAuth
   useEffect(() => {
+    console.log("GoogleOAuthButton session effect:", { pendingAuth, status, session: !!session });
+    
     if (pendingAuth && status === "authenticated" && session) {
+      console.log("Google OAuth successful, calling onSuccess");
       setPendingAuth(false);
       setLoading(false);
       onSuccess?.(session);
     } else if (pendingAuth && status === "unauthenticated") {
+      console.log("Google OAuth failed, calling onError");
       setPendingAuth(false);
       setLoading(false);
       onError?.("Authentication failed");
