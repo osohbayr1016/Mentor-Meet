@@ -3,8 +3,8 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { OtpModel } from "../model/Otp-model";
 import nodemailer from "nodemailer";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { createMentorToken } from "../utils/jwt-utils";
 
 export const MentorCheckemail = async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -173,14 +173,7 @@ export const MentorSignUp = async (req: Request, res: Response) => {
 
     const user = await MentorModel.create(userData);
 
-    const token = jwt.sign(
-      {
-        mentorId: user._id,
-        isMentor: true,
-        email: user.email,
-      },
-      tokenPassword
-    );
+    const token = createMentorToken(user._id, user.email, true);
     return res.status(200).json({
       message: "Амжилттай бүртгэгдлээ.",
       token,

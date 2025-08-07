@@ -4,7 +4,9 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import axios from "axios";
+import GoogleOAuthButton from "../../components/GoogleOAuthButton";
 
 const StudentLoginPage = () => {
   const [email, setEmail] = useState("");
@@ -12,6 +14,54 @@ const StudentLoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const { data: session } = useSession();
+
+  // Handle Google OAuth success
+  const handleGoogleSuccess = async (session: any) => {
+    try {
+      // Use the existing studentLogin endpoint with googleAuth flag
+      const API_BASE_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${API_BASE_URL}/studentLogin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: session.user?.email,
+          googleAuth: true,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store student data and redirect
+        localStorage.setItem("studentToken", data.token);
+        localStorage.setItem("studentUser", JSON.stringify(data.user));
+        localStorage.setItem("studentEmail", data.user.email);
+
+        // Dispatch custom event to notify other components about auth change
+        window.dispatchEvent(new Event("authChange"));
+
+        // Redirect to student dashboard
+        router.push("/student-dashboard");
+      } else {
+        setError(
+          data.message ||
+            "Google-р нэвтрэхэд алдаа гарлаа. Эхлээд Google-р бүртгүүлнэ үү."
+        );
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+      setError("Google-р нэвтрэхэд алдаа гарлаа");
+    }
+  };
+
+  // Handle Google OAuth error
+  const handleGoogleError = (error: string) => {
+    setError(`Google OAuth алдаа: ${error}`);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,18 +80,15 @@ const StudentLoginPage = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/studentLogin`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const API_BASE_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${API_BASE_URL}/studentLogin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
       const data = await response.json();
 
@@ -79,7 +126,7 @@ const StudentLoginPage = () => {
 
       {/* Main Login Modal */}
       <div className="relative z-10 w-full h-full flex justify-center items-center">
-        <div className="w-6/10 h-7/10 flex items-center justify-center">
+        <div className="w-6/10 h-8/10 flex items-center justify-center">
           <div className="w-full h-full border-gray-400/50 border-1 backdrop-blur-md bg-black/20 flex flex-col items-center justify-center rounded-[20px]">
             {/* Header */}
             <div className="flex gap-3 mb-8">
@@ -126,7 +173,7 @@ const StudentLoginPage = () => {
 
                 {error && (
                   <div className="text-red-400 text-sm text-center">
-                    {error}
+                    {typeof error === "string" ? error : "Алдаа гарлаа"}
                   </div>
                 )}
 
@@ -138,6 +185,21 @@ const StudentLoginPage = () => {
                   {loading ? "Нэвтэрч байна..." : "Нэвтрэх"}
                 </button>
               </form>
+
+              {/* Divider */}
+              <div className="flex items-center my-6">
+                <div className="flex-1 border-t border-white/30"></div>
+                <span className="px-4 text-white/60 text-sm">эсвэл</span>
+                <div className="flex-1 border-t border-white/30"></div>
+              </div>
+
+              {/* Google OAuth Button */}
+              <GoogleOAuthButton
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                text="Google-р нэвтрэх"
+                disabled={loading}
+              />
 
               {/* Links */}
               <div className="mt-8 text-center space-y-4">

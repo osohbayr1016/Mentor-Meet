@@ -3,7 +3,7 @@ import { StudentModel, TempUserModel } from "../model/student-model";
 import nodemailer from "nodemailer";
 import { OtpModel } from "../model/Otp-model";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { createStudentToken } from "../utils/jwt-utils";
 
 export const Checkemail = async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -135,11 +135,7 @@ export const StudentNameNumber = async (req: Request, res: Response) => {
         // No password for Google OAuth users
       });
 
-      if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET not defined");
-      const token = jwt.sign(
-        { studentId: student._id, email: student.email },
-        process.env.JWT_SECRET
-      );
+      const token = createStudentToken(student._id, student.email);
 
       return res.status(200).json({
         message: "Successfully created student with Google OAuth",
@@ -187,11 +183,7 @@ export const StudentNameNumber = async (req: Request, res: Response) => {
 
     await TempUserModel.deleteOne({ email });
 
-    if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET not defined");
-    const token = jwt.sign(
-      { studentId: student._id, email: student.email },
-      process.env.JWT_SECRET
-    );
+    const token = createStudentToken(student._id, student.email);
 
     return res.status(200).json({
       message: "Successfully updated name and number",

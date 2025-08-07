@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 
 interface Mentor {
@@ -73,54 +73,67 @@ const BookingCard: React.FC<BookingCardProps> = ({
         return "";
     }
   };
+  const [section, setSection] = useState(false);
 
   return (
-    <div className="bg-gray-700/50 rounded-xl p-4 border border-gray-600 h-[300px]">
-      <div className="flex items-start gap-4 mb-4">
-        <div className="w-16 h-16 bg-gray-300 rounded-full overflow-hidden flex-shrink-0">
-          <Image
-            src={booking.mentorId.image || "https://via.placeholder.com/64"}
-            alt={`${booking.mentorId.firstName} ${booking.mentorId.lastName}`}
-            width={64}
-            height={64}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="flex-1">
-          <h3 className="text-white font-semibold text-lg mb-1">
-            {booking.mentorId.firstName} {booking.mentorId.lastName}
-          </h3>
-          <p className="text-white/70 text-sm mb-2">
-            {booking.mentorId.profession}
-          </p>
-          <div className="flex items-center gap-4 text-sm">
-            <span className="text-white/80">Ангилал: {booking.category}</span>
-            <div className="flex items-center gap-1">
-              <svg
-                className="w-4 h-4 text-yellow-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-              <span className="text-white">{booking.mentorId.rating}</span>
-            </div>
-          </div>
-        </div>
+    // <div className="bg-gray-700/50 rounded-xl p-4 border border-gray-600 h-[300px]">
+    //   <div className="flex items-start gap-4 mb-4">
+    //     <div className="w-16 h-16 bg-gray-300 rounded-full overflow-hidden flex-shrink-0">
+    //       <Image
+    //         src={booking.mentorId.image || "https://via.placeholder.com/64"}
+    //         alt={`${booking.mentorId.firstName} ${booking.mentorId.lastName}`}
+    //         width={64}
+    //         height={64}
+    //         className="w-full h-full object-cover"
+    //       />
+    //     </div>
+    //     <div className="flex-1">
+    //       <h3 className="text-white font-semibold text-lg mb-1">
+    //         {booking.mentorId.firstName} {booking.mentorId.lastName}
+    //       </h3>
+    //       <p className="text-white/70 text-sm mb-2">
+    //         {booking.mentorId.profession}
+    //       </p>
+    //       <div className="flex items-center gap-4 text-sm">
+    //         <span className="text-white/80">Ангилал: {booking.category}</span>
+    //         <div className="flex items-center gap-1">
+    //           <svg
+    //             className="w-4 h-4 text-yellow-400"
+    //             fill="currentColor"
+    //             viewBox="0 0 20 20"
+    //           >
+    //             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+    //           </svg>
+    //           <span className="text-white">{booking.mentorId.rating}</span>
+    //         </div>
+    //       </div>
+    //     </div>
+    //   </div>
+    <div className="bg-black/40 rounded-[20px] p-4 w-[360px] h-[220px] flex flex-row gap-4  ">
+      <div className="w-[136px] h-[180px] rounded-[20px]">
+        <Image
+          src={booking.mentorId.image || "https://via.placeholder.com/64"}
+          alt={`${booking.mentorId.firstName} ${booking.mentorId.lastName}`}
+          width={136}
+          height={144}
+          className="w-full h-full object-cover rounded-[20px]"
+        />
       </div>
 
-      <div className="space-y-2 text-white mb-4">
-        <p>
-          <span className="text-gray-400">Уулзалтын өдөр:</span>{" "}
-          {formatDate(booking.date)}
-        </p>
-        <p>
-          <span className="text-gray-400">Уулзалтын цаг:</span> {booking.time}
-        </p>
-        <p>
-          <span className="text-gray-400">Үнэ:</span>{" "}
-          {booking.price.toLocaleString()}₮
-        </p>
+      <div className="space-y-2 text-white   ">
+        <div className="flex flex-col gap-16 ">
+          <p className="flex flex-col">
+            <span className="text-gray-400 text-[12px]">Уулзалтын өдөр:</span>
+            <span className="font-semibold">
+              {new Date(booking.date).toLocaleDateString("mn-MN")}
+            </span>
+            <span className="font-semibold">{booking.mentorId.profession}</span>
+          </p>
+          <p className="flex flex-col">
+            <span className="text-gray-400 text-[12px]">Уулзалтын цаг:</span>
+            <span className="font-semibold"> {booking.time}</span>
+          </p>
+        </div>
       </div>
 
       {showActions && (

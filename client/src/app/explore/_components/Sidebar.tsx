@@ -24,7 +24,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   categories = [],
 }) => {
   // Get subcategories from the selected category only
-  const selectedCategoryData = categories.find(cat => cat._id === selectedCategory);
+  const selectedCategoryData = categories.find(
+    (cat) => cat._id === selectedCategory
+  );
   const currentSubCategories = selectedCategoryData?.subCategory || [];
 
   const handleSubCategoryClick = (subCategory: string) => {
@@ -32,9 +34,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <div className="w-70 h-full p-6 flex flex-col overflow-hidden">
+    <div className="w-full h-full p-6 flex flex-col overflow-hidden">
       {/* Logo */}
-      <div className="flex justify-center items-center gap-3 mb-8 pt-[50px]">
+      <div className="flex justify-center items-center gap-3 mb-8 pt-[20px]">
         <div className="flex gap-3 items-center justify-center">
           <Image
             src="https://res.cloudinary.com/dg2soqaow/image/upload/v1753978167/image_723_nuhvy3.png"
@@ -70,7 +72,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
         )}
-        
+
         <div className="flex flex-wrap gap-3">
           {currentSubCategories.map((subCategory: string, index: number) => (
             <button

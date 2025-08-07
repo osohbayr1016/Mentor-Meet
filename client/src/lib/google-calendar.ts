@@ -64,6 +64,14 @@ export async function createGoogleMeetEvent(
     };
 
     try {
+        console.log("Creating calendar event with data:", {
+            summary: event.summary,
+            start: event.start,
+            end: event.end,
+            attendees: event.attendees,
+            hasConferenceData: !!event.conferenceData,
+        });
+
         const response = await calendar.events.insert({
             calendarId: "primary",
             requestBody: event,
@@ -71,19 +79,55 @@ export async function createGoogleMeetEvent(
         });
 
         const createdEvent = response.data;
+        console.log("Calendar event created:", {
+            eventId: createdEvent.id,
+            hasConferenceData: !!createdEvent.conferenceData,
+            entryPointsCount: createdEvent.conferenceData?.entryPoints?.length || 0,
+            hangoutLink: createdEvent.hangoutLink,
+        });
 
-        if (!createdEvent.conferenceData?.entryPoints?.[0]?.uri) {
-            throw new Error("Failed to create Google Meet link");
+        // Check for Google Meet link in multiple possible locations
+        let meetingLink = null;
+        if (createdEvent.conferenceData?.entryPoints?.[0]?.uri) {
+            meetingLink = createdEvent.conferenceData.entryPoints[0].uri;
+        } else if (createdEvent.hangoutLink) {
+            meetingLink = createdEvent.hangoutLink;
+        }
+
+        if (!meetingLink) {
+            console.error("No meeting link found in event:", {
+                conferenceData: createdEvent.conferenceData,
+                hangoutLink: createdEvent.hangoutLink,
+            });
+            throw new Error("Failed to create Google Meet link - no meeting URL found in response");
         }
 
         return {
-            hangoutLink: createdEvent.conferenceData.entryPoints[0].uri,
+            hangoutLink: meetingLink,
             eventId: createdEvent.id!,
             startTime: createdEvent.start!.dateTime!,
             endTime: createdEvent.end!.dateTime!,
         };
-    } catch (error) {
-        console.error("Error creating Google Calendar event:", error);
-        throw new Error("Failed to create meeting");
+    } catch (error: any) {
+        console.error("Error creating Google Calendar event:", {
+            error: error.message,
+            status: error.status,
+            code: error.code,
+            details: error.details,
+        });
+
+        if (error.status === 401 || error.code === 401) {
+            throw new Error("Google нэвтрэх эрх хэрэгтэй - дахин нэвтэрнэ үү");
+        } else if (error.status === 403 || error.code === 403) {
+            throw new Error("Google календарт хандах эрх хэрэгтэй - програмд зөвшөөрөл өгнө үү");
+        } else if (error.status === 429 || error.code === 429) {
+            throw new Error("Хэт олон хүсэлт илгээгдсэн - түр хүлээгээд дахин оролдоно уу");
+        } else if (error.message?.includes("Calendar")) {
+            throw new Error(`Календарын алдаа: ${error.message}`);
+        } else if (error.message?.includes("quota")) {
+            throw new Error("API квота дууссан - удахгүй дахин оролдоно уу");
+        } else {
+            throw new Error(`Уулзалт үүсгэхэд алдаа гарлаа: ${error.message}`);
+        }
     }
 } 

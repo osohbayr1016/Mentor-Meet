@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { format } from "date-fns";
 import { ConfirmModal } from "../app/_components/ConfirmModal";
 
-// ✅ Props type
+
 export interface MeetingCardProps {
   meeting: {
     id: string;
@@ -19,7 +19,7 @@ export interface MeetingCardProps {
   onCancelMeeting?: (meetingId: string) => void;
 }
 
-// ✅ Component
+
 export const MeetingCard: React.FC<MeetingCardProps> = ({
   meeting,
   onJoinMeeting,
@@ -111,11 +111,11 @@ export const MeetingCard: React.FC<MeetingCardProps> = ({
         )}
       </div>
 
-      {/* ✅ ConfirmModal */}
+      
       <ConfirmModal
-        open={showConfirm} // 🟢 'isOpen' биш 'open' гэж бичих ёстой!
-        onClose={handleCancelModal} // 🟢 handleCancelModal → cancel буюу хаах
-        onConfirm={handleConfirmCancel} // 🟢 цуцлалт баталгаажуулах
+        open={showConfirm} 
+        onClose={handleCancelModal} 
+        onConfirm={handleConfirmCancel} 
       />
     </>
   );

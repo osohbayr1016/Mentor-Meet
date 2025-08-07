@@ -47,20 +47,22 @@ const MentorDetailPage = () => {
 
   const [mentor, setMentor] = useState<Mentor | null>(null);
   const [calendar, setCalendar] = useState<CalendarSlot[]>([]);
-  const [selectedTimesByDate, setSelectedTimesByDate] = useState<Record<string, string[]>>({});
+  const [selectedTimesByDate, setSelectedTimesByDate] = useState<
+    Record<string, string[]>
+  >({});
   const [selectedBookingDate, setSelectedBookingDate] = useState<string>("");
   const [selectedBookingTime, setSelectedBookingTime] = useState<string>("");
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [totalPrice, setTotalPrice] = useState<number>(0);
 
-  // ✅ Менторын мэдээлэл татах
+  
   useEffect(() => {
     const fetchMentor = async () => {
       try {
         const res = await axios.get<Mentor>(`http://localhost:8000/mentor/${mentorId}`);
         setMentor(res.data);
       } catch (error) {
-        console.error("❌ Ментор татахад алдаа:", error);
+        console.error(" Ментор татахад алдаа:", error);
         toast.error("Менторын мэдээлэл татаж чадсангүй.");
       }
     };
@@ -68,7 +70,7 @@ const MentorDetailPage = () => {
     if (mentorId) fetchMentor();
   }, [mentorId]);
 
-  // ✅ Календарын мэдээлэл татах
+  
   useEffect(() => {
     const fetchCalendar = async () => {
       try {
@@ -77,7 +79,7 @@ const MentorDetailPage = () => {
         );
         setCalendar(res.data.availabilities);
       } catch (error) {
-        console.error("❌ Календар татахад алдаа:", error);
+        console.error(" Календар татахад алдаа:", error);
         toast.error("Календарын мэдээлэл татаж чадсангүй.");
       }
     };
@@ -85,7 +87,7 @@ const MentorDetailPage = () => {
     if (mentorId) fetchCalendar();
   }, [mentorId]);
 
-  // ✅ Цаг сонгох
+  
   const handleTimeSelect = (date: string, time: string) => {
     const current = selectedTimesByDate[date] || [];
     const updated = current.includes(time)
@@ -111,7 +113,7 @@ const MentorDetailPage = () => {
     return slot ? slot._id : null;
   };
 
-  // ✅ Үнийн тооцоолол
+  
   useEffect(() => {
     if (mentor) {
       const totalHours = Object.values(selectedTimesByDate).flat().length;
@@ -122,7 +124,7 @@ const MentorDetailPage = () => {
   const getTotalSelectedHours = () => Object.values(selectedTimesByDate).flat().length;
   const getAllSelectedTimes = () => Object.values(selectedTimesByDate).flat();
 
-  // ✅ Захиалга хийх
+  
   const handleMultiBooking = async () => {
     const token = localStorage.getItem("studentToken");
     const studentUser = JSON.parse(localStorage.getItem("studentUser") || "{}");
@@ -155,7 +157,7 @@ const MentorDetailPage = () => {
         const msg = error.response?.data?.message || "Тодорхойгүй алдаа";
         toast.error(`Захиалга амжилтгүй: ${msg}`);
       } else {
-        toast.error("⚠️ Захиалга хийх үед алдаа гарлаа.");
+        toast.error(" Захиалга хийх үед алдаа гарлаа.");
       }
     }
   };
@@ -171,7 +173,7 @@ const MentorDetailPage = () => {
 
   return (
     <div className="relative w-full h-screen">
-      {/* Background blur image */}
+      
       <div className="absolute inset-0 bg-black/30 -z-10" />
       <Image
         src="https://images.unsplash.com/photo-1706074740295-d7a79c079562?q=80&w=2232&auto=format&fit=crop"
@@ -180,7 +182,7 @@ const MentorDetailPage = () => {
         className="absolute inset-0 object-cover -z-20"
       />
 
-      {/* Main container */}
+      
       <div className="relative z-10 w-full h-full flex justify-center items-center p-6">
         <div className="w-full max-w-5xl h-[70vh] flex items-center justify-center">
           <div className="w-full h-full border border-gray-400/50 backdrop-blur-md bg-black/20 flex rounded-[20px] overflow-hidden">
@@ -201,12 +203,12 @@ const MentorDetailPage = () => {
         </div>
       </div>
 
-      {/* Footer */}
+      
       <div className="fixed bottom-2 left-6 text-xs text-white/60 z-30">
         Copyright © 2025 Mentor Meet
       </div>
 
-      {/* Modal */}
+      
       <BookingModal
         isOpen={showBookingModal}
         onClose={() => setShowBookingModal(false)}

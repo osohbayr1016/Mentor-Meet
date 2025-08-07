@@ -338,14 +338,30 @@ const MentorPayment = () => {
                       </div>
 
                       <DialogClose asChild>
-                        <Link href={"/payment-successfully"}>
-                          <Button
-                            type="submit"
-                            className="w-[200px] h-[40px] rounded-[40px] bg-[#000000] text-[#FFFFFF]"
-                          >
-                            Төлбөр шалгах
-                          </Button>
-                        </Link>
+                        <Button
+                          type="button"
+                          className="w-[200px] h-[40px] rounded-[40px] bg-[#000000] text-[#FFFFFF]"
+                          onClick={() => {
+                            // Prepare booking details for payment success
+                            const studentEmail = localStorage.getItem("studentEmail");
+                            const firstDate = Object.keys(selectedTimesByDate)[0];
+                            const firstTime = selectedTimesByDate[firstDate]?.[0];
+                            
+                            // Create payment success URL with booking details
+                            const paymentSuccessUrl = new URLSearchParams({
+                              bookingId: `booking_${Date.now()}`, // Generate temporary booking ID
+                              mentorEmail: mentor?.email || "",
+                              studentEmail: studentEmail || "",
+                              date: firstDate ? `2025-08-${firstDate}` : new Date().toISOString().split('T')[0],
+                              time: firstTime || "14:00",
+                              duration: "60"
+                            });
+                            
+                            window.location.href = `/payment-successfully?${paymentSuccessUrl.toString()}`;
+                          }}
+                        >
+                          Төлбөр шалгах
+                        </Button>
                       </DialogClose>
                     </div>
                   )}

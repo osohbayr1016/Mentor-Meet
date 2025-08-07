@@ -24,6 +24,10 @@ interface Booking {
   status: "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
   price: number;
   category: string;
+  meetingLink?: string;
+  calendarEventId?: string;
+  meetingStartTime?: string;
+  meetingEndTime?: string;
 }
 
 interface BookingsData {
@@ -37,8 +41,9 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
     "upcoming" | "history" | "mentor-profile"
-  >("upcoming");
+  >("mentor-profile");
   const [totalSpent, setTotalSpent] = useState(0);
+  const [generatingMeetLink, setGeneratingMeetLink] = useState<string | null>(null);
 
   // Get student ID from localStorage
   const [studentId, setStudentId] = useState("");
@@ -49,17 +54,26 @@ const StudentDashboard = () => {
       const studentUser = localStorage.getItem("studentUser");
       if (studentUser) {
         const studentData = JSON.parse(studentUser);
-        setStudentId(
-          studentData.id || studentData._id || studentData.studentId || ""
-        );
+        const id =
+          studentData.id || studentData._id || studentData.studentId || "";
+        if (id) {
+          setStudentId(id);
+        } else {
+          console.error("No valid student ID found in localStorage");
+          setLoading(false);
+        }
+      } else {
+        console.error("No student user data found in localStorage");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error parsing student data:", error);
+      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (studentId) {
+    if (studentId && studentId.trim() !== "") {
       fetchBookings();
     }
   }, [studentId]);
@@ -69,9 +83,7 @@ const StudentDashboard = () => {
       setLoading(true);
       console.log("Fetching bookings for studentId:", studentId);
       const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/get-booking-mentor/${studentId}`
+        `/api/get-booking-mentor?studentId=${studentId}`
       );
       const data = await response.json();
       console.log("Booking data received:", data);
@@ -165,6 +177,43 @@ const StudentDashboard = () => {
     }
   };
 
+  // Test function to generate Google Meet links
+  const handleGenerateTestMeetLink = async (booking: Booking) => {
+    setGeneratingMeetLink(booking._id);
+    
+    try {
+      const response = await fetch('/api/test-generate-meet-link', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bookingId: booking._id,
+          mentorEmail: 'mentor@example.com', // Replace with actual mentor email
+          studentEmail: 'student@example.com', // Replace with actual student email
+          date: booking.date.split('T')[0], // Extract date part
+          time: booking.time,
+          title: `Mentorship with ${booking.mentorId.firstName} ${booking.mentorId.lastName}`
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        alert(`Google Meet link generated! ${result.data.meetingLink}`);
+        // Refresh bookings to get the updated data with meeting link
+        fetchBookings();
+      } else {
+        alert(`Failed to generate meeting link: ${result.message}`);
+      }
+    } catch (error) {
+      console.error('Error generating meeting link:', error);
+      alert('Error generating meeting link. Please try again.');
+    } finally {
+      setGeneratingMeetLink(null);
+    }
+  };
+
   const handleCancelBooking = async (bookingId: string) => {
     if (!confirm("Уулзалтыг цуцлахдаа итгэлтэй байна уу?")) {
       return;
@@ -255,7 +304,7 @@ const StudentDashboard = () => {
                   <div className="w-72 flex flex-col h-full justify-between">
                     <div className="space-y-2">
                       <button
-                        onClick={() => setActiveTab("upcoming")}
+                        onClick={() => setActiveTab("mentor-profile")}
                         className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
                           activeTab === "upcoming"
                             ? "bg-gray-600 text-white"
@@ -273,16 +322,6 @@ const StudentDashboard = () => {
                         }`}
                       >
                         Уулзалтын түүх
-                      </button>
-                      <button
-                        onClick={() => setActiveTab("mentor-profile")}
-                        className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
-                          activeTab === "mentor-profile"
-                            ? "bg-gray-600 text-white"
-                            : "text-gray-300 hover:bg-gray-700/50"
-                        }`}
-                      >
-                        Ментор профиль
                       </button>
                     </div>
 
@@ -341,15 +380,15 @@ const StudentDashboard = () => {
                     </div>
 
                     {/* Content Section */}
-                    <div className="flex-1 flex flex-col">
+                    <div className="overflow-y-auto">
                       {activeTab === "mentor-profile" ? (
                         // Mentor Profile Section
-                        <div className="flex-1 flex flex-col">
+                        <div className="flex-1 flex flex-col ">
                           <h3 className="text-white text-lg font-semibold mb-4">
                             Таны товлосон уулзалтууд:
                           </h3>
 
-                          <div className="flex gap-4 flex-1 overflow-x-auto">
+                          <div className="flex gap-4 flex-1 overflow-x-auto  ">
                             {(() => {
                               const allBookings = [
                                 ...(bookings?.upcoming || []),
@@ -360,11 +399,13 @@ const StudentDashboard = () => {
                                 allBookings
                                   .slice(0, 2)
                                   .map((booking) => (
-                                    <MentorCard
-                                      key={booking._id}
-                                      booking={booking}
-                                      onCancel={handleCancelBooking}
-                                    />
+                                                      <MentorCard
+                    key={booking._id}
+                    booking={booking}
+                    onCancel={handleCancelBooking}
+                    onGenerateTestMeetLink={handleGenerateTestMeetLink}
+                    isGeneratingMeetLink={generatingMeetLink === booking._id}
+                  />
                                   ))
                               ) : (
                                 <div className="flex items-center justify-center h-64 w-full">
@@ -383,14 +424,14 @@ const StudentDashboard = () => {
                         </div>
                       ) : (
                         // Meetings Section
-                        <div className="flex-1 flex flex-col">
+                        <div className="flex-1 flex flex-col  ">
                           <h3 className="text-white text-lg font-semibold mb-4">
                             {activeTab === "upcoming"
                               ? "Таны товлосон уулзалтууд:"
                               : "Уулзалтын түүх:"}
                           </h3>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1  ">
                             {(() => {
                               const currentBookings =
                                 activeTab === "upcoming"

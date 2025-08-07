@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { MentorModel } from "../model/mentor-model";
 import { config } from "dotenv";
+import { createMentorToken } from "../utils/jwt-utils";
 
 config();
 
@@ -50,11 +50,7 @@ export const MentorLogin = async (req: Request, res: Response) => {
     if (!secret)
       return res.status(500).send({ message: "JWT тохиргоо алга байна!" });
 
-    const token = jwt.sign(
-      { mentorId: mentor._id.toString(), email: mentor.email },
-      secret,
-      { expiresIn: "24h" }
-    );
+    const token = createMentorToken(mentor._id, mentor.email);
 
     return res.status(200).json({
       message: "Амжилттай нэвтэрлээ",
