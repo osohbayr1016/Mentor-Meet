@@ -20,7 +20,8 @@ const StudentLoginPage = () => {
   const handleGoogleSuccess = async (session: any) => {
     try {
       // Check if student exists with this Google account
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const API_BASE_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       const response = await fetch(`${API_BASE_URL}/studentGoogleLogin`, {
         method: "POST",
         headers: {
@@ -48,7 +49,10 @@ const StudentLoginPage = () => {
         // Redirect to student dashboard
         router.push("/student-dashboard");
       } else {
-        setError(data.message || "Google-р нэвтрэхэд алдаа гарлаа. Эхлээд бүртгүүлнэ үү.");
+        setError(
+          data.message ||
+            "Google-р нэвтрэхэд алдаа гарлаа. Эхлээд бүртгүүлнэ үү."
+        );
       }
     } catch (error) {
       setError("Google-р нэвтрэхэд алдаа гарлаа");
@@ -77,7 +81,8 @@ const StudentLoginPage = () => {
     setError("");
 
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const API_BASE_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       const response = await fetch(`${API_BASE_URL}/studentLogin`, {
         method: "POST",
         headers: {
@@ -122,7 +127,7 @@ const StudentLoginPage = () => {
 
       {/* Main Login Modal */}
       <div className="relative z-10 w-full h-full flex justify-center items-center">
-        <div className="w-6/10 h-7/10 flex items-center justify-center">
+        <div className="w-6/10 h-8/10 flex items-center justify-center">
           <div className="w-full h-full border-gray-400/50 border-1 backdrop-blur-md bg-black/20 flex flex-col items-center justify-center rounded-[20px]">
             {/* Header */}
             <div className="flex gap-3 mb-8">

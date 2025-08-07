@@ -49,17 +49,26 @@ const StudentDashboard = () => {
       const studentUser = localStorage.getItem("studentUser");
       if (studentUser) {
         const studentData = JSON.parse(studentUser);
-        setStudentId(
-          studentData.id || studentData._id || studentData.studentId || ""
-        );
+        const id =
+          studentData.id || studentData._id || studentData.studentId || "";
+        if (id) {
+          setStudentId(id);
+        } else {
+          console.error("No valid student ID found in localStorage");
+          setLoading(false);
+        }
+      } else {
+        console.error("No student user data found in localStorage");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error parsing student data:", error);
+      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (studentId) {
+    if (studentId && studentId.trim() !== "") {
       fetchBookings();
     }
   }, [studentId]);
@@ -69,9 +78,7 @@ const StudentDashboard = () => {
       setLoading(true);
       console.log("Fetching bookings for studentId:", studentId);
       const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/get-booking-mentor/${studentId}`
+        `/api/get-booking-mentor?studentId=${studentId}`
       );
       const data = await response.json();
       console.log("Booking data received:", data);
@@ -255,7 +262,7 @@ const StudentDashboard = () => {
                   <div className="w-72 flex flex-col h-full justify-between">
                     <div className="space-y-2">
                       <button
-                      onClick={() => setActiveTab("mentor-profile")}
+                        onClick={() => setActiveTab("mentor-profile")}
                         className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
                           activeTab === "upcoming"
                             ? "bg-gray-600 text-white"
@@ -374,7 +381,7 @@ const StudentDashboard = () => {
                       ) : (
                         // Meetings Section
                         <div className="flex-1 flex flex-col  ">
-                          <h3  className="text-white text-lg font-semibold mb-4">
+                          <h3 className="text-white text-lg font-semibold mb-4">
                             {activeTab === "upcoming"
                               ? "Таны товлосон уулзалтууд:"
                               : "Уулзалтын түүх:"}
