@@ -29,15 +29,14 @@ const BottomNavigation = () => {
         const studentToken = localStorage.getItem("studentToken");
         const studentUserStr = localStorage.getItem("studentUser");
         console.log(studentUserStr, "student id");
-        
 
         if (studentToken && studentUserStr) {
           // const studentData = JSON.parse(studentUserStr) as StudentData;
           const studentDataRaw = JSON.parse(studentUserStr);
-const studentData: StudentData = {
-  ...studentDataRaw,
-  studentId: studentDataRaw.id, 
-};
+          const studentData: StudentData = {
+            ...studentDataRaw,
+            studentId: studentDataRaw.id,
+          };
 
           setStudent(studentData);
         } else {
@@ -141,15 +140,17 @@ const studentData: StudentData = {
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      const userId = mentor?.mentorId
+      const userId = mentor?.mentorId;
 
       if (!userId) return;
 
       try {
-
-        console.log(mentor?.mentorId, "id")
+        console.log(mentor?.mentorId, "id");
         const response = await axios.get(
-          `http://localhost:8000/notification/${userId}`
+          `${
+            process.env.NEXT_PUBLIC_API_URL ||
+            "https://mentor-meet-h0tx.onrender.com"
+          }/notification/${userId}`
         );
         const data: any = response.data;
 
@@ -238,7 +239,6 @@ const studentData: StudentData = {
               </button>
             )}
           </div>
-
         </div>
       </div>
     </div>

@@ -9,7 +9,8 @@ import axios from "axios";
 import Link from "next/link";
 import { useAuth } from "../_components/MentorUserProvider";
 
-const BACKEND_URL = "http://localhost:8000";
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://mentor-meet-h0tx.onrender.com";
 
 type SignupResponse = {
   message: string;

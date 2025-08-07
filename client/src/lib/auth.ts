@@ -2,7 +2,8 @@ import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
 // Backend API configuration
-export const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+export const BACKEND_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://mentor-meet-h0tx.onrender.com";
 
 export const authOptions: NextAuthOptions = {
   providers: [],

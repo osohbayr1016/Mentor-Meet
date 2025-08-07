@@ -17,7 +17,10 @@ export async function GET(request: NextRequest) {
     }
 
     const response = await axios.get(
-      `http://localhost:8000/get-booking-mentor/${studentId}`
+      `${
+        process.env.NEXT_PUBLIC_API_URL ||
+        "https://mentor-meet-h0tx.onrender.com"
+      }/get-booking-mentor/${studentId}`
     );
 
     const data = response.data as {
@@ -30,7 +33,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: data.success,
         message: data.message,
-        data: data.data
+        data: data.data,
       });
     } else {
       return NextResponse.json(
@@ -51,4 +54,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

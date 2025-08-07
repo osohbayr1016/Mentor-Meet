@@ -13,7 +13,9 @@ export async function GET(request: NextRequest) {
     if (subCategory) queryParams.append("subCategory", subCategory);
 
     // Call the server API
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const API_BASE_URL =
+      process.env.NEXT_PUBLIC_API_URL ||
+      "https://mentor-meet-h0tx.onrender.com";
     const response = await axios.get(
       `${API_BASE_URL}/mentors?${queryParams.toString()}`
     );

@@ -130,7 +130,10 @@ const MentorDashboard = () => {
       try {
         const token = localStorage.getItem("mentorToken");
         const response = await axios.get<{ mentor: MentorProfile }>(
-          `http://localhost:8000/mentorProfile`,
+          `${
+            process.env.NEXT_PUBLIC_API_URL ||
+            "https://mentor-meet-h0tx.onrender.com"
+          }/mentorProfile`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -235,7 +238,10 @@ const MentorDashboard = () => {
       };
 
       const response = await axios.put<{ mentor: MentorProfile }>(
-        `http://localhost:8000/mentorEditProfile`,
+        `${
+          process.env.NEXT_PUBLIC_API_URL ||
+          "https://mentor-meet-h0tx.onrender.com"
+        }/mentorEditProfile`,
         requestData,
         {
           headers: {
@@ -257,7 +263,10 @@ const MentorDashboard = () => {
           try {
             const token = localStorage.getItem("mentorToken");
             const response = await axios.get<{ mentor: MentorProfile }>(
-              `http://localhost:8000/mentorProfile`,
+              `${
+                process.env.NEXT_PUBLIC_API_URL ||
+                "https://mentor-meet-h0tx.onrender.com"
+              }/mentorProfile`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,

@@ -182,7 +182,7 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
         setLoading(true);
 
         const response = await axios.get<CategoriesResponse>(
-          "http://localhost:8000/mentor-get-category"
+          "https://mentor-meet-h0tx.onrender.com/categories"
         );
 
         const categories = response.data?.categories;
