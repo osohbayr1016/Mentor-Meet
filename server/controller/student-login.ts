@@ -63,7 +63,6 @@ export const StudentLogin = async (req: Request, res: Response) => {
       },
     });
   } catch (error: any) {
-    console.log("Login error:", error.message);
     res.status(500).json({ message: "Серверийн алдаа!", error: error.message });
     return;
   }

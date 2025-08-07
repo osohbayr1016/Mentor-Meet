@@ -10,14 +10,12 @@ export const isMentor = async (
 
   try {
     const user = await MentorModel.findById(mentorId);
-    console.log(user, "mentor data");
 
     if (!user) {
       return response.status(404).send({ message: "User not found" });
     }
 
     if (user.role === UserRoleEnum.MENTOR) {
-      console.log(user.role, "MENTOR verified");
       next();
       return;
     }

@@ -292,8 +292,6 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   };
 
   const handleMentorClick = (mentor: any) => {
-    console.log("Mentor clicked:", mentor);
-    console.log("Navigating to:", `/mentor/${mentor.id}`);
     router.push(`/mentor/${mentor.id}`);
   };
 

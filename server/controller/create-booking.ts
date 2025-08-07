@@ -70,7 +70,6 @@ export const createBooking = async (req: Request, res: Response) => {
 
     try {
       await notification.save();
-      console.log("Notification saved:", notification);
     } catch (error) {
       console.error("Error saving notification:", error);
     }
