@@ -30,6 +30,7 @@ const StudentSignupPage = () => {
 
   // Handle Google OAuth success
   const handleGoogleSuccess = async (session: any) => {
+    console.log("Google OAuth success called with session:", session);
     setLoading(true);
     setError("");
 
@@ -66,7 +67,7 @@ const StudentSignupPage = () => {
       }
     } catch (error: any) {
       console.error("Google sign-up error:", error);
-      setError("Google-р бүртгүүлэхэд алдаа гарлаа");
+      setError(`Google-р бүртгүүлэхэд алдаа гарлаа: ${error.message || error}`);
     } finally {
       setLoading(false);
     }
@@ -74,6 +75,7 @@ const StudentSignupPage = () => {
 
   // Handle Google OAuth error
   const handleGoogleError = (error: string) => {
+    console.error("Google OAuth error:", error);
     setError(`Google OAuth алдаа: ${error}`);
   };
 
