@@ -44,22 +44,25 @@ const MentorCard: React.FC<MentorCardProps> = ({ mentor, onClick }) => {
         {/* Mentor Info */}
         <div className="flex-1  flex flex-col gap-15 ">
           <div>
-          <h3 className="text-white font-semibold text-[16px] mb-1">
-            {mentor.name}
-          </h3>
-          <p className="text-white font-semibold text-[16px] mb-1">{mentor.profession}</p>
+            <h3 className="text-white font-semibold text-[16px] mb-1">
+              {mentor.name}
+            </h3>
+            <p className="text-white font-semibold text-[16px] mb-1">
+              {mentor.profession}
+            </p>
           </div>
           <div className="flex flex-row justify-between pb-1 pr-[10px] ">
-<p className="text-white font-semibold text-[16px] mb-1">{mentor.experience} жил</p>
-              <div className="flex items-center justify-between">
-            {/* <div className="flex items-center gap-1">
+            <p className="text-white font-semibold text-[16px] mb-1">
+              {mentor.experience} жил
+            </p>
+            <div className="flex items-center justify-between">
+              {/* <div className="flex items-center gap-1">
               <Star className="w-4 h-4 text-yellow-400 fill-current" />
               <span className="text-white text-sm font-medium">
                 {mentor.rating}
               </span>
             </div> */}
- 
-          </div>
+            </div>
           </div>
 
           {/* Category and Subcategory */}
@@ -79,7 +82,6 @@ const MentorCard: React.FC<MentorCardProps> = ({ mentor, onClick }) => {
           )} */}
 
           {/* Rating and Price */}
-        
         </div>
       </div>
     </div>
