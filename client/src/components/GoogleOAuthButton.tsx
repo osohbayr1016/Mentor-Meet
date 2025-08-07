@@ -37,16 +37,20 @@ export default function GoogleOAuthButton({
   }, [session, status, pendingAuth, onSuccess, onError]);
 
   const handleGoogleSignIn = async () => {
+    console.log("Google sign-in button clicked");
     if (disabled || loading) return;
 
+    console.log("Starting Google OAuth flow...");
     setLoading(true);
     setPendingAuth(true);
     
     try {
+      console.log("Calling signIn with Google provider...");
       const result = await signIn("google", {
         redirect: false,
         callbackUrl: window.location.href,
       });
+      console.log("SignIn result:", result);
 
       if (result?.error) {
         console.error("Google sign-in error:", result.error);

@@ -16,6 +16,7 @@ type SignupStep = "email" | "otp" | "password" | "profile";
 const StudentSignupPage = () => {
   const router = useRouter();
   const [googleUserData, setGoogleUserData] = useState<any>(null);
+  const [isGoogleAuth, setIsGoogleAuth] = useState(false);
   const [currentStep, setCurrentStep] = useState<SignupStep>("email");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -31,6 +32,7 @@ const StudentSignupPage = () => {
   // Handle Google OAuth success
   const handleGoogleSuccess = async (session: any) => {
     console.log("Google OAuth success called with session:", session);
+    setIsGoogleAuth(true);
     setLoading(true);
     setError("");
 
@@ -82,6 +84,12 @@ const StudentSignupPage = () => {
   const handleEmailSubmit = async () => {
     if (!email.trim()) {
       setError("Имэйл хаягаа оруулна уу");
+      return;
+    }
+
+    // Prevent OTP flow if using Google OAuth
+    if (isGoogleAuth) {
+      console.log("Skipping email submit - using Google OAuth");
       return;
     }
 
