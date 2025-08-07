@@ -375,14 +375,16 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
                       ref={(el) => {
                         buttonRefs.current[index] = el;
                       }}
-                      onClick={() => handleCategoryClick(category.id)}
+                      onClick={() => handleCategoryClick(category._id)}
                       className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all duration-300 whitespace-nowrap relative flex-shrink-0 ${
-                        selectedCategory === category.id
+                        selectedCategory === category._id
                           ? "text-white font-semibold"
                           : "text-white hover:bg-black/10"
                       }`}
                     >
-                      <span className="text-base w-5 h-5">{category.icon}</span>
+                      <span className="text-base w-5 h-5">
+                        {categoryIcons[category.categoryName] || defaultIcon}
+                      </span>
                       <span className="text-sm font-medium">
                         {category.categoryName}
                         {selectedSubCategory &&
