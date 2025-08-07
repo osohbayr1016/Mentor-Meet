@@ -106,6 +106,7 @@ const MentorCalendar = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+
       if (res.data?.calendarId) {
         localStorage.setItem("calendarId", res.data.calendarId);
       }

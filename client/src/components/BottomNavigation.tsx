@@ -6,12 +6,14 @@ import { useAuth } from "../app/_components/MentorUserProvider";
 import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import axios from "axios";
+import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog";
 
 interface StudentData {
   studentId: string;
   email: string;
   firstName: string;
   lastName: string;
+  _id: string;
 }
 
 const BottomNavigation = () => {
@@ -20,6 +22,8 @@ const BottomNavigation = () => {
   const [student, setStudent] = useState<StudentData | null>(null);
   const [notification, setNotification] = useState([]);
   const [unRead, setUnRead] = useState(false);
+  const [booking, setBooking] = useState<any>();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const params = useParams();
   const mentorId = params.id as string;
   // Check for student authentication
@@ -29,15 +33,14 @@ const BottomNavigation = () => {
         const studentToken = localStorage.getItem("studentToken");
         const studentUserStr = localStorage.getItem("studentUser");
         console.log(studentUserStr, "student id");
-        
 
         if (studentToken && studentUserStr) {
-          // const studentData = JSON.parse(studentUserStr) as StudentData;
-          const studentDataRaw = JSON.parse(studentUserStr);
-const studentData: StudentData = {
-  ...studentDataRaw,
-  studentId: studentDataRaw.id, 
-};
+          const studentData = JSON.parse(studentUserStr) as StudentData;
+          // const studentDataRaw = JSON.parse(studentUserStr);
+          // const studentData: StudentData = {
+          //   ...studentDataRaw,
+          //   studentId: studentDataRaw.id,
+          // };
 
           setStudent(studentData);
         } else {
@@ -141,19 +144,16 @@ const studentData: StudentData = {
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      const userId = mentor?.mentorId
+      const userId = mentor?.mentorId;
 
       if (!userId) return;
 
       try {
-
-        console.log(mentor?.mentorId, "id")
+        console.log(mentor?.mentorId, "id");
         const response = await axios.get(
           `http://localhost:8000/notification/${userId}`
         );
         const data: any = response.data;
-
-        console.log("Notifications fetched:", data.notification);
 
         setNotification(data.notification);
         setUnRead(data.notification?.some((n: any) => !n.checked));
@@ -164,6 +164,21 @@ const studentData: StudentData = {
 
     fetchNotifications();
   }, [mentor]);
+
+  const handleBellClick = async () => {
+    setIsDialogOpen(true);
+    const userId = mentor?.mentorId;
+    if (!userId) return;
+    try {
+      const response: any = await axios.get(
+        `http://localhost:8000/get-booking/${userId}`
+      );
+
+      setBooking(response.data.data);
+    } catch (error) {
+      console.error("Failed to fetch booking:", error);
+    }
+  };
 
   if (hideNavigationPages.includes(pathname)) {
     return null;
@@ -209,36 +224,37 @@ const studentData: StudentData = {
             >
               {thirdButton.text}
             </Link>
-            {/* {isLoggedIn && (
-              <div className="flex items-center">
-                <button className="p-2 text-white/70 hover:text-white transition-colors">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                  </svg>
-                </button>
-              </div>
-            )} */}
 
-            {isLoggedIn && (
-              <button className="relative p-2 text-white/70 hover:text-white transition-colors">
-                {unRead && (
-                  <span className="absolute top-1 right-1 w-3 h-3 bg-red-600 rounded-full" />
+            <button
+              onClick={() => handleBellClick()}
+              className="relative p-2 text-white/70 hover:text-white transition-colors"
+            >
+              {unRead && (
+                <span className="absolute top-1 right-1 w-3 h-3 bg-red-600 rounded-full" />
+              )}
+              <Bell size={20} />
+            </button>
+
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogContent className="max-w-md mx-auto p-4 bg-white rounded shadow-lg">
+                <DialogTitle className="text-lg font-semibold mb-2">
+                  Захиалгууд
+                </DialogTitle>
+                {booking?.length > 0 ? (
+                  <ul className="space-y-2">
+                    {booking?.map((b: any, index: number) => (
+                      <li key={index} className="border p-2 rounded text-black">
+                        <p>Цаг: {b?.meetingTime}</p>
+                        <p>Төлөв: {b?.status}</p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500">Захиалга алга байна.</p>
                 )}
-                <Bell size={20} />
-              </button>
-            )}
+              </DialogContent>
+            </Dialog>
           </div>
-
         </div>
       </div>
     </div>
