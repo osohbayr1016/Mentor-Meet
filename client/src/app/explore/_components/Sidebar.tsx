@@ -32,9 +32,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <div className="w-60 h-full p-6 flex flex-col overflow-hidden">
+    <div className="w-70 h-full p-6 flex flex-col overflow-hidden">
       {/* Logo */}
-      <div className="flex items-center gap-3 mb-8 flex-shrink-0">
+      <div className="flex justify-center items-center gap-3 mb-8 pt-[50px]">
         <div className="flex gap-3 items-center justify-center">
           <Image
             src="https://res.cloudinary.com/dg2soqaow/image/upload/v1753978167/image_723_nuhvy3.png"

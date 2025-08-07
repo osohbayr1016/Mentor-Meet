@@ -24,9 +24,9 @@ export interface StudentProfile {
 export interface Feedback {
   studentEmail: string;
   mentorId: string;
-  rating: number; // 1-5
+  rating: number; 
   comment?: string;
-  date: string; // ISO date string
+  date: string; 
 }
 
 export interface MentorInfo {
@@ -88,7 +88,7 @@ export const getAiReply = async (
   const messageLower = userMessage.toLowerCase();
 
   try {
-    // Хэрвээ гомдол, санал байвал шууд тусгай хариу буцаах
+  
     if (isComplaintOrFeedback(messageLower)) {
       return getComplaintResponse();
     }
@@ -147,28 +147,26 @@ const getRelevantMentors = (
   const matchedCategory = getCategoryFromMessage(message);
   if (!mentors) return [];
 
-  // Хэрэв category олдсон бол тухайн category-ийн менторуудыг эхэнд тавих
+
   if (matchedCategory) {
     const categoryMentors = mentors.filter(
       (m) =>
         m.category?.categoryId?.toLowerCase() === matchedCategory.toLowerCase()
     );
 
-    // Category-ийн менторууд байвал тэднийг эхэнд тавих
+
     if (categoryMentors.length > 0) {
       return categoryMentors.slice(0, 3);
     }
   }
 
-  // Хэрэв category олдохгүй эсвэл тухайн category-ийн ментор байхгүй бол
-  // бүх менторуудаас хамгийн тохирохыг сонгох
   const messageLower = message.toLowerCase();
 
-  // Менторуудыг тохирох байдлаар эрэмбэлэх
+ 
   const scoredMentors = mentors.map((mentor) => {
     let score = 0;
 
-    // Професс, bio, category-д keyword хайх
+ 
     const mentorText = [
       mentor.profession || "",
       mentor.bio || "",
@@ -178,11 +176,10 @@ const getRelevantMentors = (
       .join(" ")
       .toLowerCase();
 
-    // Keyword-үүдийг шалгах - илүү ухаалаг оноо өгөх
     for (const [category, keywords] of Object.entries(categoryKeywordMap)) {
       for (const keyword of keywords) {
         if (messageLower.includes(keyword) && mentorText.includes(keyword)) {
-          // Яг тохирох keyword олдсон бол илүү өндөр оноо
+         
           if (keyword.length > 3) {
             score += 3;
           } else {
@@ -192,23 +189,20 @@ const getRelevantMentors = (
       }
     }
 
-    // Category тохирсон бол нэмэлт оноо
     if (
       matchedCategory &&
       mentor.category?.categoryId?.toLowerCase() ===
         matchedCategory.toLowerCase()
     ) {
-      score += 10; // Category тохирсон бол хамгийн өндөр оноо
+      score += 10; 
     }
 
-    // Менторын туршлагатай бол нэмэлт оноо
     if (mentor.experience?.careerDuration) {
       const years = parseInt(mentor.experience.careerDuration);
       if (years >= 5) score += 2;
       else if (years >= 3) score += 1;
     }
 
-    // Дундаж үнэлгээ өндөр бол нэмэлт оноо
     if (mentor.averageRating && mentor.averageRating >= 4.0) {
       score += 1;
     }
@@ -216,7 +210,7 @@ const getRelevantMentors = (
     return { mentor, score };
   });
 
-  // Оноогоор эрэмбэлээд хамгийн тохирох 3-г авах
+
   return scoredMentors
     .sort((a, b) => b.score - a.score)
     .slice(0, 3)

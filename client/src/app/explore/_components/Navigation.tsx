@@ -410,18 +410,20 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
       </div>
 
       {/* Main Content Area with Sidebar and Mentor Cards */}
-      <div className="flex-1 px-[150px] pt-[30px]">
-        <div className="w-full h-[500px] border-gray-400/50 border-1 backdrop-blur-md bg-black/30 flex rounded-[20px]">
+      <div className="flex-1 px-[150px] pt-[30px] flex justify-center">
+        <div className="w-300 h-200 flex rounded-[20px]">
           {/* Left Sidebar */}
+        <div className=" border-none backdrop-blur-md bg-black/30 rounded-l-[40px]">
           <Sidebar
             selectedCategory={selectedCategory}
             onSubCategorySelect={handleSubCategorySelect}
             selectedSubCategory={selectedSubCategory}
             categories={categories}
           />
+       </div>
 
           {/* Right Content Area */}
-          <div className="flex-1 h-full flex flex-col">
+          <div className="flex-1 h-full flex flex-col  backdrop-blur-md bg-[#33333366] rounded-r-[40px]  ">
             <MentorCards
               categories={categories}
               selectedCategory={selectedCategory}
