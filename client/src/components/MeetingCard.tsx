@@ -6,8 +6,8 @@ import { Button } from "./ui/button";
 
 interface Meeting {
   id: string;
-  date: string;               // ISO формат: "2025-08-07T10:00:00Z"
-  day?: string;               // ✅ optional болгосон
+  date: string;               
+  day?: string;              
   time: string;
   studentEmail: string;
   status: "scheduled" | "cancelled" | "completed";
@@ -74,7 +74,6 @@ const MeetingCard: React.FC<MeetingCardProps> = ({
               Цуцлах
             </button>
           )}
-   
 
           {status === "completed" && (
             <p className="text-green-400 font-semibold text-sm text-center">

@@ -138,21 +138,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
     
    
       </div>
-{/* 
 
-      <div className="space-y-2 text-white mb-4">
-        <p>
-          <span className="text-gray-400">Уулзалтын өдөр:</span>{" "}
-          {formatDate(booking.date)}
-        </p>
-        <p>
-          <span className="text-gray-400">Уулзалтын цаг:</span> {booking.time}
-        </p>
-        <p>
-          <span className="text-gray-400">Үнэ:</span>{" "}
-          {booking.price.toLocaleString()}₮
-        </p>
-      </div> */}
 
       {showActions && (
         <div className="flex gap-2">
