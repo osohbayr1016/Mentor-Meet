@@ -78,8 +78,8 @@ const MentorCard: React.FC<MentorCardProps> = ({ mentor, onClick }) => {
                   {mentor.subCategory}
                 </span>
               )} */}
-            </div>
-          )} */}
+          {/* </div> */}
+          {/* )}  */}
 
           {/* Rating and Price */}
         </div>
