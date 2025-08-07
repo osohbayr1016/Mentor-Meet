@@ -335,7 +335,7 @@ const BottomNavigation = () => {
     }
   }, [isNotificationOpen, mentor]);
 
-  if (hideNavigationPages.includes(pathname)) {
+  if (hideNavigationPages.includes(pathname) || pathname.startsWith('/admin')) {
     return null;
   }
 
