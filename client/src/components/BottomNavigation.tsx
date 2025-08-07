@@ -196,6 +196,7 @@ const BottomNavigation = () => {
     "/student-login",
     "/mentor-resPass",
     "/student-resPass",
+    "/payment-successfully",
   ];
 
   // Show notification bell only when either mentor or student is logged in
@@ -446,7 +447,7 @@ const BottomNavigation = () => {
                   </button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className="w-80 p-0 shadow-2xl bg-[#333333]/60 backdrop-blur-md border border-white/30 rounded-[20px]"
+                  className="w-80 p-0 shadow-2xl bg-[#333333]/60 backdrop-blur-md border border-white/30 rounded-[20px] z-50"
                   align="end"
                   side="top"
                   sideOffset={8}

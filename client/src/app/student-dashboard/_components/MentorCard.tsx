@@ -66,7 +66,7 @@ const MentorCard: React.FC<MentorCardProps> = ({ booking, onCancel }) => {
     //     </div>
     //   </div>
     // </div>
-    <div className="bg-black/40 rounded-[20px] p-4 w-[360px] h-[220px] flex flex-col gap-8 ">
+    <div className="bg-black/40 rounded-[20px] p-4 w-[360px]  flex flex-col gap-8 ">
       <div className="space-y-2 text-white  ">
         <img
           src={
@@ -76,20 +76,32 @@ const MentorCard: React.FC<MentorCardProps> = ({ booking, onCancel }) => {
           alt="Mentor"
           className="w-16 h-16 rounded-full object-cover"
         />
-        <div className="flex flex-row gap-30">
+        <div className="flex flex-row gap-8 ">
           <p className="flex flex-col">
             <span className="text-gray-400 text-[12px]">Уулзалтын өдөр:</span>
-            <span className="font-semibold"></span>
-            <span className="font-semibold"></span>
+            <span className="font-semibold">
+              {new Date(booking.date).toLocaleDateString("mn-MN", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                weekday: "long",
+              })}
+            </span>
           </p>
           <p className="flex flex-col">
             <span className="text-gray-400 text-[12px]">Уулзалтын цаг:</span>
-            <span className="font-semibold"></span>
+            <span className="font-semibold">{booking.time}</span>
           </p>
         </div>
         <p className="flex flex-col">
-          <span className="text-gray-400 text-[12px]">Суралцагч:</span>
-          <span className="font-semibold"></span>
+          <span className="text-gray-400 text-[12px]">Ментор:</span>
+          <span className="font-semibold">{`${booking.mentorId.firstName} ${booking.mentorId.lastName}`}</span>
+        </p>
+        <p className="flex flex-col">
+          <span className="text-gray-400 text-[12px]">Үнэ:</span>
+          <span className="font-semibold text-green-400">
+            {booking.price?.toLocaleString()}₮
+          </span>
         </p>
       </div>
     </div>
