@@ -5,5 +5,5 @@ import { creatMessage } from "../controller/chat";
 export const chatRouter = Router();
 
 chatRouter.post("/createMessage", createMessage);
-chatRouter.get("/getMessage", getMessages);
+chatRouter.get("/getMessages", getMessages);
 chatRouter.post("/create", creatMessage);

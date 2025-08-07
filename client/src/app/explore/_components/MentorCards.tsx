@@ -75,14 +75,30 @@ const MentorCards: React.FC<MentorCardsProps> = ({
           params.subCategory = selectedSubCategory;
         }
 
-        const API_BASE_URL =
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+        const API_BASE_URL = "https://mentor-meet-h0tx.onrender.com";
 
-        const response = await axios.get<Mentor[]>(`${API_BASE_URL}/mentors`, {
-          params,
+        // Try with fetch instead of axios
+        const queryString = new URLSearchParams(params).toString();
+        const url = `${API_BASE_URL}/mentors${
+          queryString ? `?${queryString}` : ""
+        }`;
+
+        console.log("🔗 Fetching from:", url);
+
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
         });
 
-        setMentors(response.data as Mentor[]);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("✅ Data received:", data);
+        setMentors(data as Mentor[]);
       } catch (error) {
         console.error("Error fetching mentors:", error);
         setError("Менторуудыг авахад алдаа гарлаа.");

@@ -33,20 +33,29 @@ const StudentSignupPage = () => {
 
     try {
       // Check if student already exists with this email
-      const checkResponse = await fetch(`http://localhost:8000/Checkemail`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: userData.email }),
-      });
+      const checkResponse = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_API_URL ||
+          "https://mentor-meet-h0tx.onrender.com"
+        }/Checkemail`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: userData.email }),
+        }
+      );
 
       const checkData = await checkResponse.json();
 
       if (checkResponse.ok) {
         // Student doesn't exist, create new student with Google data
         const signupResponse = await fetch(
-          "http://localhost:8000/StudentNameNumber",
+          `${
+            process.env.NEXT_PUBLIC_API_URL ||
+            "https://mentor-meet-h0tx.onrender.com"
+          }/StudentNameNumber`,
           {
             method: "POST",
             headers: {
@@ -107,13 +116,19 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:8000/Checkemail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
+      const response = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_API_URL ||
+          "https://mentor-meet-h0tx.onrender.com"
+        }/Checkemail`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
 
       const data = await response.json();
 
@@ -140,13 +155,19 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:8000/checkOtp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, code: otp }),
-      });
+      const response = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_API_URL ||
+          "https://mentor-meet-h0tx.onrender.com"
+        }/checkOtp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, code: otp }),
+        }
+      );
 
       const data = await response.json();
 
@@ -183,13 +204,19 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:8000/createPassword", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_API_URL ||
+          "https://mentor-meet-h0tx.onrender.com"
+        }/createPassword`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       const data = await response.json();
 
@@ -221,13 +248,19 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:8000/StudentNameNumber", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, nickname, phoneNumber }),
-      });
+      const response = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_API_URL ||
+          "https://mentor-meet-h0tx.onrender.com"
+        }/StudentNameNumber`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, nickname, phoneNumber }),
+        }
+      );
 
       const data = await response.json();
 
