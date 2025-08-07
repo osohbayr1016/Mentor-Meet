@@ -55,61 +55,43 @@ export default function AdminReportsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState("30d");
   const [selectedReport, setSelectedReport] = useState("overview");
+  const [lastUpdated, setLastUpdated] = useState<string>("");
 
-  // Mock data for demonstration
-  useEffect(() => {
-    const mockData: ReportData = {
-      userGrowth: [
-        { month: "Jan", students: 120, mentors: 25 },
-        { month: "Feb", students: 145, mentors: 28 },
-        { month: "Mar", students: 180, mentors: 32 },
-        { month: "Apr", students: 220, mentors: 38 },
-        { month: "May", students: 280, mentors: 45 },
-        { month: "Jun", students: 340, mentors: 52 },
-      ],
-      revenueData: [
-        { month: "Jan", revenue: 2400000, bookings: 48 },
-        { month: "Feb", revenue: 3200000, bookings: 64 },
-        { month: "Mar", revenue: 4100000, bookings: 82 },
-        { month: "Apr", revenue: 5200000, bookings: 104 },
-        { month: "May", revenue: 6800000, bookings: 136 },
-        { month: "Jun", revenue: 8500000, bookings: 170 },
-      ],
-      topMentors: [
-        { name: "Доктор Сарангэрэл", bookings: 45, revenue: 6750000, rating: 4.9 },
-        { name: "Профессор Энхбаяр", bookings: 38, revenue: 7600000, rating: 4.8 },
-        { name: "Магистр Оюунаа", bookings: 32, revenue: 3840000, rating: 4.7 },
-        { name: "Доктор Батбаяр", bookings: 28, revenue: 4200000, rating: 4.6 },
-        { name: "Профессор Цэцэг", bookings: 25, revenue: 3750000, rating: 4.8 },
-      ],
-      categoryStats: [
-        { category: "Математик", bookings: 85, revenue: 12750000, percentage: 35 },
-        { category: "Физик", bookings: 62, revenue: 9300000, percentage: 25 },
-        { category: "Хими", bookings: 48, revenue: 7200000, percentage: 20 },
-        { category: "Биологи", bookings: 35, revenue: 5250000, percentage: 15 },
-        { category: "Бусад", bookings: 12, revenue: 1800000, percentage: 5 },
-      ],
-      performanceMetrics: {
-        totalSessions: 1247,
-        completionRate: 94.2,
-        averageSessionDuration: 75,
-        customerSatisfaction: 4.7,
-        repeatBookingRate: 68.5,
-        averageResponseTime: 12,
-      },
-    };
+  const fetchReportData = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams({
+        period: selectedPeriod,
+        type: selectedReport,
+      });
 
-    setTimeout(() => {
-      setReportData(mockData);
+      const response = await fetch(`/api/admin/reports?${params}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        setReportData(result.data);
+        setLastUpdated(result.meta.generatedAt);
+      }
+    } catch (error) {
+      console.error("Failed to fetch report data:", error);
+    } finally {
       setLoading(false);
-    }, 1000);
-  }, [selectedPeriod]);
+    }
+  };
+
+  const handleRefresh = () => {
+    fetchReportData();
+  };
+
+  useEffect(() => {
+    fetchReportData();
+  }, [selectedPeriod, selectedReport]);
 
   const formatCurrency = (amount: number) => {
     return `₮ ${amount.toLocaleString("en-US")}`;
   };
 
-  if (loading) {
+  if (loading && !reportData) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -117,7 +99,19 @@ export default function AdminReportsPage() {
     );
   }
 
-  if (!reportData) return null;
+  if (!reportData) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <p className="text-red-800">Тайлангийн мэдээлэл ачаалахад алдаа гарлаа.</p>
+        <button 
+          onClick={handleRefresh}
+          className="mt-2 text-red-600 hover:text-red-800 underline"
+        >
+          Дахин оролдох
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -142,9 +136,13 @@ export default function AdminReportsPage() {
             <Download className="h-4 w-4 mr-2" />
             Экспорт
           </button>
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Шинэчлэх
+          <button 
+            onClick={handleRefresh}
+            disabled={loading}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            {loading ? "Шинэчилж байна..." : "Шинэчлэх"}
           </button>
         </div>
       </div>

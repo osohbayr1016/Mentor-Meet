@@ -37,84 +37,56 @@ interface PaymentStats {
 
 export default function AdminPaymentsPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [stats, setStats] = useState<PaymentStats>({
-    totalRevenue: 45280000,
-    monthlyRevenue: 8560000,
-    totalTransactions: 1247,
-    successRate: 98.2,
-    pendingAmount: 240000,
-    refundedAmount: 180000,
-  });
+  const [stats, setStats] = useState<PaymentStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [dateRange, setDateRange] = useState("7d");
+  const [dateRange, setDateRange] = useState("30d");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [lastUpdated, setLastUpdated] = useState<string>("");
 
-  // Mock data for demonstration
-  useEffect(() => {
-    const mockPayments: Payment[] = [
-      {
-        id: "1",
-        studentName: "Болд Батбаяр",
-        mentorName: "Доктор Сарангэрэл",
-        amount: 150000,
-        status: "completed",
-        method: "card",
-        date: "2025-01-07T10:30:00Z",
-        bookingId: "BK001",
-        transactionId: "TXN123456789",
-      },
-      {
-        id: "2",
-        studentName: "Цэцэг Мөнхбат",
-        mentorName: "Профессор Энхбаяр",
-        amount: 200000,
-        status: "pending",
-        method: "bank",
-        date: "2025-01-07T09:15:00Z",
-        bookingId: "BK002",
-        transactionId: "TXN123456790",
-      },
-      {
-        id: "3",
-        studentName: "Ганбат Төмөр",
-        mentorName: "Магистр Оюунаа",
-        amount: 120000,
-        status: "completed",
-        method: "wallet",
-        date: "2025-01-06T14:20:00Z",
-        bookingId: "BK003",
-        transactionId: "TXN123456791",
-      },
-      {
-        id: "4",
-        studentName: "Нарангэрэл Баяр",
-        mentorName: "Доктор Сарангэрэл",
-        amount: 150000,
-        status: "failed",
-        method: "card",
-        date: "2025-01-06T11:45:00Z",
-        bookingId: "BK004",
-        transactionId: "TXN123456792",
-      },
-      {
-        id: "5",
-        studentName: "Мөнхзул Батсайхан",
-        mentorName: "Профессор Энхбаяр",
-        amount: 180000,
-        status: "refunded",
-        method: "card",
-        date: "2025-01-05T16:30:00Z",
-        bookingId: "BK005",
-        transactionId: "TXN123456793",
-      },
-    ];
+  const fetchPayments = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: "20",
+        ...(statusFilter !== "all" && { status: statusFilter }),
+        ...(searchTerm && { search: searchTerm }),
+        dateRange,
+      });
 
-    setTimeout(() => {
-      setPayments(mockPayments);
+      const response = await fetch(`/api/admin/payments?${params}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        setPayments(result.data.payments);
+        setStats({
+          totalRevenue: result.data.stats.totalRevenue,
+          monthlyRevenue: result.data.stats.totalRevenue, // Approximation
+          totalTransactions: result.data.stats.totalTransactions,
+          successRate: result.data.stats.successRate,
+          pendingAmount: result.data.stats.pendingAmount,
+          refundedAmount: result.data.stats.refundedAmount,
+        });
+        setTotalPages(result.data.pagination.totalPages);
+        setLastUpdated(result.data.lastUpdated);
+      }
+    } catch (error) {
+      console.error("Failed to fetch payments:", error);
+    } finally {
       setLoading(false);
-    }, 1000);
-  }, []);
+    }
+  };
+
+  useEffect(() => {
+    fetchPayments();
+  }, [currentPage, statusFilter, searchTerm, dateRange]);
+
+  const handleRefresh = () => {
+    fetchPayments();
+  };
 
   const formatCurrency = (amount: number) => {
     return `₮ ${amount.toLocaleString("en-US")}`;
@@ -180,10 +152,24 @@ export default function AdminPaymentsPage() {
     return matchesSearch && matchesStatus;
   });
 
-  if (loading) {
+  if (loading && !stats) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <p className="text-red-800">Төлбөрийн мэдээлэл ачаалахад алдаа гарлаа.</p>
+        <button 
+          onClick={handleRefresh}
+          className="mt-2 text-red-600 hover:text-red-800 underline"
+        >
+          Дахин оролдох
+        </button>
       </div>
     );
   }
@@ -201,9 +187,13 @@ export default function AdminPaymentsPage() {
             <Download className="h-4 w-4 mr-2" />
             Экспорт
           </button>
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Шинэчлэх
+          <button 
+            onClick={handleRefresh}
+            disabled={loading}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            {loading ? "Шинэчилж байна..." : "Шинэчлэх"}
           </button>
         </div>
       </div>

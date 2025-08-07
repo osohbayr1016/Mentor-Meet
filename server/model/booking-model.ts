@@ -46,6 +46,23 @@ const BookingSchema = new Schema(
       type: String,
       required: true,
     },
+    // Google Meet integration fields
+    meetingLink: {
+      type: String,
+      required: false,
+    },
+    calendarEventId: {
+      type: String,
+      required: false,
+    },
+    meetingStartTime: {
+      type: Date,
+      required: false,
+    },
+    meetingEndTime: {
+      type: Date,
+      required: false,
+    },
   },
   {
     timestamps: true, // createdAt, updatedAt автоматаар нэмэгдэнэ
