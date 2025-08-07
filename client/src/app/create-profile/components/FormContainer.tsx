@@ -115,21 +115,9 @@ const FormContainer = () => {
 
   // Map professional field to category ID
   const getCategoryId = (professionalField: string): string => {
-    // Map frontend professional fields to backend category names
-    const fieldMapping: { [key: string]: string } = {
-      technology: "технологи",
-      education: "боловсрол",
-      healthcare: "эрүүл мэнд",
-      business: "бизнес",
-      engineering: "инженерчлэл",
-      design: "дизайн",
-      marketing: "маркетинг",
-      finance: "санхүү",
-    };
-
-    const categoryName = fieldMapping[professionalField];
+    // Find category by name directly since we're now using category names as values
     const category = categories.find((cat) =>
-      cat.categoryName.toLowerCase().includes(categoryName?.toLowerCase() || "")
+      cat.categoryName === professionalField
     );
 
     // Return category ID or default to first category
@@ -359,6 +347,9 @@ const FormContainer = () => {
         return;
       }
 
+      // Get the selected category ID
+      const selectedCategoryId = getCategoryId(formData.professionalField);
+      
       // Call Step 3 API
       const response = await fetch(
         "http://localhost:8000/mentorProfile/step3",
@@ -371,6 +362,7 @@ const FormContainer = () => {
           body: JSON.stringify({
             category: {
               price: parseInt(formData.yearExperience) || 0,
+              categoryId: selectedCategoryId,
             },
             bankAccount: formData.bankAccount,
           }),
@@ -478,6 +470,7 @@ const FormContainer = () => {
                 onNext={handleNext}
                 message={message}
                 isLoading={isLoading || isUploadingImage}
+                categories={categories}
               />
             )}
             {currentStep === 1 && (

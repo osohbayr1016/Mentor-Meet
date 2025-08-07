@@ -10,7 +10,10 @@ export const MentorCreateProfileStep3 = async (req: Request, res: Response): Pro
     const updatedMentor = await MentorModel.findByIdAndUpdate(
       { _id: mentorId },
       {
-        category: { price: category.price },
+        category: { 
+          price: category.price,
+          categoryId: category.categoryId 
+        },
         bankAccount: parsedBankAccount,
         updatedAt: new Date(),
       },

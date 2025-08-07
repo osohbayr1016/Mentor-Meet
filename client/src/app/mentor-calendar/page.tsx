@@ -162,8 +162,8 @@ const MentorCalendar = () => {
               </p>
             </div>
 
-            <div className="w-full h-full flex flex-col justify-center items-center px-8">
-              <div className="w-full max-w-[500px] flex flex-col gap-[20px]">
+            <div className="w-full h-full flex flex-col justify-center items-center px-8 overflow-y-auto">
+              <div className="w-full max-w-[500px] flex flex-col gap-[20px] py-4">
                 {[week1Dates, week2Dates].map((week, i) => (
                   <div key={i} className="flex flex-col gap-[20px]">
                     <p className="font-[500] text-[16px] text-white text-center">
