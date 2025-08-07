@@ -37,7 +37,7 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
     "upcoming" | "history" | "mentor-profile"
-  >("upcoming");
+  >("mentor-profile");
   const [totalSpent, setTotalSpent] = useState(0);
 
   // Get student ID from localStorage
@@ -255,7 +255,7 @@ const StudentDashboard = () => {
                   <div className="w-72 flex flex-col h-full justify-between">
                     <div className="space-y-2">
                       <button
-                        onClick={() => setActiveTab("upcoming")}
+                      onClick={() => setActiveTab("mentor-profile")}
                         className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
                           activeTab === "upcoming"
                             ? "bg-gray-600 text-white"
@@ -273,16 +273,6 @@ const StudentDashboard = () => {
                         }`}
                       >
                         Уулзалтын түүх
-                      </button>
-                      <button
-                        onClick={() => setActiveTab("mentor-profile")}
-                        className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
-                          activeTab === "mentor-profile"
-                            ? "bg-gray-600 text-white"
-                            : "text-gray-300 hover:bg-gray-700/50"
-                        }`}
-                      >
-                        Ментор профиль
                       </button>
                     </div>
 
@@ -341,15 +331,15 @@ const StudentDashboard = () => {
                     </div>
 
                     {/* Content Section */}
-                    <div className="flex-1 flex flex-col">
+                    <div className="overflow-y-auto">
                       {activeTab === "mentor-profile" ? (
                         // Mentor Profile Section
-                        <div className="flex-1 flex flex-col">
+                        <div className="flex-1 flex flex-col ">
                           <h3 className="text-white text-lg font-semibold mb-4">
                             Таны товлосон уулзалтууд:
                           </h3>
 
-                          <div className="flex gap-4 flex-1 overflow-x-auto">
+                          <div className="flex gap-4 flex-1 overflow-x-auto  ">
                             {(() => {
                               const allBookings = [
                                 ...(bookings?.upcoming || []),
@@ -383,14 +373,14 @@ const StudentDashboard = () => {
                         </div>
                       ) : (
                         // Meetings Section
-                        <div className="flex-1 flex flex-col">
-                          <h3 className="text-white text-lg font-semibold mb-4">
+                        <div className="flex-1 flex flex-col  ">
+                          <h3  className="text-white text-lg font-semibold mb-4">
                             {activeTab === "upcoming"
                               ? "Таны товлосон уулзалтууд:"
                               : "Уулзалтын түүх:"}
                           </h3>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1  ">
                             {(() => {
                               const currentBookings =
                                 activeTab === "upcoming"
