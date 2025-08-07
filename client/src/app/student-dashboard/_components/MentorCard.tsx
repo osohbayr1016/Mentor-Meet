@@ -187,47 +187,47 @@ const MentorCard: React.FC<MentorCardProps> = ({
             <span className="text-sm font-medium">Google Meet уулзалт</span>
           </div>
           
-          <div className="flex gap-2">
-            <button
-              onClick={handleJoinMeeting}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
-            >
-              <Video size={16} />
-              Уулзалтанд орох
-            </button>
-            
-            <button
-              onClick={handleCopyLink}
-              className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition-colors flex items-center justify-center"
-              title="Холбоос хуулах"
-            >
-              {copied ? (
-                <CheckCircle size={16} className="text-green-400" />
-              ) : (
-                <Copy size={16} />
-              )}
-            </button>
-          </div>
+                           <div className="flex gap-3">
+                   <button
+                     onClick={handleJoinMeeting}
+                     className="flex-1 bg-white/10 hover:bg-blue-500/20 backdrop-blur-md border border-white/20 hover:border-blue-400/40 text-white px-4 py-3 rounded-full text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 flex items-center justify-center gap-2"
+                   >
+                     <Video size={16} />
+                     Уулзалтанд орох
+                   </button>
+                   
+                   <button
+                     onClick={handleCopyLink}
+                     className="bg-white/10 hover:bg-green-500/20 backdrop-blur-md border border-white/20 hover:border-green-400/40 text-white px-4 py-3 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-green-500/10 flex items-center justify-center"
+                     title="Холбоос хуулах"
+                   >
+                     {copied ? (
+                       <CheckCircle size={16} className="text-green-400" />
+                     ) : (
+                       <Copy size={16} />
+                     )}
+                   </button>
+                 </div>
         </div>
       )}
 
-      {/* Action Buttons */}
-      <div className="flex gap-2 pt-2">
+      {/* Action Buttons - Glassmorphism Design */}
+      <div className="flex gap-3 pt-4">
         {booking.status === "PENDING" && (
           <>
             <button
               onClick={() => onCancel(booking._id)}
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+              className="flex-1 bg-white/10 hover:bg-red-500/20 backdrop-blur-md border border-white/20 hover:border-red-400/40 text-white py-3 px-4 rounded-full text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-red-500/10"
             >
               Цуцлах
             </button>
             
-            {/* Join Meeting Button */}
+            {/* Join Meeting Button - Glassmorphism */}
             {onGenerateTestMeetLink && (
               <button
                 onClick={() => onGenerateTestMeetLink(booking)}
                 disabled={isGeneratingMeetLink}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                className="flex-1 bg-white/10 hover:bg-blue-500/20 backdrop-blur-md border border-white/20 hover:border-blue-400/40 text-white py-3 px-4 rounded-full text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Video size={16} />
                 {isGeneratingMeetLink ? "Холбогдож байна..." : "Уулзалтанд орох"}
@@ -237,8 +237,8 @@ const MentorCard: React.FC<MentorCardProps> = ({
         )}
         
         {booking.status === "CONFIRMED" && !booking.meetingLink && (
-          <div className="flex gap-2 w-full">
-            <div className="flex-1 bg-yellow-600/20 border border-yellow-600/40 text-yellow-300 py-2 px-4 rounded-lg text-sm text-center">
+          <div className="flex gap-3 w-full">
+            <div className="flex-1 bg-yellow-500/10 backdrop-blur-md border border-yellow-400/30 text-yellow-200 py-3 px-4 rounded-full text-sm text-center font-medium">
               Google Meet холбоос үүсгэгдэж байна...
             </div>
             
@@ -247,7 +247,7 @@ const MentorCard: React.FC<MentorCardProps> = ({
               <button
                 onClick={() => onGenerateTestMeetLink(booking)}
                 disabled={isGeneratingMeetLink}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                className="bg-white/10 hover:bg-blue-500/20 backdrop-blur-md border border-white/20 hover:border-blue-400/40 text-white py-3 px-4 rounded-full text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Video size={16} />
                 {isGeneratingMeetLink ? "Холбогдож байна..." : "Уулзалтанд орох"}
