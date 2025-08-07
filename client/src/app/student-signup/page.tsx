@@ -4,10 +4,12 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import FirstStudentSignup from "./_components/FirstStudentSignup";
 import SecondStudentSignup from "./_components/SecondStudentSignup";
 import ThirdStudentSignUp from "./_components/ThirdStudentSignUp";
 import FourthStudentSignup from "./_components/FourthStudentSignup";
+import GoogleOAuthButton from "../../components/GoogleOAuthButton";
 
 type SignupStep = "email" | "otp" | "password" | "profile";
 
@@ -26,82 +28,53 @@ const StudentSignupPage = () => {
   const [nickname, setNickname] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
 
-  // Handle Google OAuth sign-in
-  const handleGoogleSignIn = async (userData: any) => {
+  // Handle Google OAuth success
+  const handleGoogleSuccess = async (session: any) => {
     setLoading(true);
     setError("");
 
     try {
       // Check if student already exists with this email
-      const checkResponse = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/Checkemail`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: userData.email }),
-        }
-      );
+      const API_BASE_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const checkResponse = await fetch(`${API_BASE_URL}/Checkemail`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: session.user?.email }),
+      });
 
       const checkData = await checkResponse.json();
 
       if (checkResponse.ok) {
-        // Student doesn't exist, create new student with Google data
-        const signupResponse = await fetch(
-          `${
-            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-          }/StudentNameNumber`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: userData.email,
-              nickname: userData.name?.split(" ")[0] || "Student",
-              phoneNumber: "", // Will be filled in profile step
-              googleAuth: true,
-              googleData: {
-                name: userData.name,
-                image: userData.image,
-                accessToken: userData.accessToken,
-              },
-            }),
-          }
-        );
-
-        const signupData = await signupResponse.json();
-
-        if (signupResponse.ok) {
-          // Auto-login successful
-          const studentData = {
-            email: userData.email,
-            nickname: userData.name?.split(" ")[0] || "Student",
-            phoneNumber: "",
-            image: userData.image,
-          };
-
-          localStorage.setItem("studentUser", JSON.stringify(studentData));
-
-          setGoogleUserData(userData);
-          setEmail(userData.email);
-          setCurrentStep("profile"); // Skip to profile step
-        } else {
-          setError(signupData.message || "Google-р бүртгүүлэхэд алдаа гарлаа");
-        }
+        // Student doesn't exist, proceed with Google signup
+        setGoogleUserData({
+          email: session.user?.email,
+          name: session.user?.name,
+          image: session.user?.image,
+          accessToken: session.accessToken,
+        });
+        setEmail(session.user?.email || "");
+        setNickname(session.user?.name?.split(" ")[0] || "Student");
+        setCurrentStep("profile"); // Skip to profile step for Google users
       } else {
-        // Student already exists, try to login
-        setError("Энэ имэйл хаягтай хэрэглэгч аль хэдийн бүртгэгдсэн байна.");
+        // Student already exists, redirect to login
+        setError(
+          "Энэ имэйл хаягтай хэрэглэгч аль хэдийн бүртгэгдсэн байна. Нэвтрэх хэсэг рүү шилжинэ үү."
+        );
       }
     } catch (error: any) {
-      console.error("Google sign-in error:", error);
+      console.error("Google sign-up error:", error);
       setError("Google-р бүртгүүлэхэд алдаа гарлаа");
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handle Google OAuth error
+  const handleGoogleError = (error: string) => {
+    setError(`Google OAuth алдаа: ${error}`);
   };
 
   const handleEmailSubmit = async () => {
@@ -114,18 +87,15 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/Checkemail`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        }
-      );
+      const API_BASE_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${API_BASE_URL}/Checkemail`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
 
       const data = await response.json();
 
@@ -152,18 +122,15 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/checkOtp`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, code: otp }),
-        }
-      );
+      const API_BASE_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${API_BASE_URL}/checkOtp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, code: otp }),
+      });
 
       const data = await response.json();
 
@@ -200,18 +167,15 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/createPassword`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const API_BASE_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${API_BASE_URL}/createPassword`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
       const data = await response.json();
 
@@ -243,18 +207,29 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/StudentNameNumber`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+      const requestBody = {
+        email,
+        nickname,
+        phoneNumber,
+        ...(googleUserData && {
+          googleAuth: true,
+          googleData: {
+            name: googleUserData.name,
+            image: googleUserData.image,
+            accessToken: googleUserData.accessToken,
           },
-          body: JSON.stringify({ email, nickname, phoneNumber }),
-        }
-      );
+        }),
+      };
+
+      const API_BASE_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${API_BASE_URL}/StudentNameNumber`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
 
       const data = await response.json();
 
@@ -264,10 +239,20 @@ const StudentSignupPage = () => {
           email,
           nickname,
           phoneNumber,
+          ...(googleUserData && {
+            image: googleUserData.image,
+            googleAuth: true,
+          }),
         };
 
         localStorage.setItem("studentUser", JSON.stringify(studentData));
         localStorage.setItem("studentEmail", email);
+        if (data.token) {
+          localStorage.setItem("studentToken", data.token);
+        }
+
+        // Dispatch custom event to notify other components about auth change
+        window.dispatchEvent(new Event("authChange"));
 
         // Redirect to student dashboard
         router.push("/student-dashboard");
@@ -303,6 +288,21 @@ const StudentSignupPage = () => {
             >
               {loading ? "Илгээж байна..." : "Үргэлжлүүлэх"}
             </button>
+
+            {/* Divider */}
+            <div className="flex items-center my-4">
+              <div className="flex-1 border-t border-white/30"></div>
+              <span className="px-4 text-white/60 text-sm">эсвэл</span>
+              <div className="flex-1 border-t border-white/30"></div>
+            </div>
+
+            {/* Google OAuth Button */}
+            <GoogleOAuthButton
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              text="Google-р бүртгүүлэх"
+              disabled={loading}
+            />
           </div>
         );
 

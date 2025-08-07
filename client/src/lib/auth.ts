@@ -6,7 +6,17 @@ export const BACKEND_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export const authOptions: NextAuthOptions = {
-  providers: [],
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          scope: "openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events",
+        },
+      },
+    }),
+  ],
   callbacks: {
     async jwt({ token, account, profile }) {
       // Persist the OAuth access_token and refresh_token to the token right after signin

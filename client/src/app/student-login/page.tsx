@@ -4,7 +4,9 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import axios from "axios";
+import GoogleOAuthButton from "../../components/GoogleOAuthButton";
 
 const StudentLoginPage = () => {
   const [email, setEmail] = useState("");
@@ -12,6 +14,51 @@ const StudentLoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const { data: session } = useSession();
+
+  // Handle Google OAuth success
+  const handleGoogleSuccess = async (session: any) => {
+    try {
+      // Check if student exists with this Google account
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${API_BASE_URL}/studentGoogleLogin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: session.user?.email,
+          name: session.user?.name,
+          image: session.user?.image,
+          accessToken: session.accessToken,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store student data and redirect
+        localStorage.setItem("studentToken", data.token);
+        localStorage.setItem("studentUser", JSON.stringify(data.user));
+        localStorage.setItem("studentEmail", data.user.email);
+
+        // Dispatch custom event to notify other components about auth change
+        window.dispatchEvent(new Event("authChange"));
+
+        // Redirect to student dashboard
+        router.push("/student-dashboard");
+      } else {
+        setError(data.message || "Google-р нэвтрэхэд алдаа гарлаа. Эхлээд бүртгүүлнэ үү.");
+      }
+    } catch (error) {
+      setError("Google-р нэвтрэхэд алдаа гарлаа");
+    }
+  };
+
+  // Handle Google OAuth error
+  const handleGoogleError = (error: string) => {
+    setError(`Google OAuth алдаа: ${error}`);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,18 +77,14 @@ const StudentLoginPage = () => {
     setError("");
 
     try {
-      const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/studentLogin`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${API_BASE_URL}/studentLogin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
       const data = await response.json();
 
@@ -138,6 +181,21 @@ const StudentLoginPage = () => {
                   {loading ? "Нэвтэрч байна..." : "Нэвтрэх"}
                 </button>
               </form>
+
+              {/* Divider */}
+              <div className="flex items-center my-6">
+                <div className="flex-1 border-t border-white/30"></div>
+                <span className="px-4 text-white/60 text-sm">эсвэл</span>
+                <div className="flex-1 border-t border-white/30"></div>
+              </div>
+
+              {/* Google OAuth Button */}
+              <GoogleOAuthButton
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                text="Google-р нэвтрэх"
+                disabled={loading}
+              />
 
               {/* Links */}
               <div className="mt-8 text-center space-y-4">
