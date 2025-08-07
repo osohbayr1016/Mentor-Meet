@@ -69,7 +69,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
     try {
       const response = await axios.post<LoginResponse>(
-        `http://localhost:8000/mentorLogin`,
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/mentorLogin`,
         {
           email,
           password,

@@ -99,8 +99,7 @@ const FormContainer = () => {
       try {
         const response = await fetch(
           `${
-            process.env.NEXT_PUBLIC_API_URL ||
-            "https://mentor-meet-h0tx.onrender.com"
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
           }/mentor-get-category`
         );
         const result = await response.json();
@@ -119,8 +118,8 @@ const FormContainer = () => {
   // Map professional field to category ID
   const getCategoryId = (professionalField: string): string => {
     // Find category by name directly since we're now using category names as values
-    const category = categories.find((cat) =>
-      cat.categoryName === professionalField
+    const category = categories.find(
+      (cat) => cat.categoryName === professionalField
     );
 
     // Return category ID or default to first category
@@ -240,8 +239,7 @@ const FormContainer = () => {
         // Call Step 1 API
         const response = await fetch(
           `${
-            process.env.NEXT_PUBLIC_API_URL ||
-            "https://mentor-meet-h0tx.onrender.com"
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
           }/mentorProfile/step1`,
           {
             method: "POST",
@@ -288,8 +286,7 @@ const FormContainer = () => {
         // Call Step 2 API
         const response = await fetch(
           `${
-            process.env.NEXT_PUBLIC_API_URL ||
-            "https://mentor-meet-h0tx.onrender.com"
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
           }/mentorProfile/step2`,
           {
             method: "PATCH",
@@ -358,12 +355,11 @@ const FormContainer = () => {
 
       // Get the selected category ID
       const selectedCategoryId = getCategoryId(formData.professionalField);
-      
+
       // Call Step 3 API
       const response = await fetch(
         `${
-          process.env.NEXT_PUBLIC_API_URL ||
-          "https://mentor-meet-h0tx.onrender.com"
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
         }/mentorProfile/step3`,
         {
           method: "PATCH",

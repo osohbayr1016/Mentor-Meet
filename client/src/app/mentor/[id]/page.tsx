@@ -74,8 +74,7 @@ const MentorDetailPage = () => {
       try {
         const response = await axios.get(
           `${
-            process.env.NEXT_PUBLIC_API_URL ||
-            "https://mentor-meet-h0tx.onrender.com"
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
           }/mentor/${mentorId}`
         );
 
@@ -99,8 +98,7 @@ const MentorDetailPage = () => {
       try {
         const res = await axios.get<any>(
           `${
-            process.env.NEXT_PUBLIC_API_URL ||
-            "https://mentor-meet-h0tx.onrender.com"
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
           }/calendar/${mentorId}`
         );
 
@@ -204,10 +202,7 @@ const MentorDetailPage = () => {
       };
 
       const response = await axios.post(
-        `${
-          process.env.NEXT_PUBLIC_API_URL ||
-          "https://mentor-meet-h0tx.onrender.com"
-        }/booking`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/booking`,
         payload,
         {
           headers: {

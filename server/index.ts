@@ -26,7 +26,11 @@ if (process.env.NODE_ENV === "production") {
 // CORS configuration
 app.use(
   cors({
-    origin: "https://mentor-meet-wine.vercel.app",
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:8000",
+    ],
     credentials: false,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["*"],

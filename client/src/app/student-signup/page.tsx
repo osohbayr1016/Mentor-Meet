@@ -35,8 +35,7 @@ const StudentSignupPage = () => {
       // Check if student already exists with this email
       const checkResponse = await fetch(
         `${
-          process.env.NEXT_PUBLIC_API_URL ||
-          "https://mentor-meet-h0tx.onrender.com"
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
         }/Checkemail`,
         {
           method: "POST",
@@ -53,8 +52,7 @@ const StudentSignupPage = () => {
         // Student doesn't exist, create new student with Google data
         const signupResponse = await fetch(
           `${
-            process.env.NEXT_PUBLIC_API_URL ||
-            "https://mentor-meet-h0tx.onrender.com"
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
           }/StudentNameNumber`,
           {
             method: "POST",
@@ -118,8 +116,7 @@ const StudentSignupPage = () => {
     try {
       const response = await fetch(
         `${
-          process.env.NEXT_PUBLIC_API_URL ||
-          "https://mentor-meet-h0tx.onrender.com"
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
         }/Checkemail`,
         {
           method: "POST",
@@ -157,8 +154,7 @@ const StudentSignupPage = () => {
     try {
       const response = await fetch(
         `${
-          process.env.NEXT_PUBLIC_API_URL ||
-          "https://mentor-meet-h0tx.onrender.com"
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
         }/checkOtp`,
         {
           method: "POST",
@@ -206,8 +202,7 @@ const StudentSignupPage = () => {
     try {
       const response = await fetch(
         `${
-          process.env.NEXT_PUBLIC_API_URL ||
-          "https://mentor-meet-h0tx.onrender.com"
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
         }/createPassword`,
         {
           method: "POST",
@@ -250,8 +245,7 @@ const StudentSignupPage = () => {
     try {
       const response = await fetch(
         `${
-          process.env.NEXT_PUBLIC_API_URL ||
-          "https://mentor-meet-h0tx.onrender.com"
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
         }/StudentNameNumber`,
         {
           method: "POST",

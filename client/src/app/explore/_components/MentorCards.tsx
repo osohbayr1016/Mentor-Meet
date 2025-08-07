@@ -75,7 +75,7 @@ const MentorCards: React.FC<MentorCardsProps> = ({
           params.subCategory = selectedSubCategory;
         }
 
-        const API_BASE_URL = "https://mentor-meet-h0tx.onrender.com";
+        const API_BASE_URL = "http://localhost:8000";
 
         // Try with fetch instead of axios
         const queryString = new URLSearchParams(params).toString();

@@ -32,8 +32,7 @@ const StudentLoginPage = () => {
     try {
       const response = await fetch(
         `${
-          process.env.NEXT_PUBLIC_API_URL ||
-          "https://mentor-meet-h0tx.onrender.com"
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
         }/studentLogin`,
         {
           method: "POST",
