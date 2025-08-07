@@ -406,7 +406,7 @@ const MentorDashboard = () => {
 
                   <div className="mt-auto space-y-2">
                     <button
-                      onClick={() => router.push("/mentor-dashboard-calendar")}
+                      onClick={() => router.push("/mentor-calendar")}
                       className="w-full text-left px-4 py-3 rounded-xl font-medium text-gray-300 hover:bg-gray-700/50 transition-colors flex items-center gap-2"
                     >
                       <svg
