@@ -5,11 +5,9 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 
-
 import "./model/student-model";
 import "./model/mentor-model";
 import "./model/booking-model";
-
 
 import { MentorRouter } from "./router/mentor-router";
 import { StudentRouter } from "./router/student-router";
@@ -22,23 +20,8 @@ import { NotificationRouter } from "./router/notification-router";
 
 const app = express();
 
-
-app.use(
-  cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://localhost:8000",
-    ],
-    credentials: false,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["*"],
-  })
-);
-
-
-app.use(express.json({ limit: "10mb" }));
-
+app.use(cors());
+app.use(express.json());
 
 const uri = process.env.MONGODB_URI;
 const dataBaseConnection = async () => {
@@ -56,12 +39,10 @@ const dataBaseConnection = async () => {
   }
 };
 
-
 const startServer = async () => {
   try {
     await dataBaseConnection();
 
-    
     app.use(MentorRouter);
     app.use(StudentRouter);
     app.use(CategoryRouter);
@@ -72,9 +53,7 @@ const startServer = async () => {
     app.use(NotificationRouter);
 
     const PORT = process.env.PORT || 8000;
-    app.listen(PORT, () => {
-      
-    });
+    app.listen(PORT, () => {});
   } catch (error) {
     console.error(" Failed to start server:", error);
   }

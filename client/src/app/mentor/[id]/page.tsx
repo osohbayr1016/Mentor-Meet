@@ -46,7 +46,9 @@ const MentorDetailPage = () => {
 
   const [mentor, setMentor] = useState<Mentor | null>(null);
   const [calendar, setCalendar] = useState<CalendarSlot[]>([]);
-  const [selectedTimesByDate, setSelectedTimesByDate] = useState<Record<string, string[]>>({});
+  const [selectedTimesByDate, setSelectedTimesByDate] = useState<
+    Record<string, string[]>
+  >({});
   const [selectedBookingDate, setSelectedBookingDate] = useState<string>("");
   const [selectedBookingTime, setSelectedBookingTime] = useState<string>("");
   const [showBookingModal, setShowBookingModal] = useState(false);
@@ -55,7 +57,9 @@ const MentorDetailPage = () => {
   useEffect(() => {
     const fetchMentor = async () => {
       try {
-        const response = await axios.get<Mentor>(`http://localhost:8000/mentor/${mentorId}`);
+        const response = await axios.get<Mentor>(
+          `http://localhost:8000/mentor/${mentorId}`
+        );
         setMentor(response.data);
       } catch (error) {
         console.error("Mentor fetch алдаа:", error);
@@ -73,7 +77,7 @@ const MentorDetailPage = () => {
         );
         setCalendar(response.data.availabilities);
       } catch (error) {
-        console.error("Calendar fetch алдаа:", error);
+        console.log("Calendar fetch алдаа:", error);
       }
     };
 
@@ -101,7 +105,9 @@ const MentorDetailPage = () => {
   };
 
   const findCalendarId = (date: string, time: string): string | null => {
-    const slot = calendar.find((s) => s.date === date && s.times.includes(time));
+    const slot = calendar.find(
+      (s) => s.date === date && s.times.includes(time)
+    );
     return slot ? slot._id : null;
   };
 
@@ -115,8 +121,7 @@ const MentorDetailPage = () => {
   const getTotalSelectedHours = () =>
     Object.values(selectedTimesByDate).flat().length;
 
-  const getAllSelectedTimes = () =>
-    Object.values(selectedTimesByDate).flat();
+  const getAllSelectedTimes = () => Object.values(selectedTimesByDate).flat();
 
   const handleMultiBooking = async () => {
     const token = localStorage.getItem("studentToken");
@@ -124,7 +129,13 @@ const MentorDetailPage = () => {
     const studentId = studentUser.id;
     const times = getAllSelectedTimes();
 
-    if (!token || !mentorId || !studentId || times.length === 0 || !selectedBookingDate) {
+    if (
+      !token ||
+      !mentorId ||
+      !studentId ||
+      times.length === 0 ||
+      !selectedBookingDate
+    ) {
       alert("Мэдээлэл дутуу байна.");
       return;
     }
@@ -139,9 +150,13 @@ const MentorDetailPage = () => {
         category: mentor?.category?.categoryId || "Тодорхойгүй",
       };
 
-      const response = await axios.post("http://localhost:8000/bookings", payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.post(
+        "http://localhost:8000/bookings",
+        payload,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       console.log("Booking success:", response.data);
       setShowBookingModal(true);
