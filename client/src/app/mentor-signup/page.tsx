@@ -9,8 +9,7 @@ import axios from "axios";
 import Link from "next/link";
 import { useAuth } from "../_components/MentorUserProvider";
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://mentor-meet-h0tx.onrender.com";
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 type SignupResponse = {
   message: string;
@@ -84,7 +83,7 @@ const SignupPage = () => {
         if (signupResponse.data.token) {
           // Store token immediately after successful signup
           localStorage.setItem("mentorToken", signupResponse.data.token);
-          
+
           // Auto-login successful
           const mentorData = {
             mentorId: signupResponse.data.mentorId,

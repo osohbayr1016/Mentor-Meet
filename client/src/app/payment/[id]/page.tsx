@@ -78,8 +78,7 @@ const MentorPayment = () => {
       try {
         const res = await fetch(
           `${
-            process.env.NEXT_PUBLIC_API_URL ||
-            "https://mentor-meet-h0tx.onrender.com"
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
           }/mentor/${mentorId}`
         );
         if (!res.ok) {
@@ -116,8 +115,7 @@ const MentorPayment = () => {
         availabilities: { date: string; times: string[] }[];
       }>(
         `${
-          process.env.NEXT_PUBLIC_API_URL ||
-          "https://mentor-meet-h0tx.onrender.com"
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
         }/calendar/${mentorId}`
       );
 
@@ -166,8 +164,7 @@ const MentorPayment = () => {
     try {
       const response = await axios.post(
         `${
-          process.env.NEXT_PUBLIC_API_URL ||
-          "https://mentor-meet-h0tx.onrender.com"
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
         }/payment/${student}`,
         {
           mentorId,

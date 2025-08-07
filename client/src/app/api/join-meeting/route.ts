@@ -16,8 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     const API_BASE_URL =
-      process.env.NEXT_PUBLIC_API_URL ||
-      "https://mentor-meet-h0tx.onrender.com";
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
     const response = await fetch(`${API_BASE_URL}/bookings/${bookingId}/join`, {
       method: "POST",
       headers: {

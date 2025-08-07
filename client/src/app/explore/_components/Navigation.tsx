@@ -17,7 +17,6 @@ import {
   Pickaxe,
   Scale,
   SquareCode,
-  Users,
   Video,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
@@ -55,98 +54,98 @@ interface Category {
   createdAt: Date;
   updatedAt: Date;
 }
-// const jobCategories = [
-//   {
-//     id: 1,
-//     name: "Программчлал ба Технологи",
-//     icon: <SquareCode size={20} />,
-//     description: "Programming and Technology",
-//   },
-//   {
-//     id: 2,
-//     name: "Бизнес ба Менежмент",
-//     icon: <BriefcaseBusiness size={20} />,
-//     description: "Business and Management",
-//   },
-//   {
-//     id: 3,
-//     name: "Боловсрол ба Сургалт",
-//     icon: <Brain size={20} />,
-//     description: "Education and Training",
-//   },
-//   {
-//     id: 4,
-//     name: "Эрүүл мэнд ба Анагаах ухаан",
-//     icon: <Cross size={20} />,
-//     description: "Health and Medicine",
-//   },
-//   {
-//     id: 5,
-//     name: "Урлаг ба Дизайн",
-//     icon: <Palette size={20} />,
-//     description: "Arts and Design",
-//   },
-//   {
-//     id: 6,
-//     name: "Хууль ба Эрх зүй",
-//     icon: <Scale size={20} />,
-//     description: "Law and Legal",
-//   },
-//   {
-//     id: 7,
-//     name: "Сэргээгдэх эрчим хүч",
-//     icon: <Landmark size={20} />,
-//     description: "Renewable Energy",
-//   },
-//   {
-//     id: 8,
-//     name: "Хөдөө аж ахуй",
-//     icon: <House size={20} />,
-//     description: "Agriculture",
-//   },
-//   {
-//     id: 9,
-//     name: "Байгаль орчин",
-//     icon: <Pickaxe size={20} />,
-//     description: "Environment",
-//   },
-//   {
-//     id: 10,
-//     name: "Спорт ба Фитнес",
-//     icon: <Medal size={20} />,
-//     description: "Sports and Fitness",
-//   },
-//   {
-//     id: 11,
-//     name: "Мэдээлэл ба Хэвлэл",
-//     icon: <Mail size={20} />,
-//     description: "Media and Journalism",
-//   },
-//   {
-//     id: 12,
-//     name: "Тээвэр ба Логистик",
-//     icon: <ChartCandlestick size={20} />,
-//     description: "Transportation and Logistics",
-//   },
-//   {
-//     id: 13,
-//     name: "Үйлчилгээ ба Худалдаа",
-//     icon: <Crown size={20} />,
-//     description: "Services and Commerce",
-//   },
-//   {
-//     id: 14,
-//     name: "Үйлдвэрлэл ба Технологи",
-//     icon: <Video size={20} />,
-//     description: "Manufacturing and Technology",
-//   },
-//   {
-//     id: 15,
-//     name: "Барилга ба Архитектур",
-//     icon: <Camera size={20} />,
-//     description: "Construction and Architecture",
-//   },
-// ];
+const jobCategories = [
+  {
+    id: 1,
+    name: "Программчлал ба Технологи",
+    icon: <SquareCode size={20} />,
+    description: "Programming and Technology",
+  },
+  {
+    id: 2,
+    name: "Бизнес ба Менежмент",
+    icon: <BriefcaseBusiness size={20} />,
+    description: "Business and Management",
+  },
+  {
+    id: 3,
+    name: "Боловсрол ба Сургалт",
+    icon: <Brain size={20} />,
+    description: "Education and Training",
+  },
+  {
+    id: 4,
+    name: "Эрүүл мэнд ба Анагаах ухаан",
+    icon: <Cross size={20} />,
+    description: "Health and Medicine",
+  },
+  {
+    id: 5,
+    name: "Урлаг ба Дизайн",
+    icon: <Palette size={20} />,
+    description: "Arts and Design",
+  },
+  {
+    id: 6,
+    name: "Хууль ба Эрх зүй",
+    icon: <Scale size={20} />,
+    description: "Law and Legal",
+  },
+  {
+    id: 7,
+    name: "Сэргээгдэх эрчим хүч",
+    icon: <Landmark size={20} />,
+    description: "Renewable Energy",
+  },
+  {
+    id: 8,
+    name: "Хөдөө аж ахуй",
+    icon: <House size={20} />,
+    description: "Agriculture",
+  },
+  {
+    id: 9,
+    name: "Байгаль орчин",
+    icon: <Pickaxe size={20} />,
+    description: "Environment",
+  },
+  {
+    id: 10,
+    name: "Спорт ба Фитнес",
+    icon: <Medal size={20} />,
+    description: "Sports and Fitness",
+  },
+  {
+    id: 11,
+    name: "Мэдээлэл ба Хэвлэл",
+    icon: <Mail size={20} />,
+    description: "Media and Journalism",
+  },
+  {
+    id: 12,
+    name: "Тээвэр ба Логистик",
+    icon: <ChartCandlestick size={20} />,
+    description: "Transportation and Logistics",
+  },
+  {
+    id: 13,
+    name: "Үйлчилгээ ба Худалдаа",
+    icon: <Crown size={20} />,
+    description: "Services and Commerce",
+  },
+  {
+    id: 14,
+    name: "Үйлдвэрлэл ба Технологи",
+    icon: <Video size={20} />,
+    description: "Manufacturing and Technology",
+  },
+  {
+    id: 15,
+    name: "Барилга ба Архитектур",
+    icon: <Camera size={20} />,
+    description: "Construction and Architecture",
+  },
+];
 
 interface NavigationProps {
   onCategoryChange?: (categoryId: string, subCategories: string[]) => void;
@@ -176,48 +175,35 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
     categories: Category[];
   };
   // Fetch categor
-  // Fetch categories function
-  const fetchCategories = async () => {
-    try {
-      setLoading(true);
-      setError(""); // Clear any previous errors
+  // ies from backend
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
 
-      const response = await axios.get<CategoriesResponse>(
-        "https://mentor-meet-h0tx.onrender.com/mentor-get-category"
-      );
+        const response = await axios.get<CategoriesResponse>(
+          "http://localhost:8000/mentor-get-category"
+        );
 
-      const categories = response.data?.categories;
-      console.log("Fetched categories:", categories);
-      if (Array.isArray(categories) && categories.length > 0) {
-        setCategories(categories);
-        // Don't auto-select first category, let user choose or show all
-        setSelectedCategory(""); // Start with no category selected
-      } else {
-        setError("Ангилал олдсонгүй");
-      }
-    } catch (error: any) {
-      console.error("Ангилал авахад алдаа гарлаа:", error);
-      if (error.response?.status === 404) {
-        setError("Ангилалын мэдээлэл олдсонгүй. Дахин оролдоно уу.");
-      } else if (error.response?.status >= 500) {
-        setError("Сервер дээр алдаа гарлаа. Дахин оролдоно уу.");
-      } else if (
-        error.code === "NETWORK_ERROR" ||
-        error.code === "ECONNABORTED"
-      ) {
-        setError("Сүлжээний холболт амжилтгүй. Интернэт холболтоо шалгана уу.");
-      } else {
+        const categories = response.data?.categories;
+        console.log(categories);
+        if (Array.isArray(categories) && categories.length > 0) {
+          setCategories(categories);
+          // Don't auto-select first category, let user choose or show all
+          setSelectedCategory(""); // Start with no category selected
+        } else {
+          setError("Ангилал олдсонгүй");
+        }
+      } catch (error: any) {
+        console.error("Ангилал авахад алдаа гарлаа:", error);
         setError(
           error.response?.data?.message || "Ангилал авахад амжилтгүй боллоо"
         );
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  // Fetch categories from backend
-  useEffect(() => {
     fetchCategories();
   }, []);
 
@@ -325,19 +311,7 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   if (error) {
     return (
       <div className="w-full h-[600px] flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-500 text-lg mb-4">{error}</div>
-          <button
-            onClick={() => {
-              setError("");
-              setLoading(true);
-              fetchCategories();
-            }}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Дахин оролдох
-          </button>
-        </div>
+        <div className="text-red-500 text-lg">Error: {error}</div>
       </div>
     );
   }
@@ -350,7 +324,20 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
           <div className="mx-auto">
             <div className="flex items-center justify-between py-3 px-4 relative">
               {/* All Mentors Button - Top Right */}
-           
+              <button
+                onClick={handleAllMentorsClick}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 whitespace-nowrap relative flex-shrink-0 ${
+                  !selectedCategory && !selectedSubCategory
+                    ? "text-white font-semibold bg-gray-600/50 border border-blue-400/50"
+                    : "text-white hover:bg-gray-600/50"
+                }`}
+              >
+                <span className="text-sm font-medium">
+                  {!selectedCategory && !selectedSubCategory
+                    ? "✓ Бүх Ментор"
+                    : "Бүх Ментор"}
+                </span>
+              </button>
               {/* Left Double Arrow */}
               <button
                 onClick={scrollLeft}
@@ -380,21 +367,6 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
                     WebkitOverflowScrolling: "touch",
                   }}
                 >
-                     <button
-                onClick={handleAllMentorsClick}
-                className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all duration-300 whitespace-nowrap relative flex-shrink-0 ${
-                  !selectedCategory && !selectedSubCategory
-                    ? "text-white font-semibold"
-                    : "text-white hover:bg-black/10"
-                }`}
-              >
-                <span className="text-base w-5 h-5 text-white">
-                  <Users size={20} />
-                </span>
-                <span className="text-sm font-medium">
-                  Бүх Ментор
-                </span>
-              </button>
                   {categories.map((category, index) => (
                     <button
                       key={category._id}
