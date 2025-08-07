@@ -75,7 +75,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
   };
 
   return (
-    <div className="bg-gray-700/50 rounded-xl p-4 border border-gray-600">
+    <div className="bg-gray-700/50 rounded-xl p-4 border border-gray-600 h-[300px]">
       <div className="flex items-start gap-4 mb-4">
         <div className="w-16 h-16 bg-gray-300 rounded-full overflow-hidden flex-shrink-0">
           <Image

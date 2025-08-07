@@ -70,11 +70,11 @@ const MentorCard: React.FC<MentorCardProps> = ({ mentor, onClick }) => {
                   {mentor.category}
                 </span>
               )}
-              {mentor.subCategory && (
+              {/* {mentor.subCategory && (
                 <span className="inline-block bg-green-600/30 text-green-300 text-xs px-2 py-1 rounded">
                   {mentor.subCategory}
                 </span>
-              )}
+              )} */}
             </div>
           )} */}
 

@@ -28,7 +28,7 @@ interface MentorCardProps {
 
 const MentorCard: React.FC<MentorCardProps> = ({ booking, onCancel }) => {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-lg w-[350px] h-[450px]">
+    <div className="bg-white rounded-xl p-6 shadow-lg w-[350px] h-[300px]">
       <div className="flex items-start space-x-4">
         <div className="flex-shrink-0">
           <img

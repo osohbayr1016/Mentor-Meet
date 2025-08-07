@@ -82,6 +82,9 @@ const SignupPage = () => {
         );
 
         if (signupResponse.data.token) {
+          // Store token immediately after successful signup
+          localStorage.setItem("mentorToken", signupResponse.data.token);
+          
           // Auto-login successful
           const mentorData = {
             mentorId: signupResponse.data.mentorId,
@@ -92,7 +95,6 @@ const SignupPage = () => {
             image: userData.image,
           };
 
-          localStorage.setItem("mentorToken", signupResponse.data.token);
           localStorage.setItem("mentorUser", JSON.stringify(mentorData));
 
           setGoogleUserData(userData);
@@ -219,6 +221,9 @@ const SignupPage = () => {
         console.log("Signup successful, token received:", token);
         setAutoLoggingIn(true);
 
+        // Store token immediately after successful signup
+        localStorage.setItem("mentorToken", token);
+
         try {
           // Fetch mentor profile data using the token
           const profileResponse = await axios.get<ProfileResponse>(
@@ -233,8 +238,7 @@ const SignupPage = () => {
           const mentorData = profileResponse.data.mentor;
 
           if (mentorData) {
-            // Store token and user data
-            localStorage.setItem("mentorToken", token);
+            // Store user data
             localStorage.setItem("mentorUser", JSON.stringify(mentorData));
 
             console.log("Auto-login successful with profile data");
@@ -254,7 +258,6 @@ const SignupPage = () => {
               lastName: "",
             };
 
-            localStorage.setItem("mentorToken", token);
             localStorage.setItem("mentorUser", JSON.stringify(minimalUser));
 
             console.log("Auto-login successful with minimal data");
@@ -266,7 +269,7 @@ const SignupPage = () => {
         } catch (profileError: any) {
           console.error("Profile fetch failed:", profileError);
 
-          // Still store token and minimal user data
+          // Still store minimal user data
           const minimalUser = {
             mentorId: mentorId || "",
             email: form.email,
@@ -275,7 +278,6 @@ const SignupPage = () => {
             lastName: "",
           };
 
-          localStorage.setItem("mentorToken", token);
           localStorage.setItem("mentorUser", JSON.stringify(minimalUser));
 
           setStep(3);
