@@ -117,13 +117,17 @@ export async function createGoogleMeetEvent(
         });
 
         if (error.status === 401 || error.code === 401) {
-            throw new Error("Authentication failed - please sign in with Google again");
+            throw new Error("Google нэвтрэх эрх хэрэгтэй - дахин нэвтэрнэ үү");
         } else if (error.status === 403 || error.code === 403) {
-            throw new Error("Permission denied - please grant calendar access to the application");
+            throw new Error("Google календарт хандах эрх хэрэгтэй - програмд зөвшөөрөл өгнө үү");
+        } else if (error.status === 429 || error.code === 429) {
+            throw new Error("Хэт олон хүсэлт илгээгдсэн - түр хүлээгээд дахин оролдоно уу");
         } else if (error.message?.includes("Calendar")) {
-            throw new Error(`Calendar API error: ${error.message}`);
+            throw new Error(`Календарын алдаа: ${error.message}`);
+        } else if (error.message?.includes("quota")) {
+            throw new Error("API квота дууссан - удахгүй дахин оролдоно уу");
         } else {
-            throw new Error(`Failed to create meeting: ${error.message}`);
+            throw new Error(`Уулзалт үүсгэхэд алдаа гарлаа: ${error.message}`);
         }
     }
 } 
