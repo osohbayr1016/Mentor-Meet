@@ -1,17 +1,16 @@
 import React from "react";
 import { Step1Props } from "../types/FormTypes";
 import {
-  professionalFields,
   experienceOptions,
 } from "../constants/FormConstants";
 
 const Step1BasicInfo: React.FC<Step1Props> = ({
   formData,
   setFormData,
-
   onNext,
   message,
   isLoading,
+  categories,
 }) => {
   // Subcategories for each professional field
   const subCategories = {
@@ -251,13 +250,16 @@ const Step1BasicInfo: React.FC<Step1Props> = ({
                     required
                     className="w-full px-3 py-2 bg-black/20 border border-white/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all text-white appearance-none cursor-pointer text-xs"
                   >
-                    {professionalFields.map((field) => (
+                    <option value="" className="bg-gray-800 text-white">
+                      Салбар сонгоно уу
+                    </option>
+                    {categories.map((category) => (
                       <option
-                        key={field.value}
-                        value={field.value}
+                        key={category._id}
+                        value={category.categoryName}
                         className="bg-gray-800 text-white"
                       >
-                        {field.label}
+                        {category.categoryName}
                       </option>
                     ))}
                   </select>
@@ -549,11 +551,7 @@ const Step1BasicInfo: React.FC<Step1Props> = ({
                   </span>
                 </div>
                 <p className="text-white text-xs font-medium">
-                  {formData.professionalField
-                    ? professionalFields.find(
-                        (f) => f.value === formData.professionalField
-                      )?.label
-                    : "Салбар сонгоно уу"}
+                  {formData.professionalField || "Салбар сонгоно уу"}
                 </p>
               </div>
 

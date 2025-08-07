@@ -54,6 +54,98 @@ interface Category {
   createdAt: Date;
   updatedAt: Date;
 }
+const jobCategories = [
+  {
+    id: 1,
+    name: "Программчлал ба Технологи",
+    icon: <SquareCode size={20} />,
+    description: "Programming and Technology",
+  },
+  {
+    id: 2,
+    name: "Бизнес ба Менежмент",
+    icon: <BriefcaseBusiness size={20} />,
+    description: "Business and Management",
+  },
+  {
+    id: 3,
+    name: "Боловсрол ба Сургалт",
+    icon: <Brain size={20} />,
+    description: "Education and Training",
+  },
+  {
+    id: 4,
+    name: "Эрүүл мэнд ба Анагаах ухаан",
+    icon: <Cross size={20} />,
+    description: "Health and Medicine",
+  },
+  {
+    id: 5,
+    name: "Урлаг ба Дизайн",
+    icon: <Palette size={20} />,
+    description: "Arts and Design",
+  },
+  {
+    id: 6,
+    name: "Хууль ба Эрх зүй",
+    icon: <Scale size={20} />,
+    description: "Law and Legal",
+  },
+  {
+    id: 7,
+    name: "Сэргээгдэх эрчим хүч",
+    icon: <Landmark size={20} />,
+    description: "Renewable Energy",
+  },
+  {
+    id: 8,
+    name: "Хөдөө аж ахуй",
+    icon: <House size={20} />,
+    description: "Agriculture",
+  },
+  {
+    id: 9,
+    name: "Байгаль орчин",
+    icon: <Pickaxe size={20} />,
+    description: "Environment",
+  },
+  {
+    id: 10,
+    name: "Спорт ба Фитнес",
+    icon: <Medal size={20} />,
+    description: "Sports and Fitness",
+  },
+  {
+    id: 11,
+    name: "Мэдээлэл ба Хэвлэл",
+    icon: <Mail size={20} />,
+    description: "Media and Journalism",
+  },
+  {
+    id: 12,
+    name: "Тээвэр ба Логистик",
+    icon: <ChartCandlestick size={20} />,
+    description: "Transportation and Logistics",
+  },
+  {
+    id: 13,
+    name: "Үйлчилгээ ба Худалдаа",
+    icon: <Crown size={20} />,
+    description: "Services and Commerce",
+  },
+  {
+    id: 14,
+    name: "Үйлдвэрлэл ба Технологи",
+    icon: <Video size={20} />,
+    description: "Manufacturing and Technology",
+  },
+  {
+    id: 15,
+    name: "Барилга ба Архитектур",
+    icon: <Camera size={20} />,
+    description: "Construction and Architecture",
+  },
+];
 
 interface NavigationProps {
   onCategoryChange?: (categoryId: string, subCategories: string[]) => void;
@@ -200,8 +292,6 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   };
 
   const handleMentorClick = (mentor: any) => {
-    console.log("Mentor clicked:", mentor);
-    console.log("Navigating to:", `/mentor/${mentor.id}`);
     router.push(`/mentor/${mentor.id}`);
   };
 
@@ -227,12 +317,12 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   }
 
   return (
-    <div className="w-full h-[600px] flex flex-col mb-40">
+    <div className="w-full h-full flex flex-col">
       {/* Navigation Bar */}
-      <div className="w-full flex justify-center relative pt-[60px] py-3">
+      <div className="w-full flex justify-center relative pt-[40px] ">
         <div className="bg-[#737373]/50 w-[90vw] max-w-[1200px] rounded-full">
           <div className="mx-auto">
-            <div className="flex items-center justify-between py-3 px-4 relative">
+            <div className="flex items-center justify-between py-3 px-4 relative ">
               {/* All Mentors Button - Top Right */}
               <button
                 onClick={handleAllMentorsClick}
@@ -243,7 +333,9 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
                 }`}
               >
                 <span className="text-sm font-medium">
-                  {!selectedCategory && !selectedSubCategory ? "✓ Бүх Ментор" : "Бүх Ментор"}
+                  {!selectedCategory && !selectedSubCategory
+                    ? "✓ Бүх Ментор"
+                    : "Бүх Ментор"}
                 </span>
               </button>
               {/* Left Double Arrow */}
@@ -258,7 +350,7 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
               <div className="flex-1 mx-3 relative overflow-hidden">
                 {/* Gray Selected Background */}
                 <div
-                  className="absolute top-0 left-0 h-full bg-gray-600/40 rounded-lg transition-all duration-700 ease-out"
+                  className="absolute top-0 left-0 h-full bg-black/30 rounded-full transition-all duration-700 ease-out"
                   style={{
                     left: `${sliderPosition}px`,
                     width: `${sliderWidth}px`,
@@ -282,22 +374,23 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
                         buttonRefs.current[index] = el;
                       }}
                       onClick={() => handleCategoryClick(category._id)}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 whitespace-nowrap relative flex-shrink-0 ${
+                      className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all duration-300 whitespace-nowrap relative flex-shrink-0 ${
                         selectedCategory === category._id
                           ? "text-white font-semibold"
-                          : "text-white hover:bg-gray-600/50"
+                          : "text-white hover:bg-black/10"
                       }`}
                     >
-                      <span className="text-base">
+                      <span className="text-base w-5 h-5">
                         {categoryIcons[category.categoryName] || defaultIcon}
                       </span>
                       <span className="text-sm font-medium">
                         {category.categoryName}
-                        {selectedSubCategory && selectedCategory === category._id && (
-                          <span className="ml-1 text-xs text-blue-300">
-                            • {selectedSubCategory}
-                          </span>
-                        )}
+                        {selectedSubCategory &&
+                          selectedCategory === category._id && (
+                            <span className="ml-1 text-xs text-blue-300">
+                              • {selectedSubCategory}
+                            </span>
+                          )}
                       </span>
                     </button>
                   ))}
@@ -317,24 +410,33 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
       </div>
 
       {/* Main Content Area with Sidebar and Mentor Cards */}
-      <div className="flex-1 px-[120px] pt-[10px]">
-        <div className="w-full h-[500px] border-gray-400/50 border-1 backdrop-blur-md bg-black/20 flex rounded-[20px]">
-          {/* Left Sidebar */}
-          <Sidebar
-            selectedCategory={selectedCategory}
-            onSubCategorySelect={handleSubCategorySelect}
-            selectedSubCategory={selectedSubCategory}
-            categories={categories}
-          />
+      <div className="flex-1 px-6 pb-6 pt-6 flex items-center justify-center ">
+        <div className="w-full max-w-6xl ">
+          {/* Main Container - matching mentor-dashboard dimensions */}
+          <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20 h-[650px] w-full">
+            <div className="flex gap-8 h-full">
+              {/* Left Sidebar */}
+              <div className="w-72 flex flex-col h-full">
+                <Sidebar
+                  selectedCategory={selectedCategory}
+                  onSubCategorySelect={handleSubCategorySelect}
+                  selectedSubCategory={selectedSubCategory}
+                  categories={categories}
+                />
+              </div>
 
-          {/* Right Content Area */}
-          <div className="flex-1 h-full flex flex-col">
-            <MentorCards
-                 categories={categories}
-              selectedCategory={selectedCategory}
-              selectedSubCategory={selectedSubCategory}
-              onMentorClick={handleMentorClick}
-            />
+              {/* Right Content Area */}
+              <div className="flex-1 h-full flex flex-col overflow-hidden">
+                <div className="flex-1 overflow-y-auto">
+                  <MentorCards
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    selectedSubCategory={selectedSubCategory}
+                    onMentorClick={handleMentorClick}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

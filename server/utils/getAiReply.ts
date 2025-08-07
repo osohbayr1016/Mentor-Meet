@@ -1,12 +1,32 @@
 import { OpenAI } from "openai";
 import { IntentType } from "./detectIntent";
 
+// Create single OpenAI client instance to avoid memory leaks
+let openaiClient: OpenAI | null = null;
+const getOpenAIClient = (): OpenAI => {
+  if (!openaiClient && process.env.OPENAI_API_KEY) {
+    openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openaiClient!;
+};
+
+// =======================
+// Interfaces
+// =======================
 export interface StudentProfile {
   name?: string;
   email: string;
   phoneNumber?: string;
   goal?: string;
   level?: string;
+}
+
+export interface Feedback {
+  studentEmail: string;
+  mentorId: string;
+  rating: number; 
+  comment?: string;
+  date: string; 
 }
 
 export interface MentorInfo {
@@ -20,8 +40,45 @@ export interface MentorInfo {
   category?: {
     categoryId?: string;
   };
+  feedbacks?: Feedback[];
+  averageRating?: number;
 }
 
+export const calculateAverageRating = (feedbacks?: Feedback[]): number => {
+  if (!feedbacks || feedbacks.length === 0) return 0;
+  const sum = feedbacks.reduce((acc, fb) => acc + fb.rating, 0);
+  return parseFloat((sum / feedbacks.length).toFixed(2));
+};
+
+// =======================
+// Optimized Category keyword map - Reduced for memory efficiency
+// =======================
+export const categoryKeywordMap: Record<string, string[]> = {
+  "Программчлал ба Технологи": [
+    "программ",
+    "код",
+    "technology",
+    "developer",
+    "software",
+    "javascript",
+    "python",
+    "web",
+    "app",
+  ],
+  Дизайн: ["дизайн", "ux", "ui", "design", "figma"],
+  "Бизнес ба Менежмент": ["бизнес", "менежмент", "business", "management"],
+  Маркетинг: ["маркетинг", "marketing", "зар", "social"],
+  Санхүү: ["санхүү", "finance", "мөнгө", "banking"],
+  Инженерчлэл: ["инженер", "engineer", "engineering"],
+  "Хууль ба Эрх зүй": ["хууль", "law", "legal", "lawyer"],
+  "Спорт ба Фитнес": ["спорт", "fitness", "exercise"],
+  "Эрүүл мэнд": ["эрүүл", "health", "medical", "doctor"],
+  Боловсрол: ["боловсрол", "education", "teacher"],
+};
+
+// =======================
+// MAIN ENTRY
+// =======================
 export const getAiReply = async (
   userMessage: string,
   intent?: IntentType,
@@ -31,12 +88,15 @@ export const getAiReply = async (
   const messageLower = userMessage.toLowerCase();
 
   try {
-    // If we have OpenAI API key and mentors data, use AI-powered response
+  
+    if (isComplaintOrFeedback(messageLower)) {
+      return getComplaintResponse();
+    }
+
     if (process.env.OPENAI_API_KEY && mentors && mentors.length > 0) {
       return await getAIResponse(userMessage, intent, studentProfile, mentors);
     }
 
-    // Fallback to rule-based responses with mentor suggestions
     return getRuleBasedResponseWithMentors(messageLower, mentors);
   } catch (error) {
     console.error("Error in getAiReply:", error);
@@ -44,295 +104,223 @@ export const getAiReply = async (
   }
 };
 
-// AI-powered response generation
+const complaintKeywords = [
+  "гомдол",
+  "санаа зовнил",
+  "алдаа",
+  "буруу",
+  "санаа",
+  "сэтгэл дундуур",
+  "муу",
+  "сэтгэл гонсойлгох",
+  "санаа зовох",
+];
+
+const isComplaintOrFeedback = (message: string): boolean => {
+  const msg = message.toLowerCase();
+  return complaintKeywords.some((kw) => msg.includes(kw));
+};
+
+const getComplaintResponse = (): string => {
+  return `Таны санал, гомдлыг хүлээн авлаа. Бид үүнийг сайжруулахад анхааралтай хандах болно. Таны үнэлгээ, зөвлөгөөг бид үнэлж байна. Баярлалаа!`;
+};
+
+// =======================
+// Detect category dynamically
+// =======================
+const getCategoryFromMessage = (message: string): string | null => {
+  for (const [category, keywords] of Object.entries(categoryKeywordMap)) {
+    if (keywords.some((kw) => message.includes(kw))) {
+      return category;
+    }
+  }
+  return null;
+};
+
+// =======================
+// Get relevant mentors
+// =======================
+const getRelevantMentors = (
+  message: string,
+  mentors?: MentorInfo[]
+): MentorInfo[] => {
+  const matchedCategory = getCategoryFromMessage(message);
+  if (!mentors) return [];
+
+
+  if (matchedCategory) {
+    const categoryMentors = mentors.filter(
+      (m) =>
+        m.category?.categoryId?.toLowerCase() === matchedCategory.toLowerCase()
+    );
+
+
+    if (categoryMentors.length > 0) {
+      return categoryMentors.slice(0, 3);
+    }
+  }
+
+  const messageLower = message.toLowerCase();
+
+ 
+  const scoredMentors = mentors.map((mentor) => {
+    let score = 0;
+
+ 
+    const mentorText = [
+      mentor.profession || "",
+      mentor.bio || "",
+      mentor.category?.categoryId || "",
+      `${mentor.firstName || ""} ${mentor.lastName || ""}`,
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    for (const [category, keywords] of Object.entries(categoryKeywordMap)) {
+      for (const keyword of keywords) {
+        if (messageLower.includes(keyword) && mentorText.includes(keyword)) {
+         
+          if (keyword.length > 3) {
+            score += 3;
+          } else {
+            score += 1;
+          }
+        }
+      }
+    }
+
+    if (
+      matchedCategory &&
+      mentor.category?.categoryId?.toLowerCase() ===
+        matchedCategory.toLowerCase()
+    ) {
+      score += 10; 
+    }
+
+    if (mentor.experience?.careerDuration) {
+      const years = parseInt(mentor.experience.careerDuration);
+      if (years >= 5) score += 2;
+      else if (years >= 3) score += 1;
+    }
+
+    if (mentor.averageRating && mentor.averageRating >= 4.0) {
+      score += 1;
+    }
+
+    return { mentor, score };
+  });
+
+
+  return scoredMentors
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((item) => item.mentor);
+};
+
+// =======================
+// Format mentor text
+// =======================
+const formatMentorSuggestions = (
+  mentors: MentorInfo[],
+  category: string
+): string => {
+  if (!mentors.length) {
+    return " Менторуудтай холбогдохын тулд тэдний профайлыг үзээрэй.";
+  }
+
+  const list = mentors
+    .map((m) => {
+      const name = `${m.firstName || ""} ${m.lastName || ""}`.trim();
+      const prof = m.profession || "Ментор";
+      const exp = m.experience?.careerDuration
+        ? `, ${m.experience.careerDuration} жил туршлагатай`
+        : "";
+      return `• ${name} (${prof}${exp})`;
+    })
+    .join("\n");
+
+  return `\n\n${category} чиглэлээр санал болгох менторууд:\n${list}\n\nТэдний профайлыг үзэж холбогдоорой.`;
+};
+
+// =======================
+// Rule-based fallback (dynamic)
+// =======================
+const getRuleBasedResponseWithMentors = (
+  message: string,
+  mentors?: MentorInfo[]
+): string => {
+  const category = getCategoryFromMessage(message);
+  const relevantMentors = getRelevantMentors(message, mentors);
+  const suggestions = formatMentorSuggestions(
+    relevantMentors,
+    category || "Ерөнхий"
+  );
+
+  if (category) {
+    return `${category} чиглэлээр таны сонирхол илэрхийлэгдсэн байна.${suggestions}`;
+  }
+
+  return `Таны илгээсэн мэдээлэлд үндэслэн дараах менторуудыг санал болгож байна.${suggestions}`;
+};
+
+// =======================
+// AI-powered reply
+// =======================
 const getAIResponse = async (
   userMessage: string,
   intent?: IntentType,
   studentProfile?: StudentProfile,
   mentors?: MentorInfo[]
 ): Promise<string> => {
-  try {
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const openai = getOpenAIClient();
 
-    const studentInfo = studentProfile
-      ? `Сурагчийн мэдээлэл:\n${JSON.stringify(studentProfile, null, 2)}`
-      : "Сурагчийн мэдээлэл: Хэрэглэгчийн мэдээл байхгүй байна";
+  const studentInfo = studentProfile
+    ? `Сурагчийн мэдээлэл: ${studentProfile.name || "Нэргүй"}, ${
+        studentProfile.email || ""
+      }`
+    : "Сурагчийн мэдээлэл байхгүй.";
 
-    const mentorsInfo =
-      mentors
-        ?.map(
-          (m) =>
-            `- ${m.firstName || ""} ${m.lastName || ""}: ${m.bio} (Мэргэжил: ${
-              m.profession
-            }, Туршлага: ${m.experience?.careerDuration || ""}, Чиглэл: ${
-              m.category?.categoryId || ""
-            })`
-        )
-        .join("\n") || "Менторуудын мэдээл байхгүй байна";
+  // Limit mentors info to prevent memory issues
+  const limitedMentors = (mentors || []).slice(0, 5).map((m) => ({
+    name: `${m.firstName || ""} ${m.lastName || ""}`.trim(),
+    profession: m.profession || "",
+    category: m.category?.categoryId || "",
+  }));
+  const mentorsInfo = JSON.stringify(limitedMentors);
 
-    const prompt = `
+  const prompt = `
 ${studentInfo}
 
-Боломжит менторууд:
+Менторуудын мэдээлэл:
 ${mentorsInfo}
 
-Сурагчийн асуулт:
-"${userMessage}"
-
+Сурагчийн асуулт: "${userMessage}"
 Intent: ${intent || "unknown"}
 
-Чи Mentor Meet платформын AI туслах. Сурагчид хамгийн тохиромжтой ментор(ууд)-ыг сонгож, яагаад тохирохыг товч тайлбарла. Хэрэв сурагчийн мэдээл байхгүй бол ерөнхий зөвлөгөө өг. Хариултаа зөвхөн монголоор бич.
-    `;
+Чи Mentor Meet платформын AI туслах. Хэрэглэгчийн илгээсэн асуулт болон профайлын мэдээлэл дээр үндэслэн хамгийн тохирох ментор(ууд)-ыг санал болго. Яагаад тохирох талаар товч тайлбар өг. Хариултаа зөвхөн монголоор бич.
+  `;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: "Чи Mentor Meet платформын туслах чатбот.",
-        },
-        { role: "user", content: prompt },
-      ],
-      temperature: 0.7,
-    });
-
-    return (
-      response.choices[0].message.content || "AI хариу бэлдэхэд алдаа гарлаа."
-    );
-  } catch (error) {
-    console.error("Error in getAIResponse:", error);
-    throw error;
-  }
-};
-
-// Rule-based response generation with mentor suggestions
-const getRuleBasedResponseWithMentors = (
-  messageLower: string,
-  mentors?: MentorInfo[]
-): string => {
-  // Get relevant mentors based on message content
-  const relevantMentors = getRelevantMentors(messageLower, mentors);
-
-  // Python programming related
-  if (messageLower.includes("python") || messageLower.includes("программ")) {
-    const mentorSuggestions = formatMentorSuggestions(
-      relevantMentors,
-      "Python"
-    );
-    return `Python сурахад туслах ментор хэрэгтэй байна! Манай платформ дээр Python-д мэргэшсэн ширээтэн менторууд байна. Тэд танд Python програмчлалын үндэс, Django, Flask, data science зэргийг заахад бэлэн байна.${mentorSuggestions}`;
-  }
-
-  // General programming
-  if (messageLower.includes("код") || messageLower.includes("технологи")) {
-    const mentorSuggestions = formatMentorSuggestions(
-      relevantMentors,
-      "програмчлал"
-    );
-    return `Программчлалын талаар асуулт байна! Манай платформ дээр ширээтэн менторууд байна. Тэд танд JavaScript, Python, React, Node.js зэрэг технологиудыг заахад бэлэн байна.${mentorSuggestions}`;
-  }
-
-  // Business related
-  if (messageLower.includes("бизнес") || messageLower.includes("менеджмент")) {
-    const mentorSuggestions = formatMentorSuggestions(
-      relevantMentors,
-      "бизнес"
-    );
-    return `Бизнес, менежментийн талаар асуулт байна! Манай платформ дээр ширээтэн менторууд байна. Тэд танд бизнес стратеги, менежмент зэргийг заахад бэлэн байна.${mentorSuggestions}`;
-  }
-
-  // Design related
-  if (messageLower.includes("дизайн") || messageLower.includes("график")) {
-    const mentorSuggestions = formatMentorSuggestions(
-      relevantMentors,
-      "дизайн"
-    );
-    return `Дизайн, графикийн талаар асуулт байна! Манай платформ дээр ширээтэн менторууд байна. Тэд танд UI/UX дизайн, график дизайн зэргийг заахад бэлэн байна.${mentorSuggestions}`;
-  }
-
-  // Health related
-  if (messageLower.includes("эрүүл") || messageLower.includes("анагаах")) {
-    const mentorSuggestions = formatMentorSuggestions(
-      relevantMentors,
-      "эрүүл мэнд"
-    );
-    return `Эрүүл мэндийн талаар асуулт байна! Манай платформ дээр ширээтэн менторууд байна. Тэд танд эрүүл мэндийн зөвлөгөө өгөхөд бэлэн байна.${mentorSuggestions}`;
-  }
-
-  // Law related
-  if (messageLower.includes("хууль") || messageLower.includes("эрх")) {
-    const mentorSuggestions = formatMentorSuggestions(relevantMentors, "хууль");
-    return `Хууль, эрх зүйн талаар асуулт байна! Манай платформ дээр ширээтэн менторууд байна. Тэд танд хууль, эрх зүйн асуудлуудыг тайлбарлахад бэлэн байна.${mentorSuggestions}`;
-  }
-
-  // Mentor request related
-  if (messageLower.includes("санал") || messageLower.includes("болгооч")) {
-    const mentorSuggestions = formatMentorSuggestions(
-      relevantMentors,
-      "ментор"
-    );
-    return `Ментор санал болгох хүсэлт байна! Манай платформ дээр ширээтэн менторууд байна. Та өөрийн сонирхсон чиглэл, мэргэжлийг дэлгэрэнгүй тайлбарлавал би танд тохиромжтой ментор(ууд)-ыг санал болгож болно.${mentorSuggestions}`;
-  }
-
-  // Audio/Media related
-  if (
-    messageLower.includes("sound") ||
-    messageLower.includes("audio") ||
-    messageLower.includes("engineer") ||
-    messageLower.includes("дуу") ||
-    messageLower.includes("хөгжүүлэлт")
-  ) {
-    const mentorSuggestions = formatMentorSuggestions(
-      relevantMentors,
-      "дуу хөгжүүлэлт"
-    );
-    return `Sound Engineer сурахад туслах ментор хэрэгтэй байна! Манай платформ дээр дуу хөгжүүлэлт, аудио инженерийн чиглэлээр мэргэшсэн ширээтэн менторууд байна. Тэд танд аудио технологи, дуу бичлэг, хөгжүүлэлт зэргийг заахад бэлэн байна.${mentorSuggestions}`;
-  }
-
-  // General response
-  const mentorSuggestions = formatMentorSuggestions(relevantMentors, "ерөнхий");
-  return `Сайн байна уу! Таны асуултад хариулахад баяртай байна. Манай платформ дээр ширээтэн менторууд байна. Тэд танд тусламж үзүүлэхэд бэлэн байна.${mentorSuggestions}`;
-};
-
-// Helper function to get relevant mentors based on message content
-const getRelevantMentors = (
-  messageLower: string,
-  mentors?: MentorInfo[]
-): MentorInfo[] => {
-  if (!mentors || mentors.length === 0) return [];
-
-  // Filter mentors based on message content
-  const relevantMentors = mentors.filter((mentor) => {
-    const mentorInfo = `${mentor.profession || ""} ${mentor.bio || ""} ${
-      mentor.category?.categoryId || ""
-    }`.toLowerCase();
-
-    if (messageLower.includes("python") || messageLower.includes("программ")) {
-      return (
-        mentorInfo.includes("python") ||
-        mentorInfo.includes("программ") ||
-        mentorInfo.includes("developer")
-      );
-    }
-    if (
-      messageLower.includes("бизнес") ||
-      messageLower.includes("менеджмент")
-    ) {
-      return (
-        mentorInfo.includes("бизнес") ||
-        mentorInfo.includes("менеджмент") ||
-        mentorInfo.includes("business")
-      );
-    }
-    if (messageLower.includes("дизайн") || messageLower.includes("график")) {
-      return (
-        mentorInfo.includes("дизайн") ||
-        mentorInfo.includes("график") ||
-        mentorInfo.includes("design")
-      );
-    }
-    if (messageLower.includes("эрүүл") || messageLower.includes("анагаах")) {
-      return (
-        mentorInfo.includes("эрүүл") ||
-        mentorInfo.includes("анагаах") ||
-        mentorInfo.includes("health")
-      );
-    }
-    if (messageLower.includes("хууль") || messageLower.includes("эрх")) {
-      return (
-        mentorInfo.includes("хууль") ||
-        mentorInfo.includes("эрх") ||
-        mentorInfo.includes("law")
-      );
-    }
-    if (
-      messageLower.includes("sound") ||
-      messageLower.includes("audio") ||
-      messageLower.includes("engineer") ||
-      messageLower.includes("дуу")
-    ) {
-      return (
-        mentorInfo.includes("sound") ||
-        mentorInfo.includes("audio") ||
-        mentorInfo.includes("engineer") ||
-        mentorInfo.includes("дуу") ||
-        mentorInfo.includes("хөгжүүлэлт") ||
-        mentorInfo.includes("media")
-      );
-    }
-
-    return true; // Return all mentors for general requests
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content: "Чи Mentor Meet платформын туслах чатбот.",
+      },
+      { role: "user", content: prompt },
+    ],
+    temperature: 0.7,
   });
 
-  return relevantMentors.slice(0, 3); // Return top 3 relevant mentors
+  return (
+    response.choices[0].message.content ||
+    "AI хариу боловсруулахад алдаа гарлаа."
+  );
 };
 
-// Helper function to format mentor suggestions
-const formatMentorSuggestions = (
-  mentors: MentorInfo[],
-  category: string
-): string => {
-  if (mentors.length === 0) {
-    return " Менторуудтай холбогдохын тулд тэдний профайлыг үзээрэй.";
-  }
-
-  const mentorList = mentors
-    .map((mentor) => {
-      const name = `${mentor.firstName || ""} ${mentor.lastName || ""}`.trim();
-      const profession = mentor.profession || "Ментор";
-      const experience = mentor.experience?.careerDuration || "";
-      return `• ${name} (${profession}${
-        experience ? `, ${experience} жил туршлагатай` : ""
-      })`;
-    })
-    .join("\n");
-
-  return `\n\n${
-    category.charAt(0).toUpperCase() + category.slice(1)
-  }-д мэргэшсэн менторууд:\n${mentorList}\n\nЭдгээр менторуудтай холбогдохын тулд тэдний профайлыг үзээрэй.`;
-};
-
-// Original rule-based response generation (for backward compatibility)
-const getRuleBasedResponse = (messageLower: string): string => {
-  // Python programming related
-  if (messageLower.includes("python") || messageLower.includes("программ")) {
-    return "Python сурахад туслах ментор хэрэгтэй байна! Манай платформ дээр Python-д мэргэшсэн ширээтэн менторууд байна. Тэд танд Python програмчлалын үндэс, Django, Flask, data science зэргийг заахад бэлэн байна. Менторуудтай холбогдохын тулд тэдний профайлыг үзээрэй.";
-  }
-
-  // General programming
-  if (messageLower.includes("код") || messageLower.includes("технологи")) {
-    return "Программчлалын талаар асуулт байна! Манай платформ дээр ширээтэн менторууд байна. Тэд танд JavaScript, Python, React, Node.js зэрэг технологиудыг заахад бэлэн байна. Менторуудтай холбогдохын тулд тэдний профайлыг үзээрэй.";
-  }
-
-  // Business related
-  if (messageLower.includes("бизнес") || messageLower.includes("менеджмент")) {
-    return "Бизнес, менежментийн талаар асуулт байна! Манай платформ дээр ширээтэн менторууд байна. Тэд танд бизнес стратеги, менежмент зэргийг заахад бэлэн байна. Менторуудтай холбогдохын тулд тэдний профайлыг үзээрэй.";
-  }
-
-  // Design related
-  if (messageLower.includes("дизайн") || messageLower.includes("график")) {
-    return "Дизайн, графикийн талаар асуулт байна! Манай платформ дээр ширээтэн менторууд байна. Тэд танд UI/UX дизайн, график дизайн зэргийг заахад бэлэн байна. Менторуудтай холбогдохын тулд тэдний профайлыг үзээрэй.";
-  }
-
-  // Health related
-  if (messageLower.includes("эрүүл") || messageLower.includes("анагаах")) {
-    return "Эрүүл мэндийн талаар асуулт байна! Манай платформ дээр ширээтэн менторууд байна. Тэд танд эрүүл мэндийн зөвлөгөө өгөхөд бэлэн байна. Менторуудтай холбогдохын тулд тэдний профайлыг үзээрэй.";
-  }
-
-  // Law related
-  if (messageLower.includes("хууль") || messageLower.includes("эрх")) {
-    return "Хууль, эрх зүйн талаар асуулт байна! Манай платформ дээр ширээтэн менторууд байна. Тэд танд хууль, эрх зүйн асуудлуудыг тайлбарлахад бэлэн байна. Менторуудтай холбогдохын тулд тэдний профайлыг үзээрэй.";
-  }
-
-  // Mentor request related
-  if (messageLower.includes("санал") || messageLower.includes("болгооч")) {
-    return "Ментор санал болгох хүсэлт байна! Манай платформ дээр ширээтэн менторууд байна. Та өөрийн сонирхсон чиглэл, мэргэжлийг дэлгэрэнгүй тайлбарлавал би танд тохиромжтой ментор(ууд)-ыг санал болгож болно. Жишээ нь: програмчлал, бизнес, дизайн, эрүүл мэнд гэх мэт.";
-  }
-
-  // General response
-  return "Сайн байна уу! Таны асуултад хариулахад баяртай байна. Манай платформ дээр ширээтэн менторууд байна. Тэд танд тусламж үзүүлэхэд бэлэн байна. Менторуудтай холбогдохын тулд тэдний профайлыг үзээрэй. Мөн та өөрийн асуултаа дэлгэрэнгүй тайлбарлавал би танд тохиромжтой ментор(ууд)-ыг санал болгож болно.";
-};
-
-// Simple response for testing
+// =======================
+// Simple rule-based only fallback
+// =======================
 export const getSimpleResponse = (message: string): string => {
-  return getRuleBasedResponse(message.toLowerCase());
+  return getRuleBasedResponseWithMentors(message.toLowerCase());
 };

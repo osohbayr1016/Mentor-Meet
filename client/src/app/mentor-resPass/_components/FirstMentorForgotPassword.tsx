@@ -2,7 +2,7 @@ import Image from "next/image";
 // import axios from "axios";
 
 // const isEmailAvailable = async (email: string) => {
-//   const response = await axios.post('https://https://mentor-meet-o3rp.onrender.com/mentorEmail')
+//   const response = await axios.post('http://localhost:8000/mentorEmail')
 // }
 
 interface Props {

@@ -37,7 +37,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Create booking on the server
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const API_BASE_URL =
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
     const response = await fetch(`${API_BASE_URL}/bookings`, {
       method: "POST",
       headers: {

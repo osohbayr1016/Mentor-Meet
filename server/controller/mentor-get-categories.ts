@@ -5,14 +5,11 @@ export const getCategories = async (req: Request, res: Response) => {
   try {
     const categories = await CategoryModel.find({}).lean();
 
-
     if (!categories || categories.length === 0) {
       return res.status(404).send({ message: "Ангилал олдсонгүй." });
     }
 
     return res.status(200).send({ categories });
-    console.log(categories)
-
   } catch (error: any) {
     console.error("Get categories error:", error.message);
     return res.status(500).json({ message: "Сервер дээр алдаа гарлаа." });

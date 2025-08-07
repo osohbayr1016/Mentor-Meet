@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import { Booking } from "../model/booking-model";
-import { StudentModel } from "../model/student-model";
-import { MentorModel } from "../model/mentor-model";
+import { Booking, BookingStatus } from "../model/booking-model";
 
 export const createBooking = async (req: Request, res: Response) => {
   try {
@@ -14,75 +12,52 @@ export const createBooking = async (req: Request, res: Response) => {
       category,
     } = req.body;
 
+    
     if (!mentorId || !studentId || !date || !times || !price || !category) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Missing required fields: mentorId, studentId, date, times, price, category",
-      });
+      return res.status(400).json({ message: "Бүх талбарыг бүрэн бөглөнө үү." });
     }
 
+    
     if (!Array.isArray(times) || times.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Times must be a non-empty array",
+      return res.status(400).json({ message: "Цагийн мэдээлэл буруу байна." });
+    }
+
+    const bookingDate = new Date(date);
+
+    
+    const existingBooking = await Booking.findOne({
+      mentorId,
+      date: bookingDate,
+      times: { $in: times },
+    });
+
+    if (existingBooking) {
+      return res.status(409).json({
+        message: "Энэ цагт аль хэдийн захиалга хийгдсэн байна.",
       });
     }
 
-    const student = await StudentModel.findById(studentId);
-    if (!student) {
-      return res.status(404).json({
-        success: false,
-        message: "Student not found",
-      });
-    }
-
-    const mentor = await MentorModel.findById(mentorId);
-    if (!mentor) {
-      return res.status(404).json({
-        success: false,
-        message: "Mentor not found",
-      });
-    }
-
-    const bookings = [];
-
-    // Create one booking with all times
-    const booking = new Booking({
+    
+    const newBooking = new Booking({
       mentorId,
       studentId,
-      date: new Date(date),
-      times, // Use times array
-      price: Number(price),
+      date: bookingDate,
+      times,
+      price,
       category,
-      status: "PENDING",
+      status: BookingStatus.PENDING,
     });
 
-    await booking.save();
-    bookings.push(booking);
+    await newBooking.save();
 
     return res.status(201).json({
-      success: true,
-      message: "Bookings created successfully",
-      bookings: bookings.map((b) => ({
-        _id: b._id,
-        mentorId: b.mentorId,
-        studentId: b.studentId,
-        date: b.date,
-        times: b.times, 
-        price: b.price,
-        category: b.category,
-        status: b.status,
-        createdAt: b.createdAt,
-      })),
+      message: "Захиалга амжилттай үүсгэгдлээ.",
+      booking: newBooking,
     });
   } catch (error) {
-    console.error("Error creating bookings:", error);
+    console.error(" Захиалга үүсгэхэд алдаа гарлаа:", error);
     return res.status(500).json({
-      success: false,
-      message: "Failed to create bookings",
-      error: error instanceof Error ? error.message : "Unknown error",
+      message: "Сервер дээр алдаа гарлаа. Та дахин оролдоно уу.",
     });
   }
 };
-//???

@@ -4,84 +4,80 @@ dotenv.config();
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+
+
+import "./model/student-model";
+import "./model/mentor-model";
+import "./model/booking-model";
+
+
 import { MentorRouter } from "./router/mentor-router";
 import { StudentRouter } from "./router/student-router";
 import { CategoryRouter } from "./router/category-router";
 import { chatRouter } from "./router/chat-router";
 import { CalendarRouter } from "./router/calendar-router";
 import { PaymentRouter } from "./router/payment-router";
-import MeetingRouter from "./router/meeting.router";
 import { BookingRouter } from "./router/booking-router";
+import { NotificationRouter } from "./router/notification-router";
 
 const app = express();
+
+
 app.use(
   cors({
     origin: [
       "http://localhost:3000",
       "http://localhost:3001",
-      "http://127.0.0.1:3000",
-      "http://127.0.0.1:3001",
+      "http://localhost:8000",
     ],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    credentials: false,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["*"],
   })
 );
+
+
 app.use(express.json({ limit: "10mb" }));
+
 
 const uri = process.env.MONGODB_URI;
 const dataBaseConnection = async () => {
   try {
     await mongoose.connect(uri || "", {
-      maxPoolSize: 10, // Limit connection pool size
-      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
-      socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
-      bufferCommands: false, // Disable mongoose buffering
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      bufferCommands: false,
     });
-    console.log("DB connected");
+    console.log(" DB connected");
   } catch (error) {
-    console.error("Database connection failed:", error);
+    console.error(" Database connection failed:", error);
     process.exit(1);
   }
 };
 
+
 const startServer = async () => {
   try {
-    await dataBaseConnection(); 
+    await dataBaseConnection();
 
+    
     app.use(MentorRouter);
     app.use(StudentRouter);
     app.use(CategoryRouter);
     app.use(chatRouter);
     app.use(CalendarRouter);
     app.use(PaymentRouter);
-    app.use(MeetingRouter);
     app.use(BookingRouter);
+    app.use(NotificationRouter);
 
     const PORT = process.env.PORT || 8000;
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      
     });
   } catch (error) {
-    console.error("❌ Failed to start server:", error);
+    console.error(" Failed to start server:", error);
   }
 };
 
-startServer(); 
-
-//  dataBaseConnection();
-
-
-// app.use(MentorRouter);
-// app.use(StudentRouter);
-// app.use(CategoryRouter);
-// app.use(chatRouter);
-// app.use(CalendarRouter);
-// app.use(PaymentRouter);
-// app.use(MeetingRouter);
-// app.use(BookingRouter);
-
-// const PORT = process.env.PORT || 8000;
-// app.listen(PORT, () => {
-//   console.log(`🚀 Server running on http://localhost:${PORT}`);
-
+startServer();

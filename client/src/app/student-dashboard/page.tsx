@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import BookingCard from "../../components/BookingCard";
+import MentorCard from "./_components/MentorCard";
 import StudentAuthGuard from "../../components/StudentAuthGuard";
 
 interface Mentor {
@@ -34,13 +35,13 @@ const StudentDashboard = () => {
   const router = useRouter();
   const [bookings, setBookings] = useState<BookingsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"upcoming" | "history">(
-    "upcoming"
-  );
-  const [totalSpent] = useState(150000); // Mock data
+  const [activeTab, setActiveTab] = useState<
+    "upcoming" | "history" | "mentor-profile"
+  >("upcoming");
+  const [totalSpent, setTotalSpent] = useState(0);
 
   // Get student ID from localStorage
-  const [studentId, setStudentId] = useState("student_123");
+  const [studentId, setStudentId] = useState("");
 
   useEffect(() => {
     // Get student data from localStorage
@@ -48,146 +49,93 @@ const StudentDashboard = () => {
       const studentUser = localStorage.getItem("studentUser");
       if (studentUser) {
         const studentData = JSON.parse(studentUser);
-        setStudentId(studentData.studentId || "student_123");
+        setStudentId(
+          studentData.id || studentData._id || studentData.studentId || ""
+        );
       }
     } catch (error) {
       console.error("Error parsing student data:", error);
     }
-
-    fetchBookings();
   }, []);
+
+  useEffect(() => {
+    if (studentId) {
+      fetchBookings();
+    }
+  }, [studentId]);
 
   const fetchBookings = async () => {
     try {
       setLoading(true);
+      console.log("Fetching bookings for studentId:", studentId);
       const response = await fetch(
-        `/api/get-student-bookings?studentId=${studentId}`
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/get-booking-mentor/${studentId}`
       );
       const data = await response.json();
+      console.log("Booking data received:", data);
 
       if (data.success) {
-        setBookings(data.data);
+        // Transform the data to match the existing interface
+        const transformedData = data.data.reduce(
+          (acc: any, booking: any) => {
+            const bookingItem = {
+              _id: booking._id,
+              mentorId: {
+                _id: booking.mentorId,
+                firstName: booking.mentorName.split(" ")[0] || "",
+                lastName:
+                  booking.mentorName.split(" ").slice(1).join(" ") || "",
+                image:
+                  booking.mentorImage ||
+                  "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face",
+                profession: booking.mentorProfession || "Ментор",
+                rating: booking.mentorRating || 0,
+              },
+              date: booking.meetingDate,
+              time: booking.meetingTime,
+              status: booking.status || "PENDING",
+              price: booking.price,
+              category: booking.category || "Ерөнхий",
+            };
+
+            // Separate upcoming and past bookings
+            const meetingDate = new Date(booking.meetingDate);
+            const now = new Date();
+
+            if (meetingDate > now && booking.status !== "CANCELLED") {
+              acc.upcoming.push(bookingItem);
+            } else {
+              acc.past.push(bookingItem);
+            }
+
+            return acc;
+          },
+          { upcoming: [], past: [] }
+        );
+
+        setBookings(transformedData);
+
+        // Calculate total spent from all bookings
+        const allBookings = [
+          ...transformedData.upcoming,
+          ...transformedData.past,
+        ];
+        const total = allBookings.reduce(
+          (sum, booking) => sum + (booking.price || 0),
+          0
+        );
+        setTotalSpent(total);
       } else {
         console.error("Failed to fetch bookings:", data.message);
-        // Use mock data for now
-        setBookings({
-          upcoming: [
-            {
-              _id: "1",
-              mentorId: {
-                _id: "mentor_1",
-                firstName: "Сараа",
-                lastName: "Бат",
-                image:
-                  "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face",
-                profession: "Программчлалын багш",
-                rating: 4.8,
-              },
-              date: "2025-08-04",
-              time: "10:00",
-              status: "CONFIRMED",
-              price: 50000,
-              category: "Программчлал",
-            },
-            {
-              _id: "2",
-              mentorId: {
-                _id: "mentor_2",
-                firstName: "Бат",
-                lastName: "Дорж",
-                image:
-                  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face",
-                profession: "Бизнес зөвлөгч",
-                rating: 4.9,
-              },
-              date: "2025-08-05",
-              time: "14:00",
-              status: "PENDING",
-              price: 75000,
-              category: "Бизнес",
-            },
-          ],
-          past: [
-            {
-              _id: "3",
-              mentorId: {
-                _id: "mentor_3",
-                firstName: "Оюун",
-                lastName: "Болд",
-                image:
-                  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face",
-                profession: "Дизайнер",
-                rating: 4.7,
-              },
-              date: "2025-07-28",
-              time: "15:00",
-              status: "COMPLETED",
-              price: 60000,
-              category: "Дизайн",
-            },
-          ],
-        });
+        setBookings({ upcoming: [], past: [] });
+        setTotalSpent(0);
       }
     } catch (error) {
       console.error("Error fetching bookings:", error);
-      // Use mock data on error
-      setBookings({
-        upcoming: [
-          {
-            _id: "1",
-            mentorId: {
-              _id: "mentor_1",
-              firstName: "Сараа",
-              lastName: "Бат",
-              image:
-                "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face",
-              profession: "Программчлалын багш",
-              rating: 4.8,
-            },
-            date: "2025-08-04",
-            time: "10:00",
-            status: "CONFIRMED",
-            price: 50000,
-            category: "Программчлал",
-          },
-          {
-            _id: "2",
-            mentorId: {
-              _id: "mentor_2",
-              firstName: "Бат",
-              lastName: "Дорж",
-              image:
-                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face",
-              profession: "Бизнес зөвлөгч",
-              rating: 4.9,
-            },
-            date: "2025-08-05",
-            time: "14:00",
-            status: "PENDING",
-            price: 75000,
-            category: "Бизнес",
-          },
-        ],
-        past: [
-          {
-            _id: "3",
-            mentorId: {
-              _id: "mentor_3",
-              firstName: "Оюун",
-              lastName: "Болд",
-              image:
-                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face",
-              profession: "Дизайнер",
-              rating: 4.7,
-            },
-            date: "2025-07-28",
-            time: "15:00",
-            status: "COMPLETED",
-            price: 60000,
-            category: "Дизайн",
-          },
-        ],
-      });
+      setBookings({ upcoming: [], past: [] });
+      setTotalSpent(0);
     } finally {
       setLoading(false);
     }
@@ -298,7 +246,7 @@ const StudentDashboard = () => {
         {/* Main Dashboard */}
         <div className="relative z-10 w-full min-h-screen flex flex-col">
           {/* Main Content */}
-          <div className="flex-1 px-6 pb-20 pt-6">
+          <div className="flex-1 px-6 pb-10 pt-3 ">
             <div className="max-w-6xl mx-auto">
               {/* Main Dashboard Panel */}
               <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20 h-[650px] w-full">
@@ -325,6 +273,16 @@ const StudentDashboard = () => {
                         }`}
                       >
                         Уулзалтын түүх
+                      </button>
+                      <button
+                        onClick={() => setActiveTab("mentor-profile")}
+                        className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-colors ${
+                          activeTab === "mentor-profile"
+                            ? "bg-gray-600 text-white"
+                            : "text-gray-300 hover:bg-gray-700/50"
+                        }`}
+                      >
+                        Ментор профиль
                       </button>
                     </div>
 
@@ -382,36 +340,101 @@ const StudentDashboard = () => {
                       </p>
                     </div>
 
-                    {/* Meetings Section */}
+                    {/* Content Section */}
                     <div className="flex-1 flex flex-col">
-                      <h3 className="text-white text-lg font-semibold mb-4">
-                        {activeTab === "upcoming"
-                          ? "Таны товлосон уулзалтууд:"
-                          : "Уулзалтын түүх:"}
-                      </h3>
+                      {activeTab === "mentor-profile" ? (
+                        // Mentor Profile Section
+                        <div className="flex-1 flex flex-col">
+                          <h3 className="text-white text-lg font-semibold mb-4">
+                            Таны товлосон уулзалтууд:
+                          </h3>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto">
-                        {(activeTab === "upcoming"
-                          ? bookings?.upcoming
-                          : bookings?.past
-                        )?.map((booking) => (
-                          <BookingCard
-                            key={booking._id}
-                            booking={booking}
-                            onJoinMeeting={
-                              activeTab === "upcoming"
-                                ? handleJoinMeeting
-                                : undefined
-                            }
-                            onCancelBooking={
-                              activeTab === "upcoming"
-                                ? handleCancelBooking
-                                : undefined
-                            }
-                            showActions={activeTab === "upcoming"}
-                          />
-                        ))}
-                      </div>
+                          <div className="flex gap-4 flex-1 overflow-x-auto">
+                            {(() => {
+                              const allBookings = [
+                                ...(bookings?.upcoming || []),
+                                ...(bookings?.past || []),
+                              ];
+
+                              return allBookings.length > 0 ? (
+                                allBookings
+                                  .slice(0, 2)
+                                  .map((booking) => (
+                                    <MentorCard
+                                      key={booking._id}
+                                      booking={booking}
+                                      onCancel={handleCancelBooking}
+                                    />
+                                  ))
+                              ) : (
+                                <div className="flex items-center justify-center h-64 w-full">
+                                  <div className="text-center text-gray-400">
+                                    <p className="text-lg font-medium mb-2">
+                                      Ментор профиль байхгүй байна
+                                    </p>
+                                    <p className="text-sm">
+                                      Уулзалт захиалсны дараа энд харагдана
+                                    </p>
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        </div>
+                      ) : (
+                        // Meetings Section
+                        <div className="flex-1 flex flex-col">
+                          <h3 className="text-white text-lg font-semibold mb-4">
+                            {activeTab === "upcoming"
+                              ? "Таны товлосон уулзалтууд:"
+                              : "Уулзалтын түүх:"}
+                          </h3>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto">
+                            {(() => {
+                              const currentBookings =
+                                activeTab === "upcoming"
+                                  ? bookings?.upcoming || []
+                                  : bookings?.past || [];
+
+                              return currentBookings.length > 0 ? (
+                                currentBookings.map((booking) => (
+                                  <BookingCard
+                                    key={booking._id}
+                                    booking={booking}
+                                    onJoinMeeting={
+                                      activeTab === "upcoming"
+                                        ? handleJoinMeeting
+                                        : undefined
+                                    }
+                                    onCancelBooking={
+                                      activeTab === "upcoming"
+                                        ? handleCancelBooking
+                                        : undefined
+                                    }
+                                    showActions={activeTab === "upcoming"}
+                                  />
+                                ))
+                              ) : (
+                                <div className="col-span-2 flex items-center justify-center h-64">
+                                  <div className="text-center text-gray-400">
+                                    <p className="text-lg font-medium mb-2">
+                                      {activeTab === "upcoming"
+                                        ? "Товлосон уулзалт байхгүй байна"
+                                        : "Уулзалтын түүх байхгүй байна"}
+                                    </p>
+                                    <p className="text-sm">
+                                      {activeTab === "upcoming"
+                                        ? "Ментор хайж уулзалт захиалаарай"
+                                        : "Уулзалтын түүх энд харагдана"}
+                                    </p>
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

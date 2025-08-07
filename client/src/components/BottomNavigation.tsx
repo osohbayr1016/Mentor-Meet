@@ -1,32 +1,55 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { useAuth } from "../app/_components/MentorUserProvider";
 import { useEffect, useState } from "react";
+import { Bell } from "lucide-react";
+import axios from "axios";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@radix-ui/react-dialog";
 
 interface StudentData {
   studentId: string;
   email: string;
   firstName: string;
   lastName: string;
-  // Add other student fields as needed
+}
+
+interface Booking {
+  _id: string;
+  date: string;
+  time: string;
+  status: "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED";
+  price: number;
+  category: string;
 }
 
 const BottomNavigation = () => {
   const pathname = usePathname();
   const { mentor, isLoading } = useAuth();
   const [student, setStudent] = useState<StudentData | null>(null);
-
+  const [notification, setNotification] = useState([]);
+  const [unRead, setUnRead] = useState(false);
+  const [dialog, setDialog] = useState(false)
+  const [booking, setBooking] = useState<Booking | null>(null)
+  const params = useParams();
+  const mentorId = params.id as string;
   // Check for student authentication
   useEffect(() => {
     const checkStudentAuth = () => {
       try {
         const studentToken = localStorage.getItem("studentToken");
         const studentUserStr = localStorage.getItem("studentUser");
+        console.log(studentUserStr, "student id");
 
         if (studentToken && studentUserStr) {
-          const studentData = JSON.parse(studentUserStr) as StudentData;
+          // const studentData = JSON.parse(studentUserStr) as StudentData;
+          const studentDataRaw = JSON.parse(studentUserStr);
+          const studentData: StudentData = {
+            ...studentDataRaw,
+            studentId: studentDataRaw.id,
+          };
+
           setStudent(studentData);
         } else {
           setStudent(null);
@@ -124,12 +147,78 @@ const BottomNavigation = () => {
     "/student-resPass",
   ];
 
+  // Show notification bell only when either mentor or student is logged in
+  const isLoggedIn = mentor || student;
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      const userId = mentor?.mentorId;
+      if (!userId) return;
+
+      try {
+        console.log(mentor?.mentorId, "id");
+        const response = await axios.get(
+          `${
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+          }/notification/${userId}`
+        );
+        const data: any = response.data;
+
+        console.log("Notifications fetched:", data.notification);
+
+        setNotification(data.notification);
+        setUnRead(data.notification?.some((n: any) => !n.checked));
+      } catch (err) {
+        console.error("Error fetching notifications", err);
+      }
+    };
+
+    fetchNotifications();
+  }, [mentor]);
+
+
+// const handleDialogBook = async () =>{
+
+//   const userId = mentor?.mentorId
+//   console.log(userId, "bell");
+  
+
+// try {
+
+//   const response = await axios.get(`http://localhost:8000/booking/${userId}`);
+//   const data:any = response.data
+
+//   if(data.success) {
+
+//   }
+//   setBooking(data)
+//   setDialog(true)
+
+// } catch (err:any){
+//   console.log(err.response.data.message, "error fetch booking");
+// } 
+
+// }
+
+const handleDialogBook = async () => {
+  const userId = mentor?.mentorId;
+  if (!userId) return;
+
+  try {
+    const response = await axios.get(`http://localhost:8000/booking/${userId}`);
+    const data:any = response.data;
+
+    setBooking(data);
+    setDialog(true);
+  } catch (err: any) {
+    console.log(err.response?.data?.message || "Алдаа гарлаа");
+  }
+};
+
+
   if (hideNavigationPages.includes(pathname)) {
     return null;
   }
-
-  // Show notification bell only when either mentor or student is logged in
-  const isLoggedIn = mentor || student;
 
   return (
     <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-40 rounded-full overflow-hidden bg-[#737373]/60 backdrop-blur-2xl">
@@ -171,28 +260,48 @@ const BottomNavigation = () => {
             >
               {thirdButton.text}
             </Link>
-            {isLoggedIn && (
-              <div className="flex items-center">
-                <button className="p-2 text-white/70 hover:text-white transition-colors">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                  </svg>
-                </button>
-              </div>
-            )}
-          </div>
+      
+     
+<Dialog open={dialog} onOpenChange={setDialog}>
+  <DialogTrigger asChild>
 
-          {/* Notification Bell - Only show when logged in */}
+    {isLoggedIn && (
+      <button
+        onClick={handleDialogBook}
+        className="relative p-2 text-white/70 hover:text-white transition-colors"
+      >
+        {unRead && (
+          <span className="absolute top-1 right-1 w-3 h-3 bg-red-600 rounded-full" />
+        )}
+        <Bell size={20} />
+      </button>
+    )}
+  </DialogTrigger>
+  <DialogTitle></DialogTitle>
+  <DialogContent className="bg-white rounded-xl shadow-xl p-4 max-w-md w-full">
+    <h3 className="text-lg font-semibold mb-2">Шинэ захиалгууд</h3>
+
+    {booking  ? (
+     
+        <div
+          key={booking._id}
+          className="border-b py-2 text-sm text-gray-700"
+        >
+          <p>Огноо: {booking.date}</p>
+          <p>Цаг: {booking.time}</p>
+          <p>Ангилал: {booking.category}</p>
+          <p>Үнэ: {booking.price}₮</p>
+          <p>Төлөв: {booking.status}</p>
+        </div>
+    
+    ) : (
+      <p className="text-gray-500 text-sm">Захиалга алга байна.</p>
+    )}
+  </DialogContent>
+</Dialog>
+ 
+
+          </div>
         </div>
       </div>
     </div>

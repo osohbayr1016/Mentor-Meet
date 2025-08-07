@@ -11,16 +11,12 @@ export const MentorLogin = async (req: Request, res: Response) => {
     const { email, password, googleAuth } = req.body;
 
     if (!email) {
-      return res
-        .status(400)
-        .send({ message: "Имайл шаардлагатай!" });
+      return res.status(400).send({ message: "Имайл шаардлагатай!" });
     }
 
     // For traditional login, password is required
     if (!googleAuth && !password) {
-      return res
-        .status(400)
-        .send({ message: "Нууц үг шаардлагатай!" });
+      return res.status(400).send({ message: "Нууц үг шаардлагатай!" });
     }
 
     const mentor = await MentorModel.findOne({ email });
@@ -31,7 +27,9 @@ export const MentorLogin = async (req: Request, res: Response) => {
     // For Google OAuth users, skip password validation
     if (!googleAuth) {
       if (!mentor.password) {
-        return res.status(401).send({ message: "Энэ хэрэглэгч Google-р бүртгэгдсэн байна!" });
+        return res
+          .status(401)
+          .send({ message: "Энэ хэрэглэгч Google-р бүртгэгдсэн байна!" });
       }
 
       const isPasswordValid = await bcrypt.compare(password, mentor.password);
@@ -41,18 +39,19 @@ export const MentorLogin = async (req: Request, res: Response) => {
     } else {
       // For Google OAuth users, verify they have googleAuth enabled
       if (!mentor.googleAuth) {
-        return res.status(401).send({ message: "Энэ хэрэглэгч Google-р бүртгэгдээгүй байна!" });
+        return res
+          .status(401)
+          .send({ message: "Энэ хэрэглэгч Google-р бүртгэгдээгүй байна!" });
       }
     }
 
     const secret = process.env.JWT_SECRET;
-    console.log(secret, "login secter");
 
     if (!secret)
       return res.status(500).send({ message: "JWT тохиргоо алга байна!" });
 
     const token = jwt.sign(
-      { mentorId: mentor._id.toString(), isMentor: mentor.role === "MENTOR" },
+      { mentorId: mentor._id.toString(), email: mentor.email },
       secret,
       { expiresIn: "24h" }
     );
@@ -69,6 +68,3 @@ export const MentorLogin = async (req: Request, res: Response) => {
       .json({ message: "Серверийн алдаа!", error: error.message });
   }
 };
-
-
-

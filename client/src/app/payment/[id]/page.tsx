@@ -76,7 +76,11 @@ const MentorPayment = () => {
 
     const fetchMentor = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/mentor/${mentorId}`);
+        const res = await fetch(
+          `${
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+          }/mentor/${mentorId}`
+        );
         if (!res.ok) {
           throw new Error("Mentor олдсонгүй");
         }
@@ -88,7 +92,6 @@ const MentorPayment = () => {
     fetchMentor();
   }, [mentorId]);
 
-
   useEffect(() => {
     const timesParam = searchParams.get("times");
     if (timesParam) {
@@ -96,7 +99,6 @@ const MentorPayment = () => {
         const parsedTimes = JSON.parse(decodeURIComponent(timesParam));
         setSelectedTimesByDate(parsedTimes);
 
- 
         if (mentor) {
           const totalHours = Object.values(parsedTimes).flat().length;
           setTotalPrice(totalHours * mentor.hourlyPrice);
@@ -107,32 +109,32 @@ const MentorPayment = () => {
     }
   }, [searchParams, mentor]);
 
-const getAllSelectedTimes = async () => {
-  try {
+  const getAllSelectedTimes = async () => {
+    try {
+      const response = await axios.get<{
+        availabilities: { date: string; times: string[] }[];
+      }>(
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/calendar/${mentorId}`
+      );
 
-
-    const response = await axios.get<{
-      availabilities: { date: string; times: string[] }[];
-    }>(`http://localhost:8000/calendar/${mentorId}`);
-
-    const allTimes = response.data.availabilities.flatMap((a) => a.times);
-    return allTimes;
-    
-  } catch (err) {
-    console.error("Цаг авахад алдаа гарлаа:", err);
-    return [];
-  }
-};
-
-useEffect(() => {
-  const fetchTimes = async () => {
-    const times = await getAllSelectedTimes();
-    console.log("Сонгосон цагууд:", times);
+      const allTimes = response.data.availabilities.flatMap((a) => a.times);
+      return allTimes;
+    } catch (err) {
+      console.error("Цаг авахад алдаа гарлаа:", err);
+      return [];
+    }
   };
 
-  fetchTimes();
-}, []);
+  useEffect(() => {
+    const fetchTimes = async () => {
+      const times = await getAllSelectedTimes();
+      console.log("Сонгосон цагууд:", times);
+    };
 
+    fetchTimes();
+  }, []);
 
   // Get total selected hours
   const getTotalSelectedHours = () => {
@@ -150,44 +152,44 @@ useEffect(() => {
     return formattedTimes;
   };
 
+  const savePayment = async () => {
+    const token = localStorage.getItem("studentToken");
+    const student = JSON.parse(localStorage.getItem("studentUser") || "{}")?.id;
+    const calendarId =
+      searchParams.get("calendarId") || localStorage.getItem("calendarId");
+    const paymentStatus = "pending";
+    const studentEmail = localStorage.getItem("studentEmail");
+    const studentId = localStorage.getItem("studentUser");
 
-const savePayment = async () => {
-  const token = localStorage.getItem("studentToken");
-  const student = JSON.parse(localStorage.getItem("studentUser") || "{}")?.id;
-  const calendarId = searchParams.get("calendarId") || localStorage.getItem("calendarId")
-  const paymentStatus = "pending";
-  const studentEmail = localStorage.getItem("studentEmail");
-  const studentId = localStorage.getItem("studentUser");
+    try {
+      const response = await axios.post(
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+        }/payment/${student}`,
+        {
+          mentorId,
+          studentId: student,
+          price: totalPrice,
+          paymentStatus,
+          email: studentEmail,
+          calendarId,
+        }
+      );
 
+      setPaymentSuccess(true);
 
-  try {
-    const response = await axios.post(
-      `http://localhost:8000/payment/${student}`,
-      {
-        mentorId,
+      console.log("REQUEST DATA:", {
         studentId: student,
+        mentorId,
         price: totalPrice,
         paymentStatus,
         email: studentEmail,
-       calendarId,
-      }
-    );
-
-    setPaymentSuccess(true);
-
-    console.log("REQUEST DATA:", {
-      studentId: student,
-      mentorId,
-      price: totalPrice,
-      paymentStatus,
-      email: studentEmail,
-      calendarId,
-    });
-  } catch (err) {
-    console.error("Төлбөр илгээхэд алдаа гарлаа:", err);
-  }
-};
-  
+        calendarId,
+      });
+    } catch (err) {
+      console.error("Төлбөр илгээхэд алдаа гарлаа:", err);
+    }
+  };
 
   return (
     <div className="relative w-full h-screen">
@@ -379,4 +381,3 @@ const savePayment = async () => {
 };
 
 export default MentorPayment;
-
