@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { StudentModel } from "../model/student-model";
 
-// Student profile авах
+// 🧑‍🎓 Student profile авах
 export const getStudentProfile = async (req: Request, res: Response) => {
   try {
     const { email } = req.params;
@@ -20,8 +20,8 @@ export const getStudentProfile = async (req: Request, res: Response) => {
       name: student.nickname || "Unknown",
       email: student.email,
       phoneNumber: student.phoneNumber,
-      createAt: student.createAt,
-      updateAt: student.updateAt,
+      createdAt: student.createdAt,
+      updatedAt: student.updatedAt,
     };
 
     res.json(profile);
@@ -31,7 +31,7 @@ export const getStudentProfile = async (req: Request, res: Response) => {
   }
 };
 
-// Student profile шинэчлэх
+// 📝 Student profile шинэчлэх
 export const updateStudentProfile = async (req: Request, res: Response) => {
   try {
     const { email } = req.params;
@@ -44,7 +44,7 @@ export const updateStudentProfile = async (req: Request, res: Response) => {
     const updateData: any = {};
     if (nickname) updateData.nickname = nickname;
     if (phoneNumber) updateData.phoneNumber = phoneNumber;
-    updateData.updateAt = new Date();
+    updateData.updatedAt = new Date(); // ✅ зөв нэршил
 
     const student = await StudentModel.findOneAndUpdate({ email }, updateData, {
       new: true,
@@ -58,8 +58,8 @@ export const updateStudentProfile = async (req: Request, res: Response) => {
       name: student.nickname || "Unknown",
       email: student.email,
       phoneNumber: student.phoneNumber,
-      createAt: student.createAt,
-      updateAt: student.updateAt,
+      createdAt: student.createdAt,
+      updatedAt: student.updatedAt,
     };
 
     res.json(profile);
@@ -69,7 +69,7 @@ export const updateStudentProfile = async (req: Request, res: Response) => {
   }
 };
 
-// Бүх student-уудын жагсаалт авах
+// 🧾 Бүх student-уудын жагсаалт авах
 export const getAllStudents = async (_req: Request, res: Response) => {
   try {
     const students = await StudentModel.find({}, { password: 0 }); // password-г хасаж авна
@@ -78,8 +78,8 @@ export const getAllStudents = async (_req: Request, res: Response) => {
       name: student.nickname || "Unknown",
       email: student.email,
       phoneNumber: student.phoneNumber,
-      createAt: student.createAt,
-      updateAt: student.updateAt,
+      createdAt: student.createdAt,
+      updatedAt: student.updatedAt,
     }));
 
     res.json(profiles);
