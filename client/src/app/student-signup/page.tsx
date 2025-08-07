@@ -451,7 +451,7 @@ const StudentSignupPage = () => {
 
               {error && (
                 <div className="text-red-400 text-sm text-center mb-4">
-                  {error}
+                  {typeof error === "string" ? error : "Алдаа гарлаа"}
                 </div>
               )}
 

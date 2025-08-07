@@ -20,7 +20,8 @@ const StudentLoginPage = () => {
   const handleGoogleSuccess = async (session: any) => {
     try {
       // Use the existing studentLogin endpoint with googleAuth flag
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const API_BASE_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       const response = await fetch(`${API_BASE_URL}/studentLogin`, {
         method: "POST",
         headers: {
@@ -46,7 +47,10 @@ const StudentLoginPage = () => {
         // Redirect to student dashboard
         router.push("/student-dashboard");
       } else {
-        setError(data.message || "Google-р нэвтрэхэд алдаа гарлаа. Эхлээд Google-р бүртгүүлнэ үү.");
+        setError(
+          data.message ||
+            "Google-р нэвтрэхэд алдаа гарлаа. Эхлээд Google-р бүртгүүлнэ үү."
+        );
       }
     } catch (error) {
       console.error("Google login error:", error);
@@ -76,7 +80,8 @@ const StudentLoginPage = () => {
     setError("");
 
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const API_BASE_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       const response = await fetch(`${API_BASE_URL}/studentLogin`, {
         method: "POST",
         headers: {
@@ -168,7 +173,7 @@ const StudentLoginPage = () => {
 
                 {error && (
                   <div className="text-red-400 text-sm text-center">
-                    {error}
+                    {typeof error === "string" ? error : "Алдаа гарлаа"}
                   </div>
                 )}
 
