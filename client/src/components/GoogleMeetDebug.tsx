@@ -32,7 +32,7 @@ export default function GoogleMeetDebug() {
       hasSession: !!session,
       hasAccessToken: !!(session as any)?.accessToken,
       tokenLength: (session as any)?.accessToken?.length,
-      userEmail: session?.user?.email,
+      userEmail: session?.user?.email || undefined,
       expiresAt: (session as any)?.expiresAt,
     });
   };

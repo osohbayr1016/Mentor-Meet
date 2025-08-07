@@ -137,16 +137,13 @@ export async function GET(request: NextRequest) {
     const data = generateReportsData(period);
 
     // Filter data based on report type
-    let filteredData = data;
+    let filteredData: any = data;
     switch (reportType) {
       case "revenue":
         filteredData = {
           revenueData: data.revenueData,
           categoryStats: data.categoryStats,
-          performanceMetrics: {
-            totalSessions: data.performanceMetrics.totalSessions,
-            averageBookingValue: data.performanceMetrics.averageBookingValue,
-          },
+          performanceMetrics: data.performanceMetrics,
           generatedAt: data.generatedAt,
           period: data.period,
         };
