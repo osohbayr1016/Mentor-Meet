@@ -46,16 +46,19 @@ const SignupPage = () => {
   const [autoLoggingIn, setAutoLoggingIn] = useState(false);
   const [error, setError] = useState("");
   const [googleUserData, setGoogleUserData] = useState<any>(null);
+  const [isGoogleAuth, setIsGoogleAuth] = useState(false);
 
-  // Handle Google OAuth sign-in
-  const handleGoogleSignIn = async (userData: any) => {
+  // Handle Google OAuth success (similar to student signup)
+  const handleGoogleSuccess = async (session: any) => {
+    console.log("Google OAuth success called with session:", session);
+    setIsGoogleAuth(true);
     setLoading(true);
     setError("");
 
     try {
       // Check if mentor already exists with this email
       const checkResponse = await axios.post(`${BACKEND_URL}/mentorEmail`, {
-        email: userData.email,
+        email: session.user?.email,
       });
 
       // Type the response data properly
@@ -64,61 +67,69 @@ const SignupPage = () => {
         message?: string;
       };
 
+      console.log("mentorEmail response:", checkData);
+
       if (checkData.error) {
-        // Mentor doesn't exist, create new mentor with Google data
-        const signupResponse = await axios.post<SignupResponse>(
-          `${BACKEND_URL}/mentorSignup`,
-          {
-            email: userData.email,
-            password: "", // No password for Google OAuth users
-            googleAuth: true,
-            googleData: {
-              name: userData.name,
-              image: userData.image,
-              accessToken: userData.accessToken,
-            },
-          }
-        );
-
-        if (signupResponse.data.token) {
-          // Store token immediately after successful signup
-          localStorage.setItem("mentorToken", signupResponse.data.token);
-
-          // Auto-login successful
-          const mentorData = {
-            mentorId: signupResponse.data.mentorId,
-            email: userData.email,
-            isAdmin: false,
-            firstName: userData.name?.split(" ")[0] || "",
-            lastName: userData.name?.split(" ").slice(1).join(" ") || "",
-            image: userData.image,
-          };
-
-          localStorage.setItem("mentorUser", JSON.stringify(mentorData));
-
-          setGoogleUserData(userData);
-          setStep(3); // Skip to success step
-
-          setTimeout(() => {
-            router.push("/create-profile");
-          }, 3000);
-        }
+        // Mentor doesn't exist, proceed with Google signup
+        console.log("Email available, proceeding with Google signup");
+        setGoogleUserData({
+          email: session.user?.email,
+          name: session.user?.name,
+          image: session.user?.image,
+          accessToken: session.accessToken,
+        });
+        setForm(prev => ({ ...prev, email: session.user?.email || "" }));
+        setStep(3); // Skip to success step for Google users
       } else {
-        // Mentor already exists, try to login
-        setError("Энэ имэйл хаягтай хэрэглэгч аль хэдийн бүртгэгдсэн байна.");
+        // Mentor already exists, try to login with Google
+        console.log("Mentor already exists, attempting Google login");
+        try {
+          const loginResponse = await axios.post(`${BACKEND_URL}/mentorLogin`, {
+            email: session.user?.email,
+            googleAuth: true,
+          });
+
+          console.log("Google login response:", loginResponse.data);
+
+          if (loginResponse.data.token) {
+            // Store the authentication data
+            localStorage.setItem("mentorToken", loginResponse.data.token);
+            localStorage.setItem("mentorEmail", session.user?.email || "");
+            localStorage.setItem("mentorUser", JSON.stringify(loginResponse.data.mentor));
+
+            console.log("Google login successful, redirecting to create-profile");
+            router.push("/create-profile");
+            return; // Exit early on successful login
+          } else {
+            setError("Google аккаунт олдсон боловч нэвтрэхэд алдаа гарлаа. Гарын авлагаар нэвтэрнэ үү.");
+          }
+        } catch (loginError: any) {
+          console.error("Google login error:", loginError);
+          setError("Google-р нэвтрэхэд алдаа гарлаа. Гарын авлагаар нэвтэрнэ үү.");
+        }
       }
     } catch (error: any) {
-      console.error("Google sign-in error:", error);
-      setError(
-        error.response?.data?.message || "Google-р бүртгүүлэхэд алдаа гарлаа"
-      );
+      console.error("Google sign-up error:", error);
+      setError(`Google-р бүртгүүлэхэд алдаа гарлаа: ${error.message || error}`);
     } finally {
       setLoading(false);
     }
   };
 
+  // Handle Google OAuth error
+  const handleGoogleError = (error: string) => {
+    console.error("Google OAuth error:", error);
+    setError(typeof error === 'string' ? error : 'Google OAuth алдаа гарлаа');
+    setLoading(false);
+  };
+
   // Step 1: Email
   const handleEmailSubmit = async () => {
+    // Prevent OTP flow if Google Auth is being used
+    if (isGoogleAuth) {
+      return;
+    }
+
     setLoading(true);
     setError("");
     try {
@@ -174,6 +185,61 @@ const SignupPage = () => {
 
   // Step 3: Signup
   const handleSignupSubmit = async () => {
+    // If it's Google auth, handle Google signup
+    if (isGoogleAuth && googleUserData) {
+      setLoading(true);
+      setError("");
+      try {
+        // Create mentor with Google data
+        const res = await axios.post<SignupResponse>(
+          `${BACKEND_URL}/mentorSignup`,
+          {
+            email: googleUserData.email,
+            password: "", // No password for Google OAuth users
+            googleAuth: true,
+            googleData: {
+              name: googleUserData.name,
+              image: googleUserData.image,
+              accessToken: googleUserData.accessToken,
+            },
+          }
+        );
+
+        if (res.data.token) {
+          // Store token immediately after successful signup
+          localStorage.setItem("mentorToken", res.data.token);
+
+          // Auto-login successful
+          const mentorData = {
+            mentorId: res.data.mentorId,
+            email: googleUserData.email,
+            isAdmin: false,
+            firstName: googleUserData.name?.split(" ")[0] || "",
+            lastName: googleUserData.name?.split(" ").slice(1).join(" ") || "",
+            image: googleUserData.image,
+          };
+
+          localStorage.setItem("mentorUser", JSON.stringify(mentorData));
+
+          setStep(3); // Go to success step
+
+          setTimeout(() => {
+            router.push("/create-profile");
+          }, 3000);
+          return;
+        }
+      } catch (error: any) {
+        console.error("Google signup error:", error);
+        setError(
+          error.response?.data?.message || "Google-р бүртгүүлэхэд алдаа гарлаа"
+        );
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Regular password-based signup
     // Password validation
     if (form.password !== form.confirmPassword) {
       setError("Password not matching");
@@ -309,7 +375,8 @@ const SignupPage = () => {
           onSubmit={handleEmailSubmit}
           loading={loading}
           error={error}
-          onGoogleSignIn={handleGoogleSignIn}
+          onGoogleSuccess={handleGoogleSuccess}
+          onGoogleError={handleGoogleError}
         />
       )}
       {step === 1 && (
