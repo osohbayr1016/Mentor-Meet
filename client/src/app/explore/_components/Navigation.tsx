@@ -176,35 +176,48 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
     categories: Category[];
   };
   // Fetch categor
-  // ies from backend
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setLoading(true);
+  // Fetch categories function
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      setError(""); // Clear any previous errors
 
-        const response = await axios.get<CategoriesResponse>(
-          "https://mentor-meet-h0tx.onrender.com/categories"
-        );
+      const response = await axios.get<CategoriesResponse>(
+        "https://mentor-meet-h0tx.onrender.com/mentor-get-category"
+      );
 
-        const categories = response.data?.categories;
-        console.log(categories);
-        if (Array.isArray(categories) && categories.length > 0) {
-          setCategories(categories);
-          // Don't auto-select first category, let user choose or show all
-          setSelectedCategory(""); // Start with no category selected
-        } else {
-          setError("Ангилал олдсонгүй");
-        }
-      } catch (error: any) {
-        console.error("Ангилал авахад алдаа гарлаа:", error);
+      const categories = response.data?.categories;
+      console.log("Fetched categories:", categories);
+      if (Array.isArray(categories) && categories.length > 0) {
+        setCategories(categories);
+        // Don't auto-select first category, let user choose or show all
+        setSelectedCategory(""); // Start with no category selected
+      } else {
+        setError("Ангилал олдсонгүй");
+      }
+    } catch (error: any) {
+      console.error("Ангилал авахад алдаа гарлаа:", error);
+      if (error.response?.status === 404) {
+        setError("Ангилалын мэдээлэл олдсонгүй. Дахин оролдоно уу.");
+      } else if (error.response?.status >= 500) {
+        setError("Сервер дээр алдаа гарлаа. Дахин оролдоно уу.");
+      } else if (
+        error.code === "NETWORK_ERROR" ||
+        error.code === "ECONNABORTED"
+      ) {
+        setError("Сүлжээний холболт амжилтгүй. Интернэт холболтоо шалгана уу.");
+      } else {
         setError(
           error.response?.data?.message || "Ангилал авахад амжилтгүй боллоо"
         );
-      } finally {
-        setLoading(false);
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Fetch categories from backend
+  useEffect(() => {
     fetchCategories();
   }, []);
 
@@ -312,7 +325,19 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   if (error) {
     return (
       <div className="w-full h-[600px] flex items-center justify-center">
-        <div className="text-red-500 text-lg">Error: {error}</div>
+        <div className="text-center">
+          <div className="text-red-500 text-lg mb-4">{error}</div>
+          <button
+            onClick={() => {
+              setError("");
+              setLoading(true);
+              fetchCategories();
+            }}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Дахин оролдох
+          </button>
+        </div>
       </div>
     );
   }
@@ -416,14 +441,14 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
       <div className="flex-1 px-[150px] pt-[30px] flex justify-center">
         <div className="w-300 h-200 flex rounded-[20px]">
           {/* Left Sidebar */}
-        <div className=" border-none backdrop-blur-md bg-black/30 rounded-l-[40px]">
-          <Sidebar
-            selectedCategory={selectedCategory}
-            onSubCategorySelect={handleSubCategorySelect}
-            selectedSubCategory={selectedSubCategory}
-            categories={categories}
-          />
-       </div>
+          <div className=" border-none backdrop-blur-md bg-black/30 rounded-l-[40px]">
+            <Sidebar
+              selectedCategory={selectedCategory}
+              onSubCategorySelect={handleSubCategorySelect}
+              selectedSubCategory={selectedSubCategory}
+              categories={categories}
+            />
+          </div>
 
           {/* Right Content Area */}
           <div className="flex-1 h-full flex flex-col  backdrop-blur-md bg-[#33333366] rounded-r-[40px]  ">
