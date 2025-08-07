@@ -28,7 +28,7 @@ api.interceptors.request.use((config) => {
   }
 
   // 🔍 Debug info
-  console.log("📡 Outgoing request to:", config.baseURL + config.url);
+console.log(`[API] ${config.baseURL ?? ""}${config.url ?? ""}`);
   console.log("📦 Request method:", config.method?.toUpperCase());
   console.log("📤 Request headers:", config.headers);
   if (config.data) console.log("📝 Request data:", config.data);

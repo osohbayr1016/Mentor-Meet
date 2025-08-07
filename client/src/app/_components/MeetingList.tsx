@@ -2,8 +2,8 @@
 
 import { FC } from "react";
 import { format } from "date-fns";
-import MeetingCard from "../../components/MeetingCard"; 
-import { Meeting } from "@/app/types/mentor"; 
+import { MeetingCard } from "../../components/MeetingCard"; // ✅ named export ашиглаж байгаа бол ингэж оруулна
+import { Meeting } from "@/app/types/mentor";
 
 interface MeetingListProps {
   meetings: Meeting[];
@@ -31,10 +31,11 @@ const MeetingList: FC<MeetingListProps> = ({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {meetings.map((meeting, index) => {
-            // ✅ Хэрвээ day байхгүй бол date-оос гаргаж авна
+            // ✨ day байхгүй бол date-оос weekday-ийг гаргаж авна
             const ensuredDay =
               meeting.day || format(new Date(meeting.date), "EEEE");
 
+            // ✨ шинэчилсэн объект
             const updatedMeeting: Meeting = {
               ...meeting,
               day: ensuredDay,
