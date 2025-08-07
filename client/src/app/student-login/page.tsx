@@ -49,7 +49,11 @@ const StudentLoginPage = () => {
       } else {
         setError(
           data.message ||
+<<<<<<< HEAD
             "Google-р нэвтрэхэд алдаа гарлаа. Эхлээд Google-р бүртгүүлнэ үү."
+=======
+            "Google-р нэвтрэхэд алдаа гарлаа. Эхлээд бүртгүүлнэ үү."
+>>>>>>> 2cb9e37a208a15145424c69249c26170eab01daf
         );
       }
     } catch (error) {
@@ -126,7 +130,7 @@ const StudentLoginPage = () => {
 
       {/* Main Login Modal */}
       <div className="relative z-10 w-full h-full flex justify-center items-center">
-        <div className="w-6/10 h-7/10 flex items-center justify-center">
+        <div className="w-6/10 h-8/10 flex items-center justify-center">
           <div className="w-full h-full border-gray-400/50 border-1 backdrop-blur-md bg-black/20 flex flex-col items-center justify-center rounded-[20px]">
             {/* Header */}
             <div className="flex gap-3 mb-8">

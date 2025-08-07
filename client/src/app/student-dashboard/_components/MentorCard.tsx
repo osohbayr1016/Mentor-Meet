@@ -49,15 +49,15 @@ const MentorCard: React.FC<MentorCardProps> = ({ booking, onCancel }) => {
     //         <span className="text-gray-700 text-sm ml-1">{booking.mentorId.rating}</span>
     //       </div>
     //       <div className="space-y-1 text-sm text-gray-600 mb-4">
-    //         <p>Уулзалтын өдөр: {new Date(booking.date).toLocaleDateString('mn-MN', { 
-    //           month: 'long', 
-    //           day: 'numeric', 
-    //           weekday: 'long' 
+    //         <p>Уулзалтын өдөр: {new Date(booking.date).toLocaleDateString('mn-MN', {
+    //           month: 'long',
+    //           day: 'numeric',
+    //           weekday: 'long'
     //         })}</p>
     //         <p>Уулзалтын цаг: {booking.time}</p>
     //         <p>Үнэ: {booking.price?.toLocaleString()}₮</p>
     //       </div>
-    //       <button 
+    //       <button
     //         onClick={() => onCancel(booking._id)}
     //         className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors"
     //       >
@@ -66,31 +66,33 @@ const MentorCard: React.FC<MentorCardProps> = ({ booking, onCancel }) => {
     //     </div>
     //   </div>
     // </div>
-     <div className="bg-black/40 rounded-[20px] p-4 w-[360px] h-[220px] flex flex-col gap-8 ">
+    <div className="bg-black/40 rounded-[20px] p-4 w-[360px] h-[220px] flex flex-col gap-8 ">
       <div className="space-y-2 text-white  ">
-            <img
-            src={booking.mentorId.image || "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face"}
-            alt="Mentor"
-            className="w-16 h-16 rounded-full object-cover"
-          />
+        <img
+          src={
+            booking.mentorId.image ||
+            "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=64&h=64&fit=crop&crop=face"
+          }
+          alt="Mentor"
+          className="w-16 h-16 rounded-full object-cover"
+        />
         <div className="flex flex-row gap-30">
-        <p className="flex flex-col">
-          <span className="text-gray-400 text-[12px]">Уулзалтын өдөр:</span> 
-          <span className="font-semibold">
-          </span>
-          <span className="font-semibold" ></span>
-        </p>
-        <p className="flex flex-col">
-          <span className="text-gray-400 text-[12px]">Уулзалтын цаг:</span>
-          <span className="font-semibold"></span>
-        </p>
+          <p className="flex flex-col">
+            <span className="text-gray-400 text-[12px]">Уулзалтын өдөр:</span>
+            <span className="font-semibold"></span>
+            <span className="font-semibold"></span>
+          </p>
+          <p className="flex flex-col">
+            <span className="text-gray-400 text-[12px]">Уулзалтын цаг:</span>
+            <span className="font-semibold"></span>
+          </p>
         </div>
         <p className="flex flex-col">
           <span className="text-gray-400 text-[12px]">Суралцагч:</span>
-         <span className="font-semibold"></span>
+          <span className="font-semibold"></span>
         </p>
       </div>
-      </div>
+    </div>
   );
 };
 

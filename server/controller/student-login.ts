@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { MentorModel } from "../model/mentor-model";
 import { config } from "dotenv";
 import { StudentModel } from "../model/student-model";
+import { createStudentToken } from "../utils/jwt-utils";
 
 export const StudentLogin = async (req: Request, res: Response) => {
   try {
@@ -45,18 +45,12 @@ export const StudentLogin = async (req: Request, res: Response) => {
       }
     }
 
-    const token = jwt.sign(
-      { studentId: student.id, email: student.email },
-      process.env.JWT_SECRET as string,
-      {
-        expiresIn: "24h",
-      }
-    );
+    const token = createStudentToken(student._id, student.email);
 
     res.json({
       token,
       user: {
-        id: student.id,
+        id: student._id,
         email: student.email,
         nickname: student.nickname,
         phoneNumber: student.phoneNumber,
