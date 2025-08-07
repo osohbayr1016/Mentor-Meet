@@ -317,12 +317,12 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   }
 
   return (
-    <div className="w-full h-[600px] flex flex-col mb-40">
+    <div className="w-full h-full flex flex-col">
       {/* Navigation Bar */}
-      <div className="w-full flex justify-center relative pt-[60px] py-3">
+      <div className="w-full flex justify-center relative pt-[40px] ">
         <div className="bg-[#737373]/50 w-[90vw] max-w-[1200px] rounded-full">
           <div className="mx-auto">
-            <div className="flex items-center justify-between py-3 px-4 relative">
+            <div className="flex items-center justify-between py-3 px-4 relative ">
               {/* All Mentors Button - Top Right */}
               <button
                 onClick={handleAllMentorsClick}
@@ -410,26 +410,33 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
       </div>
 
       {/* Main Content Area with Sidebar and Mentor Cards */}
-      <div className="flex-1 px-[150px] pt-[30px] flex justify-center">
-        <div className="w-300 h-200 flex rounded-[20px]">
-          {/* Left Sidebar */}
-          <div className=" border-none backdrop-blur-md bg-black/30 rounded-l-[40px]">
-            <Sidebar
-              selectedCategory={selectedCategory}
-              onSubCategorySelect={handleSubCategorySelect}
-              selectedSubCategory={selectedSubCategory}
-              categories={categories}
-            />
-          </div>
+      <div className="flex-1 px-6 pb-6 pt-6 flex items-center justify-center ">
+        <div className="w-full max-w-6xl ">
+          {/* Main Container - matching mentor-dashboard dimensions */}
+          <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-8 border border-white/20 h-[650px] w-full">
+            <div className="flex gap-8 h-full">
+              {/* Left Sidebar */}
+              <div className="w-72 flex flex-col h-full">
+                <Sidebar
+                  selectedCategory={selectedCategory}
+                  onSubCategorySelect={handleSubCategorySelect}
+                  selectedSubCategory={selectedSubCategory}
+                  categories={categories}
+                />
+              </div>
 
-          {/* Right Content Area */}
-          <div className="flex-1 h-full flex flex-col  backdrop-blur-md bg-[#33333366] rounded-r-[40px]  ">
-            <MentorCards
-              categories={categories}
-              selectedCategory={selectedCategory}
-              selectedSubCategory={selectedSubCategory}
-              onMentorClick={handleMentorClick}
-            />
+              {/* Right Content Area */}
+              <div className="flex-1 h-full flex flex-col overflow-hidden">
+                <div className="flex-1 overflow-y-auto">
+                  <MentorCards
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    selectedSubCategory={selectedSubCategory}
+                    onMentorClick={handleMentorClick}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
