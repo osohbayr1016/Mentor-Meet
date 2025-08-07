@@ -86,7 +86,7 @@ const StudentSignupPage = () => {
             localStorage.setItem("studentToken", loginData.token);
             localStorage.setItem("studentEmail", session.user?.email || "");
             localStorage.setItem("studentUser", JSON.stringify(loginData.user));
-            
+
             console.log("Google login successful, redirecting to dashboard");
             router.push("/student-dashboard");
             return; // Exit early on successful login
