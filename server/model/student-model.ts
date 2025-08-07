@@ -1,36 +1,35 @@
-
 import mongoose, { model, ObjectId, Schema } from "mongoose";
-
-
 
 export type StudentType = {
   _id: string;
   email: string;
-  password?: string; // Made optional for Google OAuth users
+  password?: string;
   phoneNumber?: number;
   nickname?: string;
-  createAt: Date;
-  updateAt: Date;
-  meetingHistory: ObjectId;
-  bookedHistory: ObjectId;
-  googleAuth?: boolean; // New field for Google OAuth users
+  createdAt: Date;
+  updatedAt: Date;
+  meetingHistory: ObjectId[]; // олон уулзалт
+  bookedHistory: ObjectId[]; // олон захиалга
+  googleAuth?: boolean;
 };
 
-const StudentSchema = new Schema<StudentType>({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: false, unique: true },
-  phoneNumber: { type: Number, required: false },
-  nickname: { type: String, required: false },
-  createAt: { type: Date, default: Date.now },
-  updateAt: { type: Date, default: Date.now },
-  meetingHistory: { type: Schema.ObjectId, ref: "Meeting" },
-  bookedHistory: { type: Schema.ObjectId, ref: "Booking" },
-  googleAuth: { type: Boolean, default: false },
-});
+const StudentSchema = new Schema<StudentType>(
+  {
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: false }, // ⚠️ unique хассан
+    phoneNumber: { type: Number, required: false },
+    nickname: { type: String, required: false },
+    meetingHistory: [{ type: Schema.ObjectId, ref: "Meeting" }],
+    bookedHistory: [{ type: Schema.ObjectId, ref: "Booking" }],
+    googleAuth: { type: Boolean, default: false },
+  },
+  {
+    timestamps: true, // ✅ createdAt, updatedAt автоматаар нэмэгдэнэ
+    versionKey: false,
+  }
+);
 
-
-
-
+// TempUser (OTP/verify зориулалттай)
 const TempUserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   code: String,
@@ -41,6 +40,4 @@ const TempUserSchema = new mongoose.Schema({
 });
 
 export const TempUserModel = mongoose.model("TempUser", TempUserSchema);
-
-
-export const StudentModel = model<StudentType>("Student", StudentSchema)
+export const StudentModel = model<StudentType>("Student", StudentSchema);
