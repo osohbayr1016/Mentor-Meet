@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { adminAPI, AdminAPIError } from "../../lib/admin-api";
 import {
   Users,
   UserCheck,
@@ -89,15 +90,24 @@ export default function StatsGrid({ onRefresh }: StatsGridProps) {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch("/api/admin/dashboard");
-      const result = await response.json();
+      const result = await adminAPI.getDashboard();
       
       if (result.success) {
         setStats(result.data.stats);
         setLastUpdated(result.data.lastUpdated);
+      } else {
+        console.error("API returned error:", result.error);
       }
     } catch (error) {
-      console.error("Failed to fetch stats:", error);
+      if (error instanceof AdminAPIError) {
+        if (error.status === 401) {
+          // This will be handled by the adminFetch utility
+          return;
+        }
+        console.error("Admin API error:", error.message);
+      } else {
+        console.error("Failed to fetch stats:", error);
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);

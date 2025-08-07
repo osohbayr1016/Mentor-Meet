@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkAdminPermission } from "../../../../lib/admin-auth";
 
 export async function GET(request: NextRequest) {
     try {
+        // Check admin authentication
+        const { authorized, session } = await checkAdminPermission();
+        
+        if (!authorized) {
+            return NextResponse.json(
+                { success: false, error: "Unauthorized access" },
+                { status: 401 }
+            );
+        }
         // In a real implementation, you would fetch from your database
         // For now, we'll return dynamic mock data based on current date/time
 
@@ -83,6 +93,16 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
     try {
+        // Check admin authentication
+        const { authorized, session } = await checkAdminPermission();
+        
+        if (!authorized) {
+            return NextResponse.json(
+                { success: false, error: "Unauthorized access" },
+                { status: 401 }
+            );
+        }
+
         const body = await request.json();
         const { action, data } = body;
 
