@@ -118,6 +118,8 @@ const MentorCalendar = () => {
 
   const handleContinue = () => {
     const hasSelections = Object.values(selectedTimesByDate).some(
+
+
       (set) => set.size > 0
     );
     hasSelections ? setShowSuccessModal(true) : setShowConfirmationModal(true);
