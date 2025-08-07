@@ -1,42 +1,16 @@
-import { AdminStats } from "../../types/admin";
+"use client";
+
+import { useState } from "react";
 import StatsGrid from "../../components/admin/StatsGrid";
 import RecentActivity from "../../components/admin/RecentActivity";
 import QuickActions from "../../components/admin/QuickActions";
 
-// Mock data for development
-const mockStats: AdminStats = {
-  totalUsers: 1247,
-  totalMentors: 156,
-  totalStudents: 1091,
-  totalBookings: 356,
-  totalRevenue: 125480000,
-  monthlyRevenue: 45280000,
-  pendingMentorApprovals: 12,
-  activeBookings: 89,
-  completedBookings: 234,
-  averageRating: 4.8,
-  recentSignups: 28,
-  conversionRate: 23.5,
-};
+export default function AdminDashboard() {
+  const [refreshKey, setRefreshKey] = useState(0);
 
-async function getAdminStats(): Promise<AdminStats> {
-  try {
-    // In production, fetch from your API
-    // const response = await fetch(`${process.env.API_URL}/admin/stats`);
-    // if (response.ok) {
-    //   return await response.json();
-    // }
-
-    // Return mock data for development
-    return mockStats;
-  } catch (error) {
-    console.error("Failed to fetch admin stats:", error);
-    return mockStats;
-  }
-}
-
-export default async function AdminDashboard() {
-  const stats = await getAdminStats();
+  const handleRefresh = () => {
+    setRefreshKey(prev => prev + 1);
+  };
 
   return (
     <div className="space-y-6">
@@ -59,18 +33,18 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <StatsGrid stats={stats} />
+      <StatsGrid onRefresh={handleRefresh} />
 
       {/* Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Activity - Takes 2 columns */}
         <div className="lg:col-span-2">
-          <RecentActivity />
+          <RecentActivity key={refreshKey} />
         </div>
 
         {/* Quick Actions - Takes 1 column */}
         <div>
-          <QuickActions pendingApprovals={stats.pendingMentorApprovals} />
+          <QuickActions key={refreshKey} />
         </div>
       </div>
     </div>

@@ -145,7 +145,7 @@ export default function QuickActions({ pendingApprovals = 0 }: QuickActionsProps
         <div className="flex items-center justify-between text-sm mt-2">
           <span className="text-gray-500">Сүүлийн backup:</span>
           <span className="text-gray-900 font-medium">
-            {new Date().toLocaleDateString("mn-MN")}
+            {new Date().toLocaleDateString("en-US")}
           </span>
         </div>
       </div>
