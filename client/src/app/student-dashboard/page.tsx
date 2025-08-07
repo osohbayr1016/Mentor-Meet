@@ -341,15 +341,15 @@ const StudentDashboard = () => {
                     </div>
 
                     {/* Content Section */}
-                    <div className="flex-1 flex flex-col">
+                    <div className="overflow-y-auto">
                       {activeTab === "mentor-profile" ? (
                         // Mentor Profile Section
-                        <div className="flex-1 flex flex-col">
+                        <div className="flex-1 flex flex-col ">
                           <h3 className="text-white text-lg font-semibold mb-4">
                             Таны товлосон уулзалтууд:
                           </h3>
 
-                          <div className="flex gap-4 flex-1 overflow-x-auto">
+                          <div className="flex gap-4 flex-1 overflow-x-auto  ">
                             {(() => {
                               const allBookings = [
                                 ...(bookings?.upcoming || []),
@@ -383,14 +383,14 @@ const StudentDashboard = () => {
                         </div>
                       ) : (
                         // Meetings Section
-                        <div className="flex-1 flex flex-col">
+                        <div className="flex-1 flex flex-col  ">
                           <h3 className="text-white text-lg font-semibold mb-4">
                             {activeTab === "upcoming"
                               ? "Таны товлосон уулзалтууд:"
                               : "Уулзалтын түүх:"}
                           </h3>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 overflow-y-auto">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1  ">
                             {(() => {
                               const currentBookings =
                                 activeTab === "upcoming"
