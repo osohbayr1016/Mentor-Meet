@@ -10,6 +10,7 @@ interface Props {
   error: string;
   onGoogleSuccess?: (session: any) => void;
   onGoogleError?: (error: string) => void;
+  callbackUrl?: string;
 }
 
 const FirstMentorSignup = ({
@@ -20,6 +21,7 @@ const FirstMentorSignup = ({
   error,
   onGoogleSuccess,
   onGoogleError,
+  callbackUrl,
 }: Props) => {
   return (
     <div className="relative w-full h-screen">
@@ -59,6 +61,7 @@ const FirstMentorSignup = ({
                     onError={onGoogleError}
                     text="Google-р бүртгүүлэх"
                     disabled={false}
+                    callbackUrl={callbackUrl || "/oauth/mentor"}
                   />
 
                   <div className="flex items-center gap-3">

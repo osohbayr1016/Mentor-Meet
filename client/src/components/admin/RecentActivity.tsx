@@ -1,75 +1,27 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Clock, User, Calendar, DollarSign, AlertTriangle } from "lucide-react";
 
-interface Activity {
-  id: string;
-  type: "user_signup" | "mentor_application" | "booking_created" | "payment_completed" | "booking_cancelled";
+interface ActivityItem {
+  id: string | number;
+  type: string;
   message: string;
-  user: string;
-  timestamp: string;
+  user?: string;
+  timestamp: string; // ISO string
   details?: string;
 }
 
-const mockActivities: Activity[] = [
-  {
-    id: "1",
-    type: "mentor_application",
-    message: "Шинэ багш бүртгүүлэх хүсэлт",
-    user: "Батбаяр Мөнх",
-    timestamp: "5 минутын өмнө",
-    details: "Програм хангамж"
-  },
-  {
-    id: "2",
-    type: "payment_completed",
-    message: "Төлбөр амжилттай төлөгдлөө",
-    user: "Сувдаа Болор",
-    timestamp: "12 минутын өмнө",
-    details: "₮50,000"
-  },
-  {
-    id: "3",
-    type: "booking_cancelled",
-    message: "Захиалга цуцлагдлаа",
-    user: "Энхбат Ганбат",
-    timestamp: "25 минутын өмнө",
-    details: "Буцаан төлбөр хийгдэх"
-  },
-  {
-    id: "4",
-    type: "user_signup",
-    message: "Шинэ суралцагч бүртгүүллээ",
-    user: "Оюунаа Сэргэлэн",
-    timestamp: "1 цагийн өмнө",
-    details: "Google-р бүртгүүлсэн"
-  },
-  {
-    id: "5",
-    type: "booking_created",
-    message: "Шинэ захиалга үүслээ",
-    user: "Болормаа Цэрэн",
-    timestamp: "2 цагийн өмнө",
-    details: "Дизайн зөвлөгөө"
-  },
-  {
-    id: "6",
-    type: "mentor_application",
-    message: "Багш профайл шинэчлэгдлээ",
-    user: "Мөнхбат Түмэн",
-    timestamp: "3 цагийн өмнө",
-    details: "Зураг солигдсон"
-  }
-];
-
-function getActivityIcon(type: Activity["type"]) {
+function getActivityIcon(type: string) {
   switch (type) {
     case "user_signup":
       return <User className="h-4 w-4 text-blue-500" />;
     case "mentor_application":
       return <User className="h-4 w-4 text-purple-500" />;
+    case "booking":
     case "booking_created":
       return <Calendar className="h-4 w-4 text-green-500" />;
+    case "payment":
     case "payment_completed":
       return <DollarSign className="h-4 w-4 text-yellow-500" />;
     case "booking_cancelled":
@@ -79,14 +31,16 @@ function getActivityIcon(type: Activity["type"]) {
   }
 }
 
-function getActivityBgColor(type: Activity["type"]) {
+function getActivityBgColor(type: string) {
   switch (type) {
     case "user_signup":
       return "bg-blue-50";
     case "mentor_application":
       return "bg-purple-50";
+    case "booking":
     case "booking_created":
       return "bg-green-50";
+    case "payment":
     case "payment_completed":
       return "bg-yellow-50";
     case "booking_cancelled":
@@ -97,19 +51,51 @@ function getActivityBgColor(type: Activity["type"]) {
 }
 
 export default function RecentActivity() {
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchActivity = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/admin/dashboard");
+      const json = await res.json();
+      if (json?.success && Array.isArray(json.data?.recentActivity)) {
+        setActivities(json.data.recentActivity);
+      } else {
+        setActivities([]);
+      }
+    } catch (e) {
+      setActivities([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchActivity();
+    const id = setInterval(fetchActivity, 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-gray-900">
           Сүүлийн үйл ажиллагаа
         </h3>
-        <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+        <button onClick={fetchActivity} className="text-sm text-blue-600 hover:text-blue-800 font-medium">
           Бүгдийг харах
         </button>
       </div>
 
       <div className="space-y-4">
-        {mockActivities.map((activity) => (
+        {loading && (
+          <div className="text-sm text-gray-500">Ачаалж байна...</div>
+        )}
+        {!loading && activities.length === 0 && (
+          <div className="text-sm text-gray-500">Үйл ажиллагаа алга.</div>
+        )}
+        {activities.map((activity: ActivityItem) => (
           <div
             key={activity.id}
             className="flex items-start space-x-4 p-3 rounded-lg hover:bg-gray-50 transition-colors"
@@ -130,7 +116,7 @@ export default function RecentActivity() {
                     {activity.message}
                   </p>
                   <p className="text-sm text-gray-600 mt-1">
-                    {activity.user}
+                    {activity.user || ""}
                   </p>
                   {activity.details && (
                     <p className="text-xs text-gray-500 mt-1">
@@ -141,7 +127,7 @@ export default function RecentActivity() {
                 <div className="flex-shrink-0 ml-4">
                   <p className="text-xs text-gray-500 flex items-center">
                     <Clock className="h-3 w-3 mr-1" />
-                    {activity.timestamp}
+                    {new Date(activity.timestamp).toLocaleString("mn-MN")}
                   </p>
                 </div>
               </div>

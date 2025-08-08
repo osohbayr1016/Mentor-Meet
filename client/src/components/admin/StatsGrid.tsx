@@ -87,6 +87,7 @@ export default function StatsGrid({ onRefresh }: StatsGridProps) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string>("");
+  const [pendingApprovals, setPendingApprovals] = useState<number>(0);
 
   const fetchStats = async () => {
     try {
@@ -95,6 +96,7 @@ export default function StatsGrid({ onRefresh }: StatsGridProps) {
       if (result.success) {
         setStats(result.data.stats);
         setLastUpdated(result.data.lastUpdated);
+        setPendingApprovals(result.data.stats?.pendingMentorApprovals ?? 0);
       } else {
         console.error("API returned error:", result.error);
       }

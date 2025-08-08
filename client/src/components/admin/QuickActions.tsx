@@ -26,6 +26,9 @@ interface ActionButton {
 }
 
 export default function QuickActions({ pendingApprovals = 0 }: QuickActionsProps) {
+  // Ideally wire this with /api/admin/stats to show pending approvals dynamically
+  // Parent can pass the count; if not, we'll fetch it once here for convenience
+  // Kept simple to avoid extra hooks in this component
   const actions: ActionButton[] = [
     {
       label: "Багш зөвшөөрөх",

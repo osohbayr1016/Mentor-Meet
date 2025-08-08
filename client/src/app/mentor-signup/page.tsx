@@ -373,6 +373,7 @@ const SignupPage = () => {
           error={error}
           onGoogleSuccess={handleGoogleSuccess}
           onGoogleError={handleGoogleError}
+          callbackUrl="/create-profile"
         />
       )}
       {step === 1 && (

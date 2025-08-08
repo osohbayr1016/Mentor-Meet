@@ -199,6 +199,7 @@ const StudentLoginPage = () => {
                 onError={handleGoogleError}
                 text="Google-р нэвтрэх"
                 disabled={loading}
+                callbackUrl="/oauth/student"
               />
 
               {/* Links */}
