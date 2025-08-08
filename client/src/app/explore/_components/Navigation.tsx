@@ -155,13 +155,10 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [sliderPosition, setSliderPosition] = useState(0);
-  const [sliderWidth, setSliderWidth] = useState(0);
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // type Category = {
   //   _id: string;
@@ -230,33 +227,6 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
       });
     }
   };
-
-  const updateSliderPosition = (categoryIndex: number) => {
-    const buttonElement = buttonRefs.current[categoryIndex];
-    if (buttonElement) {
-      const containerRect = scrollContainerRef.current?.getBoundingClientRect();
-      const buttonRect = buttonElement.getBoundingClientRect();
-
-      if (containerRect) {
-        const relativeLeft = buttonRect.left - containerRect.left;
-        const buttonWidth = buttonRect.width;
-
-        setSliderPosition(relativeLeft);
-        setSliderWidth(buttonWidth);
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (categories.length > 0 && selectedCategory) {
-      const selectedIndex = categories.findIndex(
-        (cat) => cat._id === selectedCategory
-      );
-      if (selectedIndex !== -1) {
-        updateSliderPosition(selectedIndex);
-      }
-    }
-  }, [selectedCategory, categories]);
 
   useEffect(() => {
     // Trigger initial category change when categories are loaded
@@ -328,7 +298,7 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
                 onClick={handleAllMentorsClick}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 whitespace-nowrap relative flex-shrink-0 ${
                   !selectedCategory && !selectedSubCategory
-                    ? "text-white font-semibold bg-gray-600/50 border border-blue-400/50"
+                    ? "text-white font-semibold bg-gray-600/50 border"
                     : "text-white hover:bg-gray-600/50"
                 }`}
               >
@@ -348,19 +318,9 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
 
               {/* Scrollable Categories */}
               <div className="flex-1 mx-3 relative overflow-hidden">
-                {/* Gray Selected Background */}
-                <div
-                  className="absolute top-0 left-0 h-full bg-black/30 rounded-full transition-all duration-700 ease-out"
-                  style={{
-                    left: `${sliderPosition}px`,
-                    width: `${sliderWidth}px`,
-                    filter: "blur(0.5px)",
-                  }}
-                />
-
                 <div
                   ref={scrollContainerRef}
-                  className="flex gap-2 overflow-x-auto scrollbar-hide relative z-10"
+                  className="flex gap-2 overflow-x-auto scrollbar-hide"
                   style={{
                     scrollbarWidth: "none",
                     msOverflowStyle: "none",
@@ -370,13 +330,10 @@ const Navigation: React.FC<NavigationProps> = ({ onCategoryChange }) => {
                   {categories.map((category, index) => (
                     <button
                       key={category._id}
-                      ref={(el) => {
-                        buttonRefs.current[index] = el;
-                      }}
                       onClick={() => handleCategoryClick(category._id)}
                       className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all duration-300 whitespace-nowrap relative flex-shrink-0 ${
                         selectedCategory === category._id
-                          ? "text-white font-semibold"
+                          ? "text-white font-semibold bg-black/30 "
                           : "text-white hover:bg-black/10"
                       }`}
                     >

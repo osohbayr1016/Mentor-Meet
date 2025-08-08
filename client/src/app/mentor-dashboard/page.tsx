@@ -23,8 +23,12 @@ export default function MentorDashboard() {
   const { mentor, isLoading, logout } = useAuth();
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState<"profile" | "scheduled" | "history">("profile");
-  const [mentorProfile, setMentorProfile] = useState<MentorProfile | null>(null);
+  const [activeTab, setActiveTab] = useState<
+    "profile" | "scheduled" | "history"
+  >("profile");
+  const [mentorProfile, setMentorProfile] = useState<MentorProfile | null>(
+    null
+  );
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -48,9 +52,10 @@ export default function MentorDashboard() {
     },
   });
 
-  const [totalIncome] = useState(20000); 
+  const [totalIncome] = useState(20000);
 
-  const { bookings: fetchedBookings, loading: meetingsLoading } = useMentorBookings(mentor?.mentorId || "");
+  const { bookings: fetchedBookings, loading: meetingsLoading } =
+    useMentorBookings(mentor?.mentorId || "");
   const [bookings, setBookings] = useState<Meeting[]>([]);
 
   useEffect(() => {
@@ -83,9 +88,12 @@ export default function MentorDashboard() {
       setProfileLoading(true);
       try {
         const token = localStorage.getItem("mentorToken");
-        const res = await axios.get<{ mentor: MentorProfile }>("http://localhost:8000/mentorProfile", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get<{ mentor: MentorProfile }>(
+          "http://localhost:8000/mentorProfile",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const data = res.data.mentor;
         setMentorProfile(data);
         setEditForm({
@@ -101,7 +109,9 @@ export default function MentorDashboard() {
         });
       } catch (error: any) {
         console.error("❌ Профайл ачааллах алдаа:", error);
-        setProfileError(error?.response?.data?.message || "Профайл ачаалахад алдаа гарлаа");
+        setProfileError(
+          error?.response?.data?.message || "Профайл ачаалахад алдаа гарлаа"
+        );
       } finally {
         setProfileLoading(false);
       }
@@ -134,28 +144,32 @@ export default function MentorDashboard() {
 
     try {
       const token = localStorage.getItem("mentorToken");
-      const res = await axios.put<{ mentor: MentorProfile }>("http://localhost:8000/mentorEditProfile", {
-        firstName: editForm.firstName,
-        lastName: editForm.lastName,
-        nickName: editForm.nickName,
-        bio: editForm.bio,
-        profession: editForm.profession,
-        hourlyPrice: editForm.hourlyPrice,
-        image: editForm.image,
-        experience: { ...editForm.experience },
-        education: { ...editForm.education },
-        ...(mentorProfile?.category?.categoryId && {
-          category: {
-            categoryId: mentorProfile.category.categoryId,
-            price: editForm.hourlyPrice,
-          },
-        }),
-      }, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const res = await axios.put<{ mentor: MentorProfile }>(
+        "http://localhost:8000/mentorEditProfile",
+        {
+          firstName: editForm.firstName,
+          lastName: editForm.lastName,
+          nickName: editForm.nickName,
+          bio: editForm.bio,
+          profession: editForm.profession,
+          hourlyPrice: editForm.hourlyPrice,
+          image: editForm.image,
+          experience: { ...editForm.experience },
+          education: { ...editForm.education },
+          ...(mentorProfile?.category?.categoryId && {
+            category: {
+              categoryId: mentorProfile.category.categoryId,
+              price: editForm.hourlyPrice,
+            },
+          }),
         },
-      });
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       setMentorProfile(res.data.mentor);
       setIsEditing(false);
@@ -221,7 +235,12 @@ export default function MentorDashboard() {
     }
   };
 
-  if (isLoading) return <div className="text-white h-screen flex items-center justify-center">Уншиж байна...</div>;
+  if (isLoading)
+    return (
+      <div className="text-white h-screen flex items-center justify-center">
+        Уншиж байна...
+      </div>
+    );
   if (!mentor) return null;
 
   return (
@@ -259,7 +278,9 @@ export default function MentorDashboard() {
                     error={profileError}
                   />
                 ) : meetingsLoading ? (
-                  <div className="text-white">Уулзалтын мэдээлэл ачааллаж байна...</div>
+                  <div className="text-white">
+                    Уулзалтын мэдээлэл ачааллаж байна...
+                  </div>
                 ) : (
                   <>
                     <div className="mb-6">

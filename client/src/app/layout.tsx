@@ -29,7 +29,7 @@ export default function RootLayout({
       <body className={`${inter.variable} antialiased`}>
         <SessionProvider>
           <AuthProvider>
-            <HomeChat />
+            {/* <HomeChat /> */}
             {children}
             <BottomNavigation />
           </AuthProvider>
