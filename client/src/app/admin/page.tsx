@@ -1,16 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import StatsGrid from "../../components/admin/StatsGrid";
 import RecentActivity from "../../components/admin/RecentActivity";
 import QuickActions from "../../components/admin/QuickActions";
+import { adminAPI } from "../../lib/admin-api";
 
 export default function AdminDashboard() {
   const [refreshKey, setRefreshKey] = useState(0);
+  const [pendingApprovals, setPendingApprovals] = useState<number>(0);
 
   const handleRefresh = () => {
     setRefreshKey(prev => prev + 1);
   };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await adminAPI.getDashboard();
+        if (res?.success) {
+          setPendingApprovals(res.data?.stats?.pendingMentorApprovals ?? 0);
+        }
+      } catch {}
+    })();
+  }, [refreshKey]);
 
   return (
     <div className="space-y-6">
@@ -44,7 +57,7 @@ export default function AdminDashboard() {
 
         {/* Quick Actions - Takes 1 column */}
         <div>
-          <QuickActions key={refreshKey} />
+          <QuickActions key={refreshKey} pendingApprovals={pendingApprovals} />
         </div>
       </div>
     </div>
