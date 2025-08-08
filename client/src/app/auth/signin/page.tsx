@@ -10,10 +10,9 @@ export default function SignIn() {
   const router = useRouter();
 
   useEffect(() => {
-    if (session) {
-      router.push("/mentor-calendar");
-    }
-  }, [session, router]);
+    // Redirect to role selection instead of assuming mentor
+    router.push("/role-selection");
+  }, [router]);
 
   if (status === "loading") {
     return (

@@ -21,7 +21,8 @@ const HomeChat = () => {
           <DialogTrigger asChild>
             <Button
               variant="outline"
-              className="rounded-full h-[44px] w-[44px]">
+              className="rounded-full h-[44px] w-[44px]"
+            >
               <MessageSquare />
             </Button>
           </DialogTrigger>

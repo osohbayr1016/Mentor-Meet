@@ -1,15 +1,13 @@
-
-
 import type { Metadata } from "next";
-import { Inter } from "next/font/google"; 
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "./_components/MentorUserProvider";
 import SessionProvider from "../components/SessionProvider";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { HomeChat } from "./_components/Chat";
+
 import BottomNavigation from "../components/BottomNavigation";
 import Copyright from "../components/Copyright";
-
 
 const inter = Inter({
   variable: "--font-inter",

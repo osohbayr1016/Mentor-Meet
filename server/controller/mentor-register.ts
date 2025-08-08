@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 import { createMentorToken } from "../utils/jwt-utils";
 
 export const MentorCheckemail = async (req: Request, res: Response) => {
-  const { email } = req.body;
+  const { email, googleAuth } = req.body;
 
   try {
     // Validate email
@@ -26,7 +26,30 @@ export const MentorCheckemail = async (req: Request, res: Response) => {
     const user = await MentorModel.findOne({ email });
 
     if (user) {
-      return res.status(400).json({ message: "User already exists" });
+      // For Google OAuth, return different response to indicate existing user
+      if (googleAuth) {
+        return res.status(200).json({
+          error: false,
+          message: "User already exists",
+          userExists: true,
+          canLoginWithGoogle: !!user.googleAuth
+        });
+      }
+
+      return res.status(200).json({
+        error: false,
+        message: "User already exists",
+        userExists: true
+      });
+    }
+
+    // For Google OAuth, don't send OTP - email is available
+    if (googleAuth) {
+      return res.status(200).json({
+        error: true, // true means email is available for signup
+        message: "Email available for Google signup",
+        userExists: false
+      });
     }
 
     const code = Math.floor(1000 + Math.random() * 9000).toString();
@@ -53,7 +76,10 @@ export const MentorCheckemail = async (req: Request, res: Response) => {
 
     return res
       .status(200)
-      .json({ message: "Verification code sent successfully" });
+      .json({
+        error: true, // true means proceed to next step
+        message: "Verification code sent successfully"
+      });
   } catch (error: any) {
     console.error("Checkemail error details:", {
       message: error?.message || "Unknown error",

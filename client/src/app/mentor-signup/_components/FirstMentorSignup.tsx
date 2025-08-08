@@ -21,7 +21,6 @@ const FirstMentorSignup = ({
   onGoogleSuccess,
   onGoogleError,
 }: Props) => {
-
   return (
     <div className="relative w-full h-screen">
       {/* Overlay and background image */}
@@ -59,9 +58,9 @@ const FirstMentorSignup = ({
                     onSuccess={onGoogleSuccess}
                     onError={onGoogleError}
                     text="Google-р бүртгүүлэх"
-                    disabled={loading}
+                    disabled={false}
                   />
-                  
+
                   <div className="flex items-center gap-3">
                     <div className="flex-1 h-px bg-white/30"></div>
                     <span className="text-white/60 text-sm">эсвэл</span>
@@ -83,7 +82,7 @@ const FirstMentorSignup = ({
                   />
                   {error && (
                     <div className="text-red-400 text-xs mt-1">
-                      {typeof error === 'string' ? error : 'Алдаа гарлаа'}
+                      {typeof error === "string" ? error : "Алдаа гарлаа"}
                     </div>
                   )}
                 </div>

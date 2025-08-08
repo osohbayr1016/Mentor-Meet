@@ -21,47 +21,30 @@ export default function GoogleOAuthButton({
 }: GoogleOAuthButtonProps) {
   const [loading, setLoading] = useState(false);
   const [pendingAuth, setPendingAuth] = useState(false);
-  const [hasProcessedSession, setHasProcessedSession] = useState(false);
   const { data: session, status } = useSession();
-
-  // Check for existing session on component mount
-  useEffect(() => {
-    if (!hasProcessedSession && status === "authenticated" && session && !pendingAuth) {
-      console.log("Component mounted with existing Google session, processing...");
-      setHasProcessedSession(true);
-      onSuccess?.(session);
-    }
-  }, [status, session, hasProcessedSession, pendingAuth, onSuccess]); // Proper dependencies
 
   // Handle session changes after OAuth
   useEffect(() => {
-    console.log("GoogleOAuthButton session effect:", { 
-      pendingAuth, 
-      status, 
-      session: !!session, 
-      hasProcessedSession 
+    console.log("GoogleOAuthButton session effect:", {
+      pendingAuth,
+      status,
+      sessionExists: !!session,
+      sessionProvider: session?.provider,
     });
-    
-    // Handle new authentication (pendingAuth = true)
+
+    // Only process if we initiated the auth and have a Google session
     if (pendingAuth && status === "authenticated" && session) {
-      console.log("Google OAuth successful (pending), calling onSuccess");
+      console.log("Google OAuth successful, processing session");
       setPendingAuth(false);
       setLoading(false);
-      setHasProcessedSession(true);
       onSuccess?.(session);
     } else if (pendingAuth && status === "unauthenticated") {
-      console.log("Google OAuth failed, calling onError");
+      console.log("Google OAuth failed or cancelled");
       setPendingAuth(false);
       setLoading(false);
-      onError?.("Authentication failed");
+      onError?.("Google authentication was cancelled or failed");
     }
-    // Handle existing authentication (user already logged in)
-    else if (!pendingAuth && !hasProcessedSession && status === "authenticated" && session) {
-      console.log("Found existing Google session, calling onSuccess");
-      setHasProcessedSession(true);
-      onSuccess?.(session);
-    }
-  }, [session, status, pendingAuth, hasProcessedSession, onSuccess, onError]);
+  }, [session, status, pendingAuth, onSuccess, onError]);
 
   const handleGoogleSignIn = async () => {
     console.log("Google sign-in button clicked");
@@ -70,8 +53,7 @@ export default function GoogleOAuthButton({
     console.log("Starting Google OAuth flow...");
     setLoading(true);
     setPendingAuth(true);
-    setHasProcessedSession(false); // Reset processed state for new auth attempt
-    
+
     try {
       console.log("Calling signIn with Google provider...");
       const result = await signIn("google", {
@@ -113,9 +95,7 @@ export default function GoogleOAuthButton({
       `}
     >
       <FcGoogle size={20} />
-      <span className="font-medium">
-        {loading ? "Нэвтэрч байна..." : text}
-      </span>
+      <span className="font-medium">{loading ? "Нэвтэрч байна..." : text}</span>
     </button>
   );
 }

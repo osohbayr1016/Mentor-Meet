@@ -20,7 +20,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import axios from "axios";
-import { useRouter } from "next/router";
 import { useParams, useSearchParams } from "next/navigation";
 
 interface Mentor {
@@ -343,20 +342,25 @@ const MentorPayment = () => {
                           className="w-[200px] h-[40px] rounded-[40px] bg-[#000000] text-[#FFFFFF]"
                           onClick={() => {
                             // Prepare booking details for payment success
-                            const studentEmail = localStorage.getItem("studentEmail");
-                            const firstDate = Object.keys(selectedTimesByDate)[0];
-                            const firstTime = selectedTimesByDate[firstDate]?.[0];
-                            
+                            const studentEmail =
+                              localStorage.getItem("studentEmail");
+                            const firstDate =
+                              Object.keys(selectedTimesByDate)[0];
+                            const firstTime =
+                              selectedTimesByDate[firstDate]?.[0];
+
                             // Create payment success URL with booking details
                             const paymentSuccessUrl = new URLSearchParams({
                               bookingId: `booking_${Date.now()}`, // Generate temporary booking ID
                               mentorEmail: mentor?.email || "",
                               studentEmail: studentEmail || "",
-                              date: firstDate ? `2025-08-${firstDate}` : new Date().toISOString().split('T')[0],
+                              date: firstDate
+                                ? `2025-08-${firstDate}`
+                                : new Date().toISOString().split("T")[0],
                               time: firstTime || "14:00",
-                              duration: "60"
+                              duration: "60",
                             });
-                            
+
                             window.location.href = `/payment-successfully?${paymentSuccessUrl.toString()}`;
                           }}
                         >

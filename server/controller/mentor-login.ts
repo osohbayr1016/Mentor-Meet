@@ -38,10 +38,17 @@ export const MentorLogin = async (req: Request, res: Response) => {
       }
     } else {
       // For Google OAuth users, verify they have googleAuth enabled
+      console.log("Google OAuth login attempt for mentor:", {
+        email: mentor.email,
+        hasGoogleAuth: !!mentor.googleAuth,
+        googleAuthValue: mentor.googleAuth
+      });
+
       if (!mentor.googleAuth) {
-        return res
-          .status(401)
-          .send({ message: "Энэ хэрэглэгч Google-р бүртгэгдээгүй байна!" });
+        console.log("Mentor does not have googleAuth enabled, updating mentor record");
+        // If mentor exists but doesn't have googleAuth enabled, enable it for them
+        await MentorModel.findByIdAndUpdate(mentor._id, { googleAuth: true });
+        console.log("Updated mentor googleAuth to true");
       }
     }
 
@@ -56,6 +63,14 @@ export const MentorLogin = async (req: Request, res: Response) => {
       message: "Амжилттай нэвтэрлээ",
       token,
       mentorId: mentor._id,
+      mentor: {
+        mentorId: mentor._id,
+        email: mentor.email,
+        firstName: mentor.firstName,
+        lastName: mentor.lastName,
+        image: mentor.image,
+        isAdmin: false,
+      },
     });
   } catch (error: any) {
     console.error("Login error:", error.message);

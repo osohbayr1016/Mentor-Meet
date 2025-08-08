@@ -257,7 +257,7 @@ const MentorCalendar = () => {
                           onClick={() =>
                             handleDateClick(date, i === 0 ? "top" : "bottom")
                           }
-                          className={`flex flex-col items-center justify-center w-[50px] h-[50issenpx] rounded-full border-1 transition-colors ${
+                          className={`flex flex-col items-center justify-center w-[50px] h-[50px] rounded-full border-1 transition-colors ${
                             activeDate === date
                               ? "bg-white text-black border-white"
                               : selectedTimesByDate[date]?.size > 0
