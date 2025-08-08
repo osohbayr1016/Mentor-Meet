@@ -43,7 +43,9 @@ const StudentDashboard = () => {
     "upcoming" | "history" | "mentor-profile"
   >("mentor-profile");
   const [totalSpent, setTotalSpent] = useState(0);
-  const [generatingMeetLink, setGeneratingMeetLink] = useState<string | null>(null);
+  const [generatingMeetLink, setGeneratingMeetLink] = useState<string | null>(
+    null
+  );
 
   // Get student ID from localStorage
   const [studentId, setStudentId] = useState("");
@@ -180,36 +182,36 @@ const StudentDashboard = () => {
   // Function to generate and join meeting (create Google Meet link and open it)
   const handleGenerateAndJoinMeeting = async (booking: Booking) => {
     setGeneratingMeetLink(booking._id);
-    
+
     try {
-      const response = await fetch('/api/test-generate-meet-link', {
-        method: 'POST',
+      const response = await fetch("/api/test-generate-meet-link", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           bookingId: booking._id,
-          mentorEmail: 'mentor@example.com', // Replace with actual mentor email
-          studentEmail: 'student@example.com', // Replace with actual student email
-          date: booking.date.split('T')[0], // Extract date part
+          mentorEmail: "mentor@example.com", // Replace with actual mentor email
+          studentEmail: "student@example.com", // Replace with actual student email
+          date: booking.date.split("T")[0], // Extract date part
           time: booking.time,
-          title: `Mentorship with ${booking.mentorId.firstName} ${booking.mentorId.lastName}`
+          title: `Mentorship with ${booking.mentorId.firstName} ${booking.mentorId.lastName}`,
         }),
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
         // Directly open the Google Meet link in a new tab
-        window.open(result.data.meetingLink, '_blank');
+        window.open(result.data.meetingLink, "_blank");
         // Refresh bookings to get the updated data with meeting link
         fetchBookings();
       } else {
         alert(`Failed to join meeting: ${result.message}`);
       }
     } catch (error) {
-      console.error('Error joining meeting:', error);
-      alert('Error joining meeting. Please try again.');
+      console.error("Error joining meeting:", error);
+      alert("Error joining meeting. Please try again.");
     } finally {
       setGeneratingMeetLink(null);
     }
@@ -400,13 +402,17 @@ const StudentDashboard = () => {
                                 allBookings
                                   .slice(0, 2)
                                   .map((booking) => (
-                                                      <MentorCard
-                    key={booking._id}
-                    booking={booking}
-                    onCancel={handleCancelBooking}
-                    onGenerateTestMeetLink={handleGenerateAndJoinMeeting}
-                    isGeneratingMeetLink={generatingMeetLink === booking._id}
-                  />
+                                    <MentorCard
+                                      key={booking._id}
+                                      booking={booking}
+                                      onCancel={handleCancelBooking}
+                                      onGenerateTestMeetLink={
+                                        handleGenerateAndJoinMeeting
+                                      }
+                                      isGeneratingMeetLink={
+                                        generatingMeetLink === booking._id
+                                      }
+                                    />
                                   ))
                               ) : (
                                 <div className="flex items-center justify-center h-64 w-full">

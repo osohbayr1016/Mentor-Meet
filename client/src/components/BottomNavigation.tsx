@@ -74,14 +74,14 @@ const BottomNavigation = () => {
         if (studentToken && studentUserStr) {
           try {
             const studentDataRaw = JSON.parse(studentUserStr);
-            
+
             // Validate required fields
-            if (studentDataRaw && typeof studentDataRaw === 'object') {
+            if (studentDataRaw && typeof studentDataRaw === "object") {
               const studentData: StudentData = {
-                studentId: studentDataRaw.id || studentDataRaw.studentId || '',
-                email: studentDataRaw.email || '',
-                firstName: studentDataRaw.firstName || '',
-                lastName: studentDataRaw.lastName || '',
+                studentId: studentDataRaw.id || studentDataRaw.studentId || "",
+                email: studentDataRaw.email || "",
+                firstName: studentDataRaw.firstName || "",
+                lastName: studentDataRaw.lastName || "",
                 ...studentDataRaw,
               };
 
@@ -89,7 +89,10 @@ const BottomNavigation = () => {
               if (studentData.studentId && studentData.email) {
                 setStudent(studentData);
               } else {
-                console.warn("Student data missing essential fields:", studentData);
+                console.warn(
+                  "Student data missing essential fields:",
+                  studentData
+                );
                 setStudent(null);
               }
             } else {
@@ -221,14 +224,16 @@ const BottomNavigation = () => {
           timeout: 10000, // 10 second timeout
         }
       );
-      
+
       if (response.status === 200 && response.data) {
         const data: any = response.data;
         console.log("Notifications fetched:", data.notification);
 
-        const notifications = Array.isArray(data.notification) ? data.notification : [];
+        const notifications = Array.isArray(data.notification)
+          ? data.notification
+          : [];
         setNotifications(notifications);
-        
+
         const unread = notifications.filter((n: Notification) => !n.checked);
         setUnreadCount(unread.length);
       } else {
@@ -239,7 +244,7 @@ const BottomNavigation = () => {
     } catch (err: any) {
       console.error("Error fetching notifications:", err.message || err);
       // Don't clear existing notifications on error, just log it
-      if (err.code === 'ECONNABORTED') {
+      if (err.code === "ECONNABORTED") {
         console.error("Request timeout - notification server may be slow");
       }
     } finally {
@@ -375,7 +380,7 @@ const BottomNavigation = () => {
     }
   }, [isNotificationOpen, mentor?.mentorId, fetchNotifications]);
 
-  if (hideNavigationPages.includes(pathname) || pathname.startsWith('/admin')) {
+  if (hideNavigationPages.includes(pathname) || pathname.startsWith("/admin")) {
     return null;
   }
 
