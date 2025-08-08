@@ -26,36 +26,53 @@ app.use(express.json());
 const uri = process.env.MONGODB_URI;
 const dataBaseConnection = async () => {
   try {
-    await mongoose.connect(uri || "", {
+    if (!uri) {
+      console.log("⚠️  MONGODB_URI not configured, skipping database connection");
+      return false;
+    }
+    
+    await mongoose.connect(uri, {
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
       bufferCommands: false,
     });
-    console.log(" DB connected");
+    console.log("✅ Database connected successfully");
+    return true;
   } catch (error) {
-    console.error(" Database connection failed:", error);
-    process.exit(1);
+    console.error("❌ Database connection failed:", error);
+    console.log("⚠️  Server will start without database functionality");
+    return false;
   }
 };
 
 const startServer = async () => {
   try {
-    await dataBaseConnection();
+    const dbConnected = await dataBaseConnection();
 
-    app.use(MentorRouter);
-    app.use(StudentRouter);
-    app.use(CategoryRouter);
+    // Only add database-dependent routes if database is connected
+    if (dbConnected) {
+      app.use(MentorRouter);
+      app.use(StudentRouter);
+      app.use(CategoryRouter);
+      app.use(CalendarRouter);
+      app.use(PaymentRouter);
+      app.use(BookingRouter);
+      app.use(NotificationRouter);
+    }
+
+    // Chat router can work without database
     app.use(chatRouter);
-    app.use(CalendarRouter);
-    app.use(PaymentRouter);
-    app.use(BookingRouter);
-    app.use(NotificationRouter);
 
     const PORT = process.env.PORT || 8000;
-    app.listen(PORT, () => {});
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      if (!dbConnected) {
+        console.log("⚠️  Note: Database features are disabled");
+      }
+    });
   } catch (error) {
-    console.error(" Failed to start server:", error);
+    console.error("❌ Failed to start server:", error);
   }
 };
 

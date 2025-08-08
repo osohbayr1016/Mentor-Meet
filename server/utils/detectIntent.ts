@@ -100,6 +100,12 @@ export const detectIntentWithAI = async (
   message: string
 ): Promise<IntentType> => {
   try {
+    // Check if OpenAI API key is available
+    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your-openai-api-key-here') {
+      console.log("OpenAI API key not configured, using fallback detection");
+      return detectIntent(message);
+    }
+    
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const prompt = `

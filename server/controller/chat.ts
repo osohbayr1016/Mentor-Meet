@@ -4,8 +4,10 @@ import { StudentModel } from "../model/student-model";
 import { MentorModel } from "../model/mentor-model";
 import { OpenAI } from "openai";
 
-// OpenAI client үүсгэх
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// OpenAI client үүсгэх - with fallback for missing API key
+const openai = process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'your-openai-api-key-here' 
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null;
 
 // Intent detection функц
 const detectIntent = async (
@@ -100,6 +102,12 @@ const generateAIResponse = async (
   intent: string
 ): Promise<string> => {
   try {
+    // Хэрэв OpenAI API key байхгүй бол энгийн хариу өгөх
+    if (!openai) {
+      console.log("OpenAI API key not configured, using fallback response");
+      return generateSimpleResponse(userMessage);
+    }
+
     let systemPrompt = "";
 
     // Intent-ээс хамааран system prompt тохируулах

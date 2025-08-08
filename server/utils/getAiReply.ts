@@ -3,11 +3,11 @@ import { IntentType } from "./detectIntent";
 
 // Create single OpenAI client instance to avoid memory leaks
 let openaiClient: OpenAI | null = null;
-const getOpenAIClient = (): OpenAI => {
-  if (!openaiClient && process.env.OPENAI_API_KEY) {
+const getOpenAIClient = (): OpenAI | null => {
+  if (!openaiClient && process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'your-openai-api-key-here') {
     openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   }
-  return openaiClient!;
+  return openaiClient;
 };
 
 // =======================
@@ -93,7 +93,7 @@ export const getAiReply = async (
       return getComplaintResponse();
     }
 
-    if (process.env.OPENAI_API_KEY && mentors && mentors.length > 0) {
+    if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'your-openai-api-key-here' && mentors && mentors.length > 0) {
       return await getAIResponse(userMessage, intent, studentProfile, mentors);
     }
 
@@ -274,6 +274,12 @@ const getAIResponse = async (
 ): Promise<string> => {
   const openai = getOpenAIClient();
 
+  // Check if OpenAI is available
+  if (!openai) {
+    console.log("OpenAI API key not configured, using fallback response");
+    return getRuleBasedResponseWithMentors(userMessage.toLowerCase(), mentors);
+  }
+
   const studentInfo = studentProfile
     ? `Сурагчийн мэдээлэл: ${studentProfile.name || "Нэргүй"}, ${
         studentProfile.email || ""
@@ -300,22 +306,27 @@ Intent: ${intent || "unknown"}
 Чи Mentor Meet платформын AI туслах. Хэрэглэгчийн илгээсэн асуулт болон профайлын мэдээлэл дээр үндэслэн хамгийн тохирох ментор(ууд)-ыг санал болго. Яагаад тохирох талаар товч тайлбар өг. Хариултаа зөвхөн монголоор бич.
   `;
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [
-      {
-        role: "system",
-        content: "Чи Mentor Meet платформын туслах чатбот.",
-      },
-      { role: "user", content: prompt },
-    ],
-    temperature: 0.7,
-  });
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: "Чи Mentor Meet платформын туслах чатбот.",
+        },
+        { role: "user", content: prompt },
+      ],
+      temperature: 0.7,
+    });
 
-  return (
-    response.choices[0].message.content ||
-    "AI хариу боловсруулахад алдаа гарлаа."
-  );
+    return (
+      response.choices[0].message.content ||
+      "AI хариу боловсруулахад алдаа гарлаа."
+    );
+  } catch (error) {
+    console.error("OpenAI API error:", error);
+    return getRuleBasedResponseWithMentors(userMessage.toLowerCase(), mentors);
+  }
 };
 
 // =======================

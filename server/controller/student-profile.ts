@@ -20,8 +20,8 @@ export const getStudentProfile = async (req: Request, res: Response) => {
       name: student.nickname || "Unknown",
       email: student.email,
       phoneNumber: student.phoneNumber,
-      createAt: student.createAt,
-      updateAt: student.updateAt,
+      createAt: student.createdAt,
+      updateAt: student.updatedAt,
     };
 
     res.json(profile);
@@ -58,8 +58,8 @@ export const updateStudentProfile = async (req: Request, res: Response) => {
       name: student.nickname || "Unknown",
       email: student.email,
       phoneNumber: student.phoneNumber,
-      createAt: student.createAt,
-      updateAt: student.updateAt,
+      createAt: student.createdAt,
+      updateAt: student.updatedAt,
     };
 
     res.json(profile);
@@ -78,8 +78,8 @@ export const getAllStudents = async (_req: Request, res: Response) => {
       name: student.nickname || "Unknown",
       email: student.email,
       phoneNumber: student.phoneNumber,
-      createAt: student.createAt,
-      updateAt: student.updateAt,
+      createAt: student.createdAt,
+      updateAt: student.updatedAt,
     }));
 
     res.json(profiles);
