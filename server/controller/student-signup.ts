@@ -103,11 +103,38 @@ export const createPassword = async (req: Request, res: Response) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Persist hashed password on temp user for traceability (optional)
     tempUser.password = hashedPassword;
     await tempUser.save();
 
-    res.send({ message: "Successfully updated password" });
-    return;
+    // Create or update a real Student record immediately and issue token
+    let student = await StudentModel.findOne({ email });
+    if (!student) {
+      student = await StudentModel.create({
+        email,
+        password: hashedPassword,
+      });
+    } else {
+      // Update password if student already exists
+      student.password = hashedPassword;
+      await student.save();
+    }
+
+    // Remove temp user record (no longer needed)
+    await TempUserModel.deleteOne({ email });
+
+    const token = createStudentToken(student._id, student.email);
+
+    return res.status(200).json({
+      message: "Successfully set password and created account",
+      user: {
+        _id: student._id,
+        email: student.email,
+        nickname: student.nickname,
+        phoneNumber: student.phoneNumber,
+      },
+      token,
+    });
   } catch (error) {
     console.error("Error updating password:", error);
     return res.status(500).send({ message: "Internal server error" });
@@ -149,45 +176,40 @@ export const StudentNameNumber = async (req: Request, res: Response) => {
       });
     }
 
-    // Traditional signup flow
-    const tempUser = await TempUserModel.findOne({
-      email,
-      isVerified: true,
-      password: { $exists: true },
-    });
+    // Traditional signup flow: student record should already exist after createPassword
+    let student = await StudentModel.findOne({ email });
 
-    if (!tempUser) {
-      return res
-        .status(400)
-        .json({ message: "Email not verified or password not set" });
+    if (!student) {
+      // Fallback: if, for some reason, student doesn't exist yet, create one now
+      const tempUser = await TempUserModel.findOne({ email, isVerified: true });
+      if (!tempUser) {
+        return res
+          .status(400)
+          .json({ message: "Email not verified or password not set" });
+      }
+
+      student = await StudentModel.create({
+        email: tempUser.email,
+        password: tempUser.password,
+      });
+      await TempUserModel.deleteOne({ email });
     }
 
-    tempUser.nickname = nickname;
-    tempUser.phoneNumber = phoneNumber;
-
-    await tempUser.save();
-
-    const existingStudent = await StudentModel.findOne({ email });
-    if (existingStudent) {
-      return res
-        .status(400)
-        .json({ message: "User already exists in main collection" });
-    }
-
-    const student = await StudentModel.create({
-      email: tempUser.email,
-      password: tempUser.password,
-      nickname: tempUser.nickname,
-      phoneNumber: tempUser.phoneNumber,
-    });
-
-    await TempUserModel.deleteOne({ email });
+    // Update profile fields
+    if (typeof nickname !== "undefined") student.nickname = nickname;
+    if (typeof phoneNumber !== "undefined") student.phoneNumber = phoneNumber;
+    await student.save();
 
     const token = createStudentToken(student._id, student.email);
 
     return res.status(200).json({
       message: "Successfully updated name and number",
-      tempUser,
+      user: {
+        _id: student._id,
+        email: student.email,
+        nickname: student.nickname,
+        phoneNumber: student.phoneNumber,
+      },
       token,
     });
   } catch (error) {
