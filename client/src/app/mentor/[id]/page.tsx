@@ -30,7 +30,14 @@ interface Mentor {
   hourlyPrice: number;
   image: string;
   category?: {
-    categoryId: string;
+    categoryId: {
+      _id: string;
+      categoryName: string;
+      subCategory: any[];
+      createdAt: string;
+      updatedAt: string;
+      __v: number;
+    };
     price: number;
   };
 }
@@ -58,17 +65,37 @@ const MentorDetailPage = () => {
   const [mentorAvailability, setMentorAvailability] = useState<
     Record<string, string[]>
   >({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     const fetchMentor = async () => {
+      // Validate mentorId format
+      if (!mentorId || mentorId.length !== 24) {
+        setError("Менторын ID буруу байна");
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      setError("");
+
       try {
+        console.log("Fetching mentor with ID:", mentorId);
         const res = await axios.get<Mentor>(
           `http://localhost:8000/mentor/${mentorId}`
         );
+        console.log("Mentor data received:", res.data);
         setMentor(res.data);
-      } catch (error) {
-        console.error(" Ментор татахад алдаа:", error);
-        alert("Менторын мэдээлэл татаж чадсангүй.");
+      } catch (error: any) {
+        console.error("Ментор татахад алдаа:", error);
+        if (error.response?.status === 404) {
+          setError("Ментор олдсонгүй");
+        } else {
+          setError("Менторын мэдээлэл татаж чадсангүй");
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -81,10 +108,19 @@ const MentorDetailPage = () => {
         const res = await axios.get<{ availabilities: CalendarSlot[] }>(
           `http://localhost:8000/calendar/${mentorId}`
         );
-        setCalendar(res.data.availabilities);
+        // The server returns the calendar object directly, not wrapped in availabilities
+        if (res.data && res.data.availabilities) {
+          setCalendar(res.data.availabilities);
+        } else if (Array.isArray(res.data)) {
+          setCalendar(res.data);
+        } else {
+          console.log("Calendar data format:", res.data);
+          setCalendar([]);
+        }
       } catch (error) {
-        console.error(" Календар татахад алдаа:", error);
-        alert("Календарын мэдээлэл татаж чадсангүй.");
+        console.error("Календар татахад алдаа:", error);
+        // Don't show alert, just log the error and set empty calendar
+        setCalendar([]);
       }
     };
 
@@ -104,10 +140,12 @@ const MentorDetailPage = () => {
         }
       } catch (error) {
         console.log("Mentor availability fetch алдаа:", error);
+        // Set empty availability if fetch fails
+        setMentorAvailability({});
       }
     };
 
-    if (mentorId) {
+    if (mentorId && mentorId.length === 24) {
       fetchCalendar();
       fetchMentorAvailability();
     }
@@ -168,13 +206,18 @@ const MentorDetailPage = () => {
       return;
     }
 
+    if (!mentor) {
+      alert("Менторын мэдээлэл олдсонгүй. Дахин оролдоно уу.");
+      return;
+    }
+
     const payload = {
       mentorId,
       studentId,
       date: `2025-08-${selectedBookingDate.padStart(2, "0")}`,
       times,
       price: totalPrice,
-      category: mentor?.category?.categoryId || "Тодорхойгүй",
+      category: mentor?.category?.categoryId?._id || "Тодорхойгүй",
     };
 
     try {
@@ -193,11 +236,28 @@ const MentorDetailPage = () => {
     }
   };
 
-  if (!mentor) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-white">
         <div className="animate-spin w-6 h-6 border-2 border-white border-t-transparent rounded-full" />
         <span className="ml-2">Уншиж байна...</span>
+      </div>
+    );
+  }
+
+  if (error || !mentor) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        <div className="text-center">
+          <div className="text-red-400 text-lg mb-2">❌</div>
+          <p className="text-lg mb-4">{error || "Ментор олдсонгүй"}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+          >
+            Дахин оролдох
+          </button>
+        </div>
       </div>
     );
   }
