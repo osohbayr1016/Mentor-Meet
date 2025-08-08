@@ -13,6 +13,7 @@ interface BookingModalProps {
   selectedTimes?: string[];
   selectedTimesByDate?: Record<string, string[]>;
   MentorId: string;
+  onBookingComplete?: () => void;
 }
 
 interface MeetingResponse {
@@ -31,6 +32,7 @@ export default function BookingModal({
   selectedTimes = [],
   selectedTimesByDate = {},
   MentorId,
+  onBookingComplete,
 }: BookingModalProps) {
   // Check for student authentication in localStorage
   const studentToken =
@@ -119,6 +121,8 @@ export default function BookingModal({
         setSuccessMessage(
           `${successfulBookings.length} захиалга амжилттай үүсгэгдлээ!`
         );
+        // Notify parent component that booking is completed
+        onBookingComplete?.();
       } else {
         setError(
           failedBookings[0]?.error ||

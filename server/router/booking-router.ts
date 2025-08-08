@@ -5,6 +5,7 @@ import { getMentorBookings } from "../controller/getMentorBookings";
 import { cancelMeeting } from "../controller/cancel-meeting";
 import { getBookingBell } from "../controller/bell";
 import { updateBookingMeeting } from "../controller/update-booking-meeting";
+import { getMentorBookedSlots } from "../controller/get-mentor-booked-slots";
 
 export const BookingRouter = Router();
 
@@ -16,4 +17,5 @@ BookingRouter.get("/mentor-bookings/:mentorId", getMentorBookings);
 BookingRouter.patch("/bookings/:bookingId/meeting-link", updateBookingMeeting);
 
 BookingRouter.patch("/bookings/:id/cancel", cancelMeeting);
-BookingRouter.get("/booking/:mentorId", getBookingBell)
+BookingRouter.get("/booking/:mentorId", getBookingBell);
+BookingRouter.get("/mentor-booked-slots/:mentorId", getMentorBookedSlots);

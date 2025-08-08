@@ -12,6 +12,7 @@ import BookingModal from "@/components/BookingModal";
 
 interface Mentor {
   id: string;
+  _id?: string; // MongoDB ID
   firstName: string;
   lastName: string;
   profession: string;
@@ -54,6 +55,10 @@ const MentorDetailPage = () => {
   const [selectedBookingTime, setSelectedBookingTime] = useState<string>("");
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [refreshCalendar, setRefreshCalendar] = useState<number>(0);
+  const [mentorAvailability, setMentorAvailability] = useState<
+    Record<string, string[]>
+  >({});
 
   
   useEffect(() => {
@@ -84,7 +89,29 @@ const MentorDetailPage = () => {
       }
     };
 
-    if (mentorId) fetchCalendar();
+    const fetchMentorAvailability = async () => {
+      try {
+        const response = await axios.get<{
+          success: boolean;
+          data: Array<{ date: string; times: string[] }>;
+        }>(`http://localhost:8000/get-availability/${mentorId}`);
+
+        if (response.data.success) {
+          const availabilityMap: Record<string, string[]> = {};
+          response.data.data.forEach((item) => {
+            availabilityMap[item.date] = item.times;
+          });
+          setMentorAvailability(availabilityMap);
+        }
+      } catch (error) {
+        console.log("Mentor availability fetch алдаа:", error);
+      }
+    };
+
+    if (mentorId) {
+      fetchCalendar();
+      fetchMentorAvailability();
+    }
   }, [mentorId]);
 
   
@@ -152,6 +179,8 @@ const MentorDetailPage = () => {
 
       toast.success("Захиалга амжилттай хийгдлээ!");
       setShowBookingModal(true);
+      // Trigger calendar refresh
+      setRefreshCalendar((prev) => prev + 1);
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
         const msg = error.response?.data?.message || "Тодорхойгүй алдаа";
@@ -198,6 +227,8 @@ const MentorDetailPage = () => {
               onTimeSelect={handleTimeSelect}
               totalHours={getTotalSelectedHours()}
               totalPrice={totalPrice}
+              refreshCalendar={refreshCalendar}
+              mentorAvailability={mentorAvailability}
             />
           </div>
         </div>
@@ -218,6 +249,12 @@ const MentorDetailPage = () => {
         selectedTimes={getAllSelectedTimes()}
         selectedTimesByDate={selectedTimesByDate}
         MentorId={mentorId}
+        onBookingComplete={() => {
+          setRefreshCalendar((prev) => prev + 1);
+          setShowBookingModal(false);
+          // Clear selected times after successful booking
+          setSelectedTimesByDate({});
+        }}
       />
     </div>
   );
