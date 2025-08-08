@@ -347,6 +347,7 @@ const StudentSignupPage = () => {
               onError={handleGoogleError}
               text="Google-р бүртгүүлэх"
               disabled={loading}
+              callbackUrl="/oauth/student"
             />
           </div>
         );

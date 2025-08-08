@@ -1,7 +1,7 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 
 interface GoogleOAuthButtonProps {
@@ -10,6 +10,7 @@ interface GoogleOAuthButtonProps {
   text?: string;
   className?: string;
   disabled?: boolean;
+  callbackUrl?: string;
 }
 
 export default function GoogleOAuthButton({
@@ -18,33 +19,9 @@ export default function GoogleOAuthButton({
   text = "Google-р нэвтрэх",
   className = "",
   disabled = false,
+  callbackUrl,
 }: GoogleOAuthButtonProps) {
   const [loading, setLoading] = useState(false);
-  const [pendingAuth, setPendingAuth] = useState(false);
-  const { data: session, status } = useSession();
-
-  // Handle session changes after OAuth
-  useEffect(() => {
-    console.log("GoogleOAuthButton session effect:", {
-      pendingAuth,
-      status,
-      sessionExists: !!session,
-      sessionProvider: session?.provider,
-    });
-
-    // Only process if we initiated the auth and have a Google session
-    if (pendingAuth && status === "authenticated" && session) {
-      console.log("Google OAuth successful, processing session");
-      setPendingAuth(false);
-      setLoading(false);
-      onSuccess?.(session);
-    } else if (pendingAuth && status === "unauthenticated") {
-      console.log("Google OAuth failed or cancelled");
-      setPendingAuth(false);
-      setLoading(false);
-      onError?.("Google authentication was cancelled or failed");
-    }
-  }, [session, status, pendingAuth, onSuccess, onError]);
 
   const handleGoogleSignIn = async () => {
     console.log("Google sign-in button clicked");
@@ -52,30 +29,15 @@ export default function GoogleOAuthButton({
 
     console.log("Starting Google OAuth flow...");
     setLoading(true);
-    setPendingAuth(true);
 
     try {
-      console.log("Calling signIn with Google provider...");
-      const result = await signIn("google", {
-        redirect: false,
-        callbackUrl: window.location.href,
+      console.log("Calling signIn with Google provider (redirect)...");
+      // For OAuth providers, allow full redirect and come back to a callback page
+      await signIn("google", {
+        callbackUrl: callbackUrl || window.location.origin + "/role-selection",
       });
-      console.log("SignIn result:", result);
-
-      if (result?.error) {
-        console.error("Google sign-in error:", result.error);
-        setPendingAuth(false);
-        setLoading(false);
-        onError?.(result.error);
-      } else if (!result?.ok) {
-        setPendingAuth(false);
-        setLoading(false);
-        onError?.("Google authentication failed");
-      }
-      // If result.ok is true, we wait for the session to update via useEffect
     } catch (error: any) {
       console.error("Google OAuth error:", error);
-      setPendingAuth(false);
       setLoading(false);
       onError?.(error.message || "Google-р нэвтрэхэд алдаа гарлаа");
     }

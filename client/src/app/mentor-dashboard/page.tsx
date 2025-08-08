@@ -57,6 +57,9 @@ export default function MentorDashboard() {
   const { bookings: fetchedBookings, loading: meetingsLoading } =
     useMentorBookings(mentor?.mentorId || "");
   const [bookings, setBookings] = useState<Meeting[]>([]);
+  const [generatingMeetLink, setGeneratingMeetLink] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     if (fetchedBookings.length > 0) {
@@ -235,6 +238,55 @@ export default function MentorDashboard() {
     }
   };
 
+  const handleJoinMeeting = async (meetingId: string) => {
+    try {
+      const booking = bookings.find((b) => b.id === meetingId);
+      if (!booking) {
+        alert("Уулзалтын мэдээлэл олдсонгүй");
+        return;
+      }
+      if (!mentor?.email) {
+        alert("Менторын имэйл олдсонгүй. Дахин нэвтэрч орно уу.");
+        return;
+      }
+
+      setGeneratingMeetLink(meetingId);
+
+      const response = await fetch("/api/test-generate-meet-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookingId: booking.id,
+          mentorEmail: mentor.email,
+          studentEmail: booking.studentEmail,
+          date: booking.date, // YYYY-MM-DD
+          time: booking.time, // HH:mm
+          title: `Mentorship with ${booking.studentEmail}`,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result?.data?.meetingLink) {
+        window.open(result.data.meetingLink, "_blank");
+      } else if (
+        result?.error === "NO_SESSION" ||
+        result?.error === "NO_ACCESS_TOKEN"
+      ) {
+        alert(
+          "Google Meet холбоос үүсгэхийн тулд Google-ээр нэвтэрсэн байх хэрэгтэй. Дахин Google-ээр нэвтэрч орно уу."
+        );
+      } else {
+        alert(result?.message || "Холбоос үүсгэхэд алдаа гарлаа");
+      }
+    } catch (error) {
+      console.error("Error generating/joining meeting:", error);
+      alert("Холбоос үүсгэхэд алдаа гарлаа. Дахин оролдоно уу.");
+    } finally {
+      setGeneratingMeetLink(null);
+    }
+  };
+
   if (isLoading)
     return (
       <div className="text-white h-screen flex items-center justify-center">
@@ -296,7 +348,7 @@ export default function MentorDashboard() {
                           : m.status === "completed" || m.status === "cancelled"
                       )}
                       activeTab={activeTab}
-                      onJoinMeeting={(id) => console.log("join", id)}
+                      onJoinMeeting={handleJoinMeeting}
                       onCancelMeeting={handleCancelMeeting}
                     />
                   </>
