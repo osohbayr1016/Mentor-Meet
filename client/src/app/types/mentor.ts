@@ -19,7 +19,14 @@ export interface MentorProfile {
     endedYear: string;
   };
   category: {
-    categoryId: string;
+    categoryId: {
+      _id: string;
+      categoryName: string;
+      subCategory: any[];
+      createdAt: string;
+      updatedAt: string;
+      __v: number;
+    };
     price: number;
   };
   email: string;

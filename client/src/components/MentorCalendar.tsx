@@ -111,9 +111,14 @@ const MentorCalendar: React.FC<MentorCalendarProps> = ({
         );
         setBookedSlots(normalized);
         console.log("Fetched booked slots (normalized):", normalized);
+      } else {
+        console.log("Booked slots fetch failed:", response.data.message);
+        setBookedSlots({});
       }
     } catch (error) {
       console.error("Error fetching booked slots:", error);
+      // Don't fail completely, just set empty booked slots
+      setBookedSlots({});
     } finally {
       setIsLoadingBookedSlots(false);
     }

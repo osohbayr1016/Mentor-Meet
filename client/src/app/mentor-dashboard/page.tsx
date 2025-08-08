@@ -159,9 +159,9 @@ export default function MentorDashboard() {
           image: editForm.image,
           experience: { ...editForm.experience },
           education: { ...editForm.education },
-          ...(mentorProfile?.category?.categoryId && {
+          ...(mentorProfile?.category?.categoryId?._id && {
             category: {
-              categoryId: mentorProfile.category.categoryId,
+              categoryId: mentorProfile.category.categoryId._id,
               price: editForm.hourlyPrice,
             },
           }),
