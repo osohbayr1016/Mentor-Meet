@@ -5,13 +5,11 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 
-
 console.log(" Моделиудыг ачааллаж байна...");
 import "./model/student-model";
 import "./model/mentor-model";
 import "./model/booking-model";
-console.log(" Моделиуд ачаалагдлаа");
-
+import "./model/mentor-availability-model";
 
 console.log("🧭 Route-уудыг import хийж байна...");
 import { MentorRouter } from "./router/mentor-router";
@@ -22,17 +20,16 @@ import { CalendarRouter } from "./router/calendar-router";
 import { PaymentRouter } from "./router/payment-router";
 import { BookingRouter } from "./router/booking-router";
 import { NotificationRouter } from "./router/notification-router";
-console.log(" Route-ууд import хийгдлээ");
+import { MentorAvailabilityRouter } from "./router/mentor-availability-router";
 
 const app = express();
-
 
 const allowedOrigins = [
   "http://localhost:3000",
   "http://127.0.0.1:3000",
   "http://localhost:3001",
   "http://127.0.0.1:3001",
-  "https://mentor-meet.vercel.app", 
+  "https://mentor-meet.vercel.app",
 ];
 
 app.use(
@@ -53,10 +50,8 @@ app.use(
 
 console.log(" CORS тохиргоо ачаалагдлаа");
 
-
 app.use(express.json({ limit: "10mb" }));
 console.log("✅ JSON body parser ачаалагдлаа");
-
 
 const uri = process.env.MONGODB_URI;
 const dataBaseConnection = async () => {
@@ -76,7 +71,6 @@ const dataBaseConnection = async () => {
     process.exit(1);
   }
 };
-
 
 const startServer = async () => {
   try {
@@ -107,12 +101,14 @@ const startServer = async () => {
     console.log(" BookingRouter бүртгэгдлээ");
 
     app.use(NotificationRouter);
-    console.log(" NotificationRouter бүртгэгдлээ");
+    app.use(MentorAvailabilityRouter);
 
     const PORT = process.env.PORT || 8000;
 
     app.listen(PORT, () => {
-      console.log(` Сервер амжилттай http://localhost:${PORT} дээр ажиллаж байна`);
+      console.log(
+        ` Сервер амжилттай http://localhost:${PORT} дээр ажиллаж байна`
+      );
     });
   } catch (error: any) {
     console.error(" Сервер асаахад алдаа:", error.message || error);

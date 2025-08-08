@@ -1,6 +1,8 @@
 // components/MentorDetails.tsx
 "use client";
 
+import MentorCalendar from "@/components/MentorCalendar";
+
 interface CalendarSlot {
   _id: string;
   date: string;
@@ -18,6 +20,8 @@ interface Mentor {
   education?: {
     schoolName?: string;
   };
+  id?: string;
+  _id?: string;
 }
 
 interface Props {
@@ -27,6 +31,8 @@ interface Props {
   onTimeSelect: (date: string, time: string) => void;
   totalHours: number;
   totalPrice: number;
+  refreshCalendar?: number;
+  mentorAvailability?: Record<string, string[]>;
 }
 
 const MentorDetails = ({
@@ -36,6 +42,8 @@ const MentorDetails = ({
   onTimeSelect,
   totalHours,
   totalPrice,
+  refreshCalendar,
+  mentorAvailability = {},
 }: Props) => {
   return (
     <div className="w-2/3 p-5 flex flex-col">
@@ -49,7 +57,9 @@ const MentorDetails = ({
             </p>
           </div>
           <div className="bg-white/10 rounded-lg p-2.5">
-            <h3 className="text-white font-medium mb-1 text-sm">Төгссөн сургууль</h3>
+            <h3 className="text-white font-medium mb-1 text-sm">
+              Төгссөн сургууль
+            </h3>
             <p className="text-gray-300 text-xs">
               {mentor.education?.schoolName || "Тодорхойгүй"}
             </p>
@@ -63,27 +73,21 @@ const MentorDetails = ({
         </div>
 
         {/* Calendar */}
-        {calendar.map((slot) => (
-          <div key={slot.date} className="mb-4">
-            <h4 className="font-medium text-white">{slot.date}</h4>
-            <div className="flex gap-2 flex-wrap mt-1">
-              {slot.times.map((time: string) => {
-                const isSelected = selectedTimesByDate[slot.date]?.includes(time);
-                return (
-                  <button
-                    key={time}
-                    onClick={() => onTimeSelect(slot.date, time)}
-                    className={`px-3 py-1 rounded ${
-                      isSelected ? "bg-blue-500 text-white" : "bg-gray-200"
-                    }`}
-                  >
-                    {time}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+        <div className="bg-white/10 rounded-lg p-2.5 mb-3">
+          <h3 className="text-white font-medium mb-3 text-sm">Хуваарь</h3>
+          <MentorCalendar
+            key={refreshCalendar} // Force re-render when refreshCalendar changes
+            mentorId={mentor._id || mentor.id}
+            onTimeSelect={onTimeSelect}
+            selectedTimesByDate={selectedTimesByDate}
+            mentorAvailability={mentorAvailability}
+            refreshToken={refreshCalendar}
+            onBookingComplete={() => {
+              // Refresh calendar after booking completion
+              console.log("Booking completed, calendar will refresh");
+            }}
+          />
+        </div>
 
         {/* Price */}
         <div className="bg-white/10 rounded-lg p-2.5">

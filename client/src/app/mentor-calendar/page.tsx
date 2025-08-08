@@ -1,14 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 
 type CalendarResponse = {
+  success?: boolean;
   calendarId?: string;
   _id?: string;
   message?: string;
+};
+
+type AvailabilityResponse = {
+  success: boolean;
+  message: string;
+  data: Array<{
+    date: string;
+    times: string[];
+  }>;
 };
 
 const MentorCalendar = () => {
@@ -25,6 +35,10 @@ const MentorCalendar = () => {
   const [selectedBookingDate, setSelectedBookingDate] = useState<string>("");
   const [selectedBookingTime, setSelectedBookingTime] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [existingAvailability, setExistingAvailability] = useState<
+    Record<string, string[]>
+  >({});
+  const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
 
   const week1Dates = [
     { day: "Да", date: "4" },
@@ -61,6 +75,60 @@ const MentorCalendar = () => {
     "20:00",
   ];
 
+  // Fetch existing mentor availability
+  useEffect(() => {
+    const fetchExistingAvailability = async () => {
+      const token = localStorage.getItem("mentorToken");
+      const mentorUser = localStorage.getItem("mentorUser");
+
+      if (!token || !mentorUser) {
+        console.log("No mentor token or user found");
+        return;
+      }
+
+      try {
+        const mentorData = JSON.parse(mentorUser);
+        const mentorId = mentorData._id || mentorData.id;
+
+        if (!mentorId) {
+          console.log("No mentor ID found");
+          return;
+        }
+
+        setIsLoadingAvailability(true);
+        const response = await axios.get<AvailabilityResponse>(
+          `${
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+          }/get-availability/${mentorId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (response.data.success) {
+          const availabilityMap: Record<string, string[]> = {};
+          response.data.data.forEach((item) => {
+            availabilityMap[item.date] = item.times;
+          });
+          setExistingAvailability(availabilityMap);
+
+          // Pre-select existing availability
+          const selectedMap: Record<string, Set<string>> = {};
+          response.data.data.forEach((item) => {
+            selectedMap[item.date] = new Set(item.times);
+          });
+          setSelectedTimesByDate(selectedMap);
+        }
+      } catch (error) {
+        console.error("Error fetching availability:", error);
+      } finally {
+        setIsLoadingAvailability(false);
+      }
+    };
+
+    fetchExistingAvailability();
+  }, []);
+
   const handleDateClick = (date: string, position: "top" | "bottom") => {
     if (activeDate === date) {
       setIsAnimating(true);
@@ -82,8 +150,18 @@ const MentorCalendar = () => {
     setSelectedBookingTime(time);
 
     const token = localStorage.getItem("mentorToken");
-    if (!token) {
+    const mentorUser = localStorage.getItem("mentorUser");
+
+    if (!token || !mentorUser) {
       alert("Токен олдсонгүй!");
+      return;
+    }
+
+    const mentorData = JSON.parse(mentorUser);
+    const mentorId = mentorData._id || mentorData.id;
+
+    if (!mentorId) {
+      alert("Ментор ID олдсонгүй!");
       return;
     }
 
@@ -102,14 +180,15 @@ const MentorCalendar = () => {
       const res = await axios.post<CalendarResponse>(
         `${
           process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-        }/calendar`,
-        { availabilities },
+        }/set-availability`,
+        { mentorId, availabilities },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      if (res.data?.calendarId) {
-        localStorage.setItem("calendarId", res.data.calendarId);
+
+      if (res.data?.success) {
+        console.log("Availability saved successfully");
       }
     } catch (err) {
       console.error("Хадгалах үед алдаа:", err);
@@ -118,8 +197,6 @@ const MentorCalendar = () => {
 
   const handleContinue = () => {
     const hasSelections = Object.values(selectedTimesByDate).some(
-
-
       (set) => set.size > 0
     );
     hasSelections ? setShowSuccessModal(true) : setShowConfirmationModal(true);
