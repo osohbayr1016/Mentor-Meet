@@ -33,6 +33,35 @@ export default function StudentOAuthCallback() {
         const data = await response.json();
 
         if (!response.ok) {
+          // If the student doesn't exist yet, auto-create via Google signup path
+          if (response.status === 400) {
+            const signupRes = await fetch(`${API_BASE_URL}/StudentNameNumber`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: session?.user?.email,
+                nickname: session?.user?.name?.split(" ")[0] || "Student",
+                phoneNumber: "",
+                googleAuth: true,
+              }),
+            });
+            const signupData = await signupRes.json();
+            if (!signupRes.ok) {
+              throw new Error(signupData?.message || "Google signup failed");
+            }
+            localStorage.setItem("studentToken", signupData.token);
+            localStorage.setItem(
+              "studentUser",
+              JSON.stringify(signupData.user)
+            );
+            localStorage.setItem(
+              "studentEmail",
+              signupData.user?.email || session?.user?.email || ""
+            );
+            window.dispatchEvent(new Event("authChange"));
+            router.replace("/student-dashboard");
+            return;
+          }
           throw new Error(data?.message || "Google login failed");
         }
 
