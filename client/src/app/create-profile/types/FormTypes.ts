@@ -29,6 +29,8 @@ export interface FormData {
   profileImage: File | null; // Added missing property
   professionalField: string; // Added missing property
   experience: string; // Added missing property
+  uploadedImageUrl?: string; // Store the uploaded image URL
+  uploadError?: string; // Store upload error message
 
   // Step 2 fields
   description?: string;

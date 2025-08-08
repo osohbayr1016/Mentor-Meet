@@ -217,7 +217,7 @@ const ProfileView: FC<ProfileViewProps> = ({
                 />
               ) : (
                 <p className="text-white">
-                  ¥{mentorProfile.category?.price?.toLocaleString() || "0"}
+                  ₮{mentorProfile.category?.price?.toLocaleString() || "0"}
                 </p>
               )}
             </div>

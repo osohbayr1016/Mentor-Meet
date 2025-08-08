@@ -1,8 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Step1Props } from "../types/FormTypes";
-import {
-  experienceOptions,
-} from "../constants/FormConstants";
+import { experienceOptions } from "../constants/FormConstants";
 
 const Step1BasicInfo: React.FC<Step1Props> = ({
   formData,
@@ -12,6 +10,7 @@ const Step1BasicInfo: React.FC<Step1Props> = ({
   isLoading,
   categories,
 }) => {
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   // Subcategories for each professional field
   const subCategories = {
     technology: [
@@ -132,9 +131,60 @@ const Step1BasicInfo: React.FC<Step1Props> = ({
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
-    setFormData((prev) => ({ ...prev, profileImage: file }));
+
+    if (file) {
+      // Set the file immediately for preview
+      setFormData((prev) => ({
+        ...prev,
+        profileImage: file,
+        uploadError: "", // Clear any previous errors
+      }));
+
+      setIsUploadingImage(true);
+
+      try {
+        // Upload image immediately
+        const { uploadImageToCloudinary, validateImageFile } = await import(
+          "../../../lib/cloudinary"
+        );
+
+        // Validate file
+        const validation = validateImageFile(file);
+        if (!validation.isValid) {
+          throw new Error(validation.error || "Invalid file");
+        }
+
+        // Upload to Cloudinary
+        const imageUrl = await uploadImageToCloudinary(file);
+
+        // Store the uploaded URL in formData
+        setFormData((prev) => ({
+          ...prev,
+          profileImage: file,
+          uploadedImageUrl: imageUrl,
+          uploadError: "",
+        }));
+      } catch (error) {
+        console.error("Image upload failed:", error);
+        // Keep the file for preview but show error
+        setFormData((prev) => ({
+          ...prev,
+          profileImage: file,
+          uploadError: error instanceof Error ? error.message : "Upload failed",
+        }));
+      } finally {
+        setIsUploadingImage(false);
+      }
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        profileImage: null,
+        uploadedImageUrl: "",
+        uploadError: "",
+      }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -399,10 +449,15 @@ const Step1BasicInfo: React.FC<Step1Props> = ({
                   accept="image/*"
                   className="hidden"
                   id="profileImage"
+                  disabled={isLoading || isUploadingImage}
                 />
                 <label
                   htmlFor="profileImage"
-                  className="w-full px-3 py-2 bg-black/20 border border-white/30 rounded-xl transition-all text-white/80 cursor-pointer hover:bg-black/30 flex items-center gap-2 text-xs"
+                  className={`w-full px-3 py-2 bg-black/20 border border-white/30 rounded-xl transition-all text-white/80 cursor-pointer hover:bg-black/30 flex items-center gap-2 text-xs ${
+                    isLoading || isUploadingImage
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
                 >
                   <svg
                     className="w-3.5 h-3.5"
@@ -424,12 +479,33 @@ const Step1BasicInfo: React.FC<Step1Props> = ({
                     />
                   </svg>
                   <span className="flex-1">
-                    {formData.profileImage
+                    {isUploadingImage
+                      ? "Зураг хуулж байна..."
+                      : formData.profileImage
                       ? formData.profileImage.name
                       : "Профайл зураг оруулах 📷"}
                   </span>
+                  {isUploadingImage && (
+                    <div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin"></div>
+                  )}
+                  {formData.uploadedImageUrl && !isUploadingImage && (
+                    <span className="text-green-400">✓</span>
+                  )}
                 </label>
               </div>
+
+              {/* Upload Status Messages */}
+              {formData.uploadError && (
+                <div className="mt-2 p-2 bg-red-600/20 border border-red-500/30 rounded-lg text-red-100 text-xs">
+                  ❌ {formData.uploadError}
+                </div>
+              )}
+
+              {formData.uploadedImageUrl && !formData.uploadError && (
+                <div className="mt-2 p-2 bg-green-600/20 border border-green-500/30 rounded-lg text-green-100 text-xs">
+                  ✅ Зураг амжилттай хуулагдлаа!
+                </div>
+              )}
             </div>
 
             {/* Submit Button */}

@@ -4,10 +4,7 @@ import { useState, useEffect, ChangeEvent } from "react";
 import Image from "next/image";
 import { useAuth } from "../../_components/MentorUserProvider";
 import { FormData } from "../types/FormTypes";
-import {
-  uploadImageToCloudinary,
-  validateImageFile,
-} from "../../../lib/cloudinary";
+
 import Step1BasicInfo from "./Step1BasicInfo";
 import Step2AdditionalDetails from "./Step2AdditionalDetails";
 import Step3PaymentInfo from "./Step3PaymentInfo";
@@ -22,8 +19,6 @@ const FormContainer = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>("");
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const [message, setMessage] = useState("");
   const [formData, setFormData] = useState<FormData>({
@@ -43,6 +38,8 @@ const FormContainer = () => {
     professionalField: "",
     subcategory: "",
     experience: "",
+    uploadedImageUrl: "",
+    uploadError: "",
     // Step 2 fields
     description: "",
     socialLinks: {
@@ -62,37 +59,6 @@ const FormContainer = () => {
     yearExperience: "",
   });
 
-  const uploadImage = async (file: File): Promise<string> => {
-    if (!file) {
-      throw new Error("No file provided");
-    }
-
-    // Validate file using helper function
-    const validation = validateImageFile(file);
-    if (!validation.isValid) {
-      throw new Error(validation.error || "Invalid file");
-    }
-
-    setIsUploadingImage(true);
-    setMessage("Зураг хуулж байна...");
-
-    try {
-      const imageUrl = await uploadImageToCloudinary(file);
-
-      setUploadedImageUrl(imageUrl);
-      setMessage("✅ Зураг амжилттай хуулагдлаа!");
-
-      return imageUrl;
-    } catch (err) {
-      console.error("Failed to upload image:", err);
-      const errorMessage =
-        err instanceof Error ? err.message : "Зургийн хуулалт амжилтгүй болсон";
-      setMessage("❌ " + errorMessage);
-      throw err;
-    } finally {
-      setIsUploadingImage(false);
-    }
-  };
   // Load categories when component mounts
   useEffect(() => {
     const loadCategories = async () => {
@@ -217,16 +183,13 @@ const FormContainer = () => {
           return;
         }
 
-        // Upload image if provided
-        let imageUrl = "";
-        if (formData.profileImage) {
-          try {
-            imageUrl = await uploadImage(formData.profileImage);
-          } catch (error) {
-            console.error("Image upload failed:", error);
-            setMessage("❌ Зургийн хуулалт амжилтгүй болсон");
-            return;
-          }
+        // Use pre-uploaded image URL if available
+        let imageUrl = formData.uploadedImageUrl || "";
+
+        // Check if there's an upload error
+        if (formData.uploadError) {
+          setMessage("❌ " + formData.uploadError);
+          return;
         }
 
         // Get authentication token
@@ -477,7 +440,7 @@ const FormContainer = () => {
                 setFormData={setFormData}
                 onNext={handleNext}
                 message={message}
-                isLoading={isLoading || isUploadingImage}
+                isLoading={isLoading}
                 categories={categories}
               />
             )}

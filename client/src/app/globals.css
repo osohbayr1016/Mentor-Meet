@@ -193,8 +193,8 @@ body {
   }
 }
 
-/* Tailwind v4 theme tokens matching usage across the app */
-@theme {
+/* Custom CSS variables for Tailwind compatibility */
+:root {
   /* Fonts */
   --font-gip: "GIP", sans-serif;
 

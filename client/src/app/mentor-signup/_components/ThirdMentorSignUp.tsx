@@ -74,7 +74,7 @@ const ThirdMentorSignup = ({
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Нууц үгээ давтана уу"
-                    className="border-1 border-white rounded-[40px] px-[20px] w-full text-[white]"
+                    className="border-1 border-white rounded-[40px] py-[8px] px-[20px] w-full text-[white]"
                     required
                     minLength={6}
                     pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{6,}$"
