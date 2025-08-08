@@ -30,6 +30,10 @@ const allowedOrigins = [
   "http://localhost:3001",
   "http://127.0.0.1:3001",
   "https://mentor-meet.vercel.app",
+  "https://mentor-meet-wine.vercel.app",
+  ...(process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim())
+    : []),
 ];
 
 app.use(
