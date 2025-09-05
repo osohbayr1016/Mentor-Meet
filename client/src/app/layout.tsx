@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "./_components/MentorUserProvider";
+import { FirebaseAuthProvider } from "../lib/firebase-auth";
 import SessionProvider from "../components/SessionProvider";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { HomeChat } from "./_components/Chat";
@@ -28,11 +29,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} antialiased`}>
         <SessionProvider>
-          <AuthProvider>
-            <HomeChat />
-            {children}
-            <BottomNavigation />
-          </AuthProvider>
+          <FirebaseAuthProvider>
+            <AuthProvider>
+              <HomeChat />
+              {children}
+              <BottomNavigation />
+            </AuthProvider>
+          </FirebaseAuthProvider>
         </SessionProvider>
       </body>
     </html>
