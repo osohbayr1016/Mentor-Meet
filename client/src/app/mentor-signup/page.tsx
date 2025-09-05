@@ -7,7 +7,12 @@ import SecondMentorSignup from "./_components/SecondMentorSignup";
 import ThirdMentorSignup from "./_components/ThirdMentorSignUp";
 import axios from "axios";
 import Link from "next/link";
-import { useAuth } from "../_components/MentorUserProvider";
+import { useFirebaseAuth } from "../../lib/firebase-auth";
+import {
+  convertFirebaseUser,
+  storeFirebaseUser,
+} from "../../lib/firebase-integration";
+import GoogleOAuthButton from "../../components/GoogleOAuthButton";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -34,7 +39,7 @@ type ProfileResponse = {
 
 const SignupPage = () => {
   const router = useRouter();
-  const { login } = useAuth(); // Get login function from AuthProvider
+  const { user, signUp } = useFirebaseAuth();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     email: "",
@@ -101,88 +106,6 @@ const SignupPage = () => {
     } else {
       throw new Error("Signup successful but no token received");
     }
-  };
-
-  // Handle Google OAuth success
-  const handleGoogleSuccess = async (session: any) => {
-    console.log("Google OAuth success called with session:", session);
-    setIsGoogleAuth(true);
-    setGoogleLoading(true);
-    setError("");
-
-    try {
-      // Check if mentor already exists with this email
-      const checkResponse = await axios.post(`${BACKEND_URL}/mentorEmail`, {
-        email: session.user?.email,
-        googleAuth: true, // Indicate this is a Google OAuth check
-      });
-
-      const checkData = checkResponse.data as {
-        error?: boolean;
-        message?: string;
-        userExists?: boolean;
-        canLoginWithGoogle?: boolean;
-      };
-
-      console.log("mentorEmail response:", checkData);
-
-      if (checkData.userExists) {
-        // Mentor already exists, try to login with Google
-        console.log("Mentor already exists, attempting Google login");
-
-        const loginResponse = await axios.post(`${BACKEND_URL}/mentorLogin`, {
-          email: session.user?.email,
-          googleAuth: true,
-        });
-
-        console.log("Google login response:", loginResponse.data);
-
-        if (loginResponse.data.token) {
-          // Store the authentication data
-          localStorage.setItem("mentorToken", loginResponse.data.token);
-          localStorage.setItem("mentorEmail", session.user?.email || "");
-          localStorage.setItem(
-            "mentorUser",
-            JSON.stringify(loginResponse.data.mentor)
-          );
-
-          console.log("Google login successful, redirecting to create-profile");
-          router.replace("/create-profile");
-          return;
-        } else {
-          throw new Error("Login successful but no token received");
-        }
-      } else {
-        // Mentor doesn't exist, proceed with Google signup
-        console.log("Email available, proceeding with Google signup");
-        await handleGoogleSignup(session);
-      }
-    } catch (error: any) {
-      console.error("Google authentication error:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Google authentication failed";
-      setError(`Google бүртгэл/нэвтрэх алдаа: ${errorMessage}`);
-    } finally {
-      setGoogleLoading(false);
-
-      // If token is now present (login/signup succeeded), stop rendering this flow
-      try {
-        const token =
-          typeof window !== "undefined" && localStorage.getItem("mentorToken");
-        if (token) {
-          router.replace("/create-profile");
-        }
-      } catch {}
-    }
-  };
-
-  // Handle Google OAuth error
-  const handleGoogleError = (error: string) => {
-    console.error("Google OAuth error:", error);
-    setError(typeof error === "string" ? error : "Google OAuth алдаа гарлаа");
-    setGoogleLoading(false);
   };
 
   // Step 1: Email
@@ -261,105 +184,73 @@ const SignupPage = () => {
     setLoading(true);
     setError("");
     try {
-      // Step 1: Complete signup
-      const res = await axios.post<SignupResponse>(
-        `${BACKEND_URL}/mentorSignup`,
-        {
-          email: form.email,
-          password: form.password,
-        }
-      );
+      // Use Firebase Authentication to create account
+      const firebaseUser = await signUp(form.email, form.password);
 
-      // Type the response data properly
-      const responseData = res.data as SignupResponse & {
-        error?: boolean;
-        message?: string;
-      };
+      if (firebaseUser) {
+        console.log("Firebase signup successful");
 
-      if (
-        responseData &&
-        typeof responseData === "object" &&
-        "error" in responseData &&
-        responseData.error
-      ) {
-        throw new Error((responseData as any).message || "Signup failed");
-      }
+        // Store Firebase user data in localStorage for compatibility
+        const userData = convertFirebaseUser(firebaseUser, "mentor");
+        storeFirebaseUser(userData);
 
-      // Step 2: Use the token and mentorId from signup response
-      const { token, message, mentorId } = responseData;
+        // Store additional mentor data
+        localStorage.setItem("mentorEmail", form.email);
 
-      if (token) {
-        console.log("Signup successful, token received:", token);
-        setAutoLoggingIn(true);
+        // Dispatch custom event to notify other components about auth change
+        window.dispatchEvent(new Event("authChange"));
 
-        // Store token immediately after successful signup
-        localStorage.setItem("mentorToken", token);
-
-        try {
-          // Fetch mentor profile data using the token
-          const profileResponse = await axios.get<ProfileResponse>(
-            `${BACKEND_URL}/mentorProfile`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          const mentorData = profileResponse.data.mentor;
-
-          if (mentorData) {
-            // Store user data
-            localStorage.setItem("mentorUser", JSON.stringify(mentorData));
-
-            console.log("Auto-login successful with profile data");
-            // Directly redirect to create-profile
-            router.push("/create-profile");
-          } else {
-            // Fallback: create minimal user object
-            const minimalUser = {
-              mentorId: mentorId || "", // Use the mentorId from signup response
-              email: form.email,
-              isAdmin: false,
-              firstName: "",
-              lastName: "",
-            };
-
-            localStorage.setItem("mentorUser", JSON.stringify(minimalUser));
-
-            console.log("Auto-login successful with minimal data");
-            // Directly redirect to create-profile
-            router.push("/create-profile");
-          }
-        } catch (profileError: any) {
-          console.error("Profile fetch failed:", profileError);
-
-          // Still store minimal user data
-          const minimalUser = {
-            mentorId: mentorId || "",
-            email: form.email,
-            isAdmin: false,
-            firstName: "",
-            lastName: "",
-          };
-
-          localStorage.setItem("mentorUser", JSON.stringify(minimalUser));
-
-          // Directly redirect to create-profile
-          router.push("/create-profile");
-        } finally {
-          setAutoLoggingIn(false);
-        }
+        // Redirect to mentor dashboard after successful signup
+        router.push("/mentor-dashboard");
       } else {
-        console.error("No token received from signup");
-        // Redirect to login if no token
-        router.push("/mentor-login");
+        setError("Signup failed");
       }
-    } catch (e: any) {
-      setError(e.response?.data?.message || e.message || "Signup failed");
+    } catch (error: any) {
+      console.error("Firebase signup error:", error);
+      if (error.code === "auth/email-already-in-use") {
+        setError("Email already exists");
+      } else if (error.code === "auth/invalid-email") {
+        setError("Invalid email format");
+      } else if (error.code === "auth/weak-password") {
+        setError("Password is too weak");
+      } else {
+        setError(error.message || "Signup failed");
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handle Google OAuth success
+  const handleGoogleSuccess = async () => {
+    try {
+      // Firebase user should already be authenticated by GoogleOAuthButton
+      if (user) {
+        // Store Firebase user data in localStorage for compatibility
+        const userData = convertFirebaseUser(user, "mentor");
+        storeFirebaseUser(userData);
+
+        // Store additional mentor data
+        localStorage.setItem("mentorEmail", user.email || "");
+
+        // Dispatch custom event to notify other components about auth change
+        window.dispatchEvent(new Event("authChange"));
+
+        console.log("Firebase Google signup successful");
+        // Redirect to create profile for Google users
+        router.push("/create-profile");
+      } else {
+        setError("Google-р бүртгүүлэхэд алдаа гарлаа. Дахин оролдоно уу.");
+      }
+    } catch (error) {
+      console.error("Google signup error:", error);
+      setError("Google-р бүртгүүлэхэд алдаа гарлаа");
+    }
+  };
+
+  // Handle Google OAuth error
+  const handleGoogleError = (error: string) => {
+    setError(`Google OAuth алдаа: ${error}`);
   };
 
   return (

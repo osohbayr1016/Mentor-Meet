@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useFirebaseAuth } from "../lib/firebase-auth";
 
 export default function GoogleMeetTestingGuide() {
-  const { data: session, status } = useSession();
+  const { user, loading } = useFirebaseAuth();
   const [testStep, setTestStep] = useState(1);
 
   const steps = [
@@ -21,28 +21,28 @@ export default function GoogleMeetTestingGuide() {
               <li>✅ Calendar Scopes: Included</li>
               <li>✅ Development Mode: Active</li>
               <li>
-                {session ? "✅" : "❌"} OAuth Session:{" "}
-                {session ? "Active" : "Not signed in"}
+                {user ? "✅" : "❌"} Firebase Auth:{" "}
+                {user ? "Active" : "Not signed in"}
               </li>
             </ul>
           </div>
 
-          {!session && (
+          {!user && (
             <button
-              onClick={() => signIn("google")}
+              onClick={() => (window.location.href = "/role-selection")}
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
             >
-              Sign In with Google
+              Go to Sign In
             </button>
           )}
 
-          {session && (
+          {user && (
             <div className="space-y-2">
-              <p className="text-green-600">
-                ✅ Signed in as: {session.user?.email}
-              </p>
+              <p className="text-green-600">✅ Signed in as: {user.email}</p>
               <button
-                onClick={() => signOut()}
+                onClick={() => {
+                  /* Firebase logout is handled globally */
+                }}
                 className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
               >
                 Sign Out
@@ -88,7 +88,7 @@ export default function GoogleMeetTestingGuide() {
       title: "3. Quick Google Meet Test",
       content: (
         <div className="space-y-4">
-          {session ? (
+          {user ? (
             <div>
               <p className="mb-3">
                 Test Google Meet creation with your current session:

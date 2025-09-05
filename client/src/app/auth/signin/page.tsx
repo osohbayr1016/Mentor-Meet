@@ -1,12 +1,12 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Image from "next/image";
+import { useFirebaseAuth } from "../../../lib/firebase-auth";
 
 export default function SignIn() {
-  const { data: session, status } = useSession();
+  const { user } = useFirebaseAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -14,13 +14,7 @@ export default function SignIn() {
     router.push("/role-selection");
   }, [router]);
 
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-white">Loading...</div>
-      </div>
-    );
-  }
+  // No loading state needed for Firebase auth redirect
 
   const handleMockSignIn = () => {
     // Mock sign-in for development
@@ -82,9 +76,7 @@ export default function SignIn() {
 
             {/* Google Sign In Button */}
             <button
-              onClick={() =>
-                signIn("google", { callbackUrl: "/mentor-calendar" })
-              }
+              onClick={() => router.push("/role-selection")}
               className="flex items-center gap-3 bg-white text-black px-6 py-3 rounded-[40px] hover:bg-gray-100 transition-colors mb-4"
             >
               <svg width="20" height="20" viewBox="0 0 24 24">

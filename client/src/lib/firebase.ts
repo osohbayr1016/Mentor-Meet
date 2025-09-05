@@ -12,12 +12,14 @@ const firebaseConfig = {
     process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "mentoracademy-f03e8",
   storageBucket:
     process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
-    "mentoracademy-f03e8.appspot.com",
+    "mentoracademy-f03e8.firebasestorage.app",
   messagingSenderId:
     process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "861973640032",
   appId:
     process.env.NEXT_PUBLIC_FIREBASE_APP_ID ||
-    "1:861973640032:web:your-app-id-here",
+    "1:861973640032:web:f259317c5b2a0b747ba405",
+  measurementId:
+    process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-N9L3BVQ70B",
 };
 
 // Initialize Firebase

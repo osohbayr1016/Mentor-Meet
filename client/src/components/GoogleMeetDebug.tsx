@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useFirebaseAuth } from "../lib/firebase-auth";
 
 interface DebugInfo {
   hasSession: boolean;
@@ -20,7 +20,7 @@ interface TestResult {
 }
 
 export default function GoogleMeetDebug() {
-  const { data: session } = useSession();
+  const { user } = useFirebaseAuth();
   const [debugInfo, setDebugInfo] = useState<DebugInfo | null>(null);
   const [testResults, setTestResults] = useState<Record<string, TestResult>>(
     {}
@@ -29,11 +29,11 @@ export default function GoogleMeetDebug() {
 
   const updateDebugInfo = () => {
     setDebugInfo({
-      hasSession: !!session,
-      hasAccessToken: !!(session as any)?.accessToken,
-      tokenLength: (session as any)?.accessToken?.length,
-      userEmail: session?.user?.email || undefined,
-      expiresAt: (session as any)?.expiresAt,
+      hasSession: !!user,
+      hasAccessToken: false, // Firebase handles tokens internally
+      tokenLength: 0,
+      userEmail: user?.email || undefined,
+      expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours from now
     });
   };
 
@@ -85,7 +85,7 @@ export default function GoogleMeetDebug() {
   const testBookingConfirmation = () => {
     runTest("bookingConfirm", "/api/confirm-booking-with-meeting", {
       bookingId: "test-booking-123",
-      mentorEmail: session?.user?.email || "mentor@test.com",
+      mentorEmail: user?.email || "mentor@test.com",
       studentEmail: "student@test.com",
       sessionDate: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // 1 hour from now
       duration: 60,
@@ -96,7 +96,7 @@ export default function GoogleMeetDebug() {
   const testPaymentGeneration = () => {
     runTest("paymentGeneration", "/api/generate-meeting-after-payment", {
       bookingId: "test-payment-booking-456",
-      mentorEmail: session?.user?.email || "mentor@test.com",
+      mentorEmail: user?.email || "mentor@test.com",
       studentEmail: "student@test.com",
       date: new Date().toISOString().split("T")[0],
       time: "14:00",

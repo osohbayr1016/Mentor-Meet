@@ -4,7 +4,12 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../_components/MentorUserProvider";
+import { useFirebaseAuth } from "../../lib/firebase-auth";
+import {
+  convertFirebaseUser,
+  storeFirebaseUser,
+} from "../../lib/firebase-integration";
+import GoogleOAuthButton from "../../components/GoogleOAuthButton";
 
 const MentorLoginPage = () => {
   const [email, setEmail] = useState("");
@@ -22,15 +27,15 @@ const MentorLoginPage = () => {
   const [lastLoginAttempt, setLastLoginAttempt] = useState(0);
 
   const router = useRouter();
-  const { login, mentor, isLoading: authLoading } = useAuth(); // Get login function and mentor state
+  const { user, signIn } = useFirebaseAuth();
 
-  // Redirect when login is successful and mentor data is available
+  // Redirect when Firebase user is available
   useEffect(() => {
-    if (loginSuccess && mentor) {
-      console.log("Login successful, redirecting to home...");
-      router.push("/");
+    if (user) {
+      console.log("Firebase login successful, redirecting to dashboard...");
+      router.push("/mentor-dashboard");
     }
-  }, [loginSuccess, mentor, router]);
+  }, [user, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,47 +45,51 @@ const MentorLoginPage = () => {
       return;
     }
 
-    // Use authLoading from AuthProvider to prevent multiple requests
-    if (loading || authLoading) {
+    // Prevent multiple requests
+    if (loading) {
       console.log("Login already in progress, ignoring click");
       return;
     }
-
-    // Debounce: prevent login attempts within 2 seconds
-    const now = Date.now();
-    if (now - lastLoginAttempt < 2000) {
-      console.log("Login attempt too soon, ignoring");
-      return;
-    }
-    setLastLoginAttempt(now);
 
     setLoading(true);
     setError("");
 
     try {
-      const result = await login(email, password);
+      // Use Firebase Authentication
+      const user = await signIn(email, password);
 
-      if (result.success) {
+      if (user) {
+        // Store Firebase user data in localStorage for compatibility
+        const userData = convertFirebaseUser(user, "mentor");
+        storeFirebaseUser(userData);
+
+        // Store additional mentor data
+        localStorage.setItem("mentorEmail", user.email || "");
+
         // Clear form
         setEmail("");
         setPassword("");
-        // Set success state to trigger useEffect redirect
-        setLoginSuccess(true);
-        console.log("Login successful, setting loginSuccess state");
 
-        // Fallback redirect after 2 seconds if useEffect doesn't work
-        setTimeout(() => {
-          if (window.location.pathname === "/mentor-login") {
-            console.log("Fallback redirect executing...");
-            router.push("/");
-          }
-        }, 2000);
+        // Dispatch custom event to notify other components about auth change
+        window.dispatchEvent(new Event("authChange"));
+
+        console.log("Firebase login successful");
+
+        // Redirect will happen via useEffect when user state updates
       } else {
-        setError(result.message);
+        setError("Нэвтрэхэд алдаа гарлаа");
       }
     } catch (error: any) {
-      console.error("Login error:", error);
-      setError("Нэвтрэхэд алдаа гарлаа");
+      console.error("Firebase login error:", error);
+      if (error.code === "auth/user-not-found") {
+        setError("Имэйл хаяг бүртгэгдээгүй байна");
+      } else if (error.code === "auth/wrong-password") {
+        setError("Нууц үг буруу байна");
+      } else if (error.code === "auth/invalid-email") {
+        setError("Имэйл хаягийн формат буруу байна");
+      } else {
+        setError("Нэвтрэхэд алдаа гарлаа");
+      }
     } finally {
       setLoading(false);
     }
@@ -165,6 +174,37 @@ const MentorLoginPage = () => {
     setResetCode("");
     setNewPassword("");
     setResetError("");
+  };
+
+  // Handle Google OAuth success
+  const handleGoogleSuccess = async () => {
+    try {
+      // Firebase user should already be authenticated by GoogleOAuthButton
+      if (user) {
+        // Store Firebase user data in localStorage for compatibility
+        const userData = convertFirebaseUser(user, "mentor");
+        storeFirebaseUser(userData);
+
+        // Store additional mentor data
+        localStorage.setItem("mentorEmail", user.email || "");
+
+        // Dispatch custom event to notify other components about auth change
+        window.dispatchEvent(new Event("authChange"));
+
+        console.log("Firebase Google login successful");
+        // Redirect will happen via useEffect when user state updates
+      } else {
+        setError("Google-р нэвтрэхэд алдаа гарлаа. Дахин оролдоно уу.");
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+      setError("Google-р нэвтрэхэд алдаа гарлаа");
+    }
+  };
+
+  // Handle Google OAuth error
+  const handleGoogleError = (error: string) => {
+    setError(`Google OAuth алдаа: ${error}`);
   };
 
   return (
@@ -259,13 +299,30 @@ const MentorLoginPage = () => {
                 <div className="flex w-full justify-center">
                   <button
                     type="submit"
-                    disabled={loading || authLoading}
+                    disabled={loading}
                     className="border-1 border-white text-white rounded-[40px] py-[6px] px-[50px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading || authLoading ? "Түр хүлээнэ үү..." : "Нэвтрэх"}
+                    {loading ? "Түр хүлээнэ үү..." : "Нэвтрэх"}
                   </button>
                 </div>
               </form>
+
+              {/* Divider */}
+              <div className="flex items-center my-4">
+                <div className="flex-1 border-t border-white/30"></div>
+                <span className="px-4 text-white/60 text-sm">эсвэл</span>
+                <div className="flex-1 border-t border-white/30"></div>
+              </div>
+
+              {/* Google OAuth Button */}
+              <GoogleOAuthButton
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                text="Google-р нэвтрэх"
+                disabled={loading}
+                userType="mentor"
+                className="w-full max-w-[300px]"
+              />
             </div>
 
             {/* Registration Link */}

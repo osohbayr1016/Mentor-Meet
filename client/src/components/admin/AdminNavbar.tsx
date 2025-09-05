@@ -1,9 +1,10 @@
 "use client";
 
-import { signOut, useSession } from "next-auth/react";
 import { Bell, Search, LogOut, User, Settings } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
+import { useFirebaseAuth } from "../../lib/firebase-auth";
+import { useRouter } from "next/navigation";
 
 interface AdminNavbarProps {
   title?: string;
@@ -11,12 +12,26 @@ interface AdminNavbarProps {
 }
 
 export default function AdminNavbar({ title, subtitle }: AdminNavbarProps) {
-  const { data: session } = useSession();
+  const { user, logout } = useFirebaseAuth();
+  const router = useRouter();
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  const handleSignOut = () => {
-    signOut({ callbackUrl: "/" });
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      // Clear localStorage
+      localStorage.removeItem("studentToken");
+      localStorage.removeItem("mentorToken");
+      localStorage.removeItem("studentUser");
+      localStorage.removeItem("mentorUser");
+      localStorage.removeItem("studentEmail");
+      localStorage.removeItem("mentorEmail");
+      // Redirect to home
+      router.push("/");
+    } catch (error) {
+      console.error("Sign out error:", error);
+    }
   };
 
   return (
@@ -109,9 +124,9 @@ export default function AdminNavbar({ title, subtitle }: AdminNavbarProps) {
               onClick={() => setShowDropdown(!showDropdown)}
               className="flex items-center space-x-3 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              {session?.user?.image ? (
+              {user?.photoURL ? (
                 <Image
-                  src={session.user.image}
+                  src={user.photoURL}
                   alt="Admin"
                   width={32}
                   height={32}
@@ -124,7 +139,7 @@ export default function AdminNavbar({ title, subtitle }: AdminNavbarProps) {
               )}
               <div className="hidden md:block text-left">
                 <p className="text-sm font-medium text-gray-900">
-                  {session?.user?.name || "Admin"}
+                  {user?.displayName || "Admin"}
                 </p>
                 <p className="text-xs text-gray-500">Администратор</p>
               </div>
@@ -135,11 +150,9 @@ export default function AdminNavbar({ title, subtitle }: AdminNavbarProps) {
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                 <div className="px-4 py-2 border-b border-gray-200">
                   <p className="text-sm font-medium text-gray-900">
-                    {session?.user?.name || "Admin"}
+                    {user?.displayName || "Admin"}
                   </p>
-                  <p className="text-xs text-gray-500">
-                    {session?.user?.email}
-                  </p>
+                  <p className="text-xs text-gray-500">{user?.email}</p>
                 </div>
 
                 <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2">

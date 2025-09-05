@@ -8,7 +8,7 @@ interface Props {
   onSubmit: () => void;
   loading: boolean;
   error: string;
-  onGoogleSuccess?: (session: any) => void;
+  onGoogleSuccess?: () => void;
   onGoogleError?: (error: string) => void;
   callbackUrl?: string;
 }
@@ -61,7 +61,7 @@ const FirstMentorSignup = ({
                     onError={onGoogleError}
                     text="Google-р бүртгүүлэх"
                     disabled={false}
-                    callbackUrl={callbackUrl || "/oauth/mentor"}
+                    userType="mentor"
                   />
 
                   <div className="flex items-center gap-3">

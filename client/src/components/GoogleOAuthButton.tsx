@@ -1,16 +1,20 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
+import { useFirebaseAuth } from "@/lib/firebase-auth";
+import {
+  convertFirebaseUser,
+  storeFirebaseUser,
+} from "@/lib/firebase-integration";
 
 interface GoogleOAuthButtonProps {
-  onSuccess?: (session: any) => void;
+  onSuccess?: () => void;
   onError?: (error: string) => void;
   text?: string;
   className?: string;
   disabled?: boolean;
-  callbackUrl?: string;
+  userType?: "student" | "mentor";
 }
 
 export default function GoogleOAuthButton({
@@ -19,27 +23,34 @@ export default function GoogleOAuthButton({
   text = "Google-р нэвтрэх",
   className = "",
   disabled = false,
-  callbackUrl,
+  userType = "student",
 }: GoogleOAuthButtonProps) {
   const [loading, setLoading] = useState(false);
+  const { signInWithGoogle } = useFirebaseAuth();
 
   const handleGoogleSignIn = async () => {
-    console.log("Google sign-in button clicked");
+    console.log("Firebase Google sign-in button clicked");
     if (disabled || loading) return;
 
-    console.log("Starting Google OAuth flow...");
+    console.log("Starting Firebase Google OAuth flow...");
     setLoading(true);
 
     try {
-      console.log("Calling signIn with Google provider (redirect)...");
-      // For OAuth providers, allow full redirect and come back to a callback page
-      await signIn("google", {
-        callbackUrl: callbackUrl || window.location.origin + "/role-selection",
-      });
+      console.log("Calling Firebase signInWithGoogle...");
+      const user = await signInWithGoogle();
+
+      if (user) {
+        const userData = convertFirebaseUser(user, userType);
+        storeFirebaseUser(userData);
+        console.log("Firebase Google sign-in successful:", userData);
+        onSuccess?.();
+      }
     } catch (error: any) {
-      console.error("Google OAuth error:", error);
+      console.error("Firebase Google OAuth error:", error);
       setLoading(false);
       onError?.(error.message || "Google-р нэвтрэхэд алдаа гарлаа");
+    } finally {
+      setLoading(false);
     }
   };
 

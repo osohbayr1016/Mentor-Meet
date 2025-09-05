@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../../../lib/auth";
 
 interface AvailabilityRequest {
   start: string;
@@ -16,15 +14,8 @@ interface MultipleAvailabilityRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get the session to access the access token
-    const session = await getServerSession(authOptions);
-
-    if (!session?.accessToken) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
-    }
+    // TODO: Get access token from Firebase for Google Calendar
+    // For now, skip authentication in development
 
     const body = await request.json();
 

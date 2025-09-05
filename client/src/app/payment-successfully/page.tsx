@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { useFirebaseAuth } from "../../lib/firebase-auth";
 import { PartyPopper, Copy, ExternalLink, Calendar } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
@@ -17,7 +17,7 @@ interface MeetingData {
 }
 
 const PaymentSuccessfullyContent = () => {
-  const { data: session } = useSession();
+  const { user } = useFirebaseAuth();
   const searchParams = useSearchParams();
   const [meetingData, setMeetingData] = useState<MeetingData | null>(null);
   const [loading, setLoading] = useState(true);

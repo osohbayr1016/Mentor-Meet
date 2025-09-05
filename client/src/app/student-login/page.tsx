@@ -4,9 +4,12 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import axios from "axios";
 import GoogleOAuthButton from "../../components/GoogleOAuthButton";
+import { useFirebaseAuth } from "../../lib/firebase-auth";
+import {
+  convertFirebaseUser,
+  storeFirebaseUser,
+} from "../../lib/firebase-integration";
 
 const StudentLoginPage = () => {
   const [email, setEmail] = useState("");
@@ -14,32 +17,19 @@ const StudentLoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-  const { data: session } = useSession();
+  const { user, signIn } = useFirebaseAuth();
 
   // Handle Google OAuth success
-  const handleGoogleSuccess = async (session: any) => {
+  const handleGoogleSuccess = async () => {
     try {
-      // Use the existing studentLogin endpoint with googleAuth flag
-      const API_BASE_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const response = await fetch(`${API_BASE_URL}/studentLogin`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: session.user?.email,
-          googleAuth: true,
-        }),
-      });
+      // Firebase user should already be authenticated by GoogleOAuthButton
+      if (user) {
+        // Store Firebase user data in localStorage for compatibility
+        const userData = convertFirebaseUser(user, "student");
+        storeFirebaseUser(userData);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Store student data and redirect
-        localStorage.setItem("studentToken", data.token);
-        localStorage.setItem("studentUser", JSON.stringify(data.user));
-        localStorage.setItem("studentEmail", data.user.email);
+        // Store additional student data
+        localStorage.setItem("studentEmail", user.email || "");
 
         // Dispatch custom event to notify other components about auth change
         window.dispatchEvent(new Event("authChange"));
@@ -47,10 +37,7 @@ const StudentLoginPage = () => {
         // Redirect to student dashboard
         router.push("/student-dashboard");
       } else {
-        setError(
-          data.message ||
-            "Google-р нэвтрэхэд алдаа гарлаа. Эхлээд Google-р бүртгүүлнэ үү."
-        );
+        setError("Google-р нэвтрэхэд алдаа гарлаа. Дахин оролдоно уу.");
       }
     } catch (error) {
       console.error("Google login error:", error);
@@ -80,23 +67,16 @@ const StudentLoginPage = () => {
     setError("");
 
     try {
-      const API_BASE_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const response = await fetch(`${API_BASE_URL}/studentLogin`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      // Use Firebase Authentication
+      const user = await signIn(email, password);
 
-      const data = await response.json();
+      if (user) {
+        // Store Firebase user data in localStorage for compatibility
+        const userData = convertFirebaseUser(user, "student");
+        storeFirebaseUser(userData);
 
-      if (response.status === 200) {
-        // Store student data and redirect
-        localStorage.setItem("studentToken", data.token);
-        localStorage.setItem("studentUser", JSON.stringify(data.user));
-        localStorage.setItem("studentEmail", data.user.email); // Email-г тусад нь хадгалах
+        // Store additional student data
+        localStorage.setItem("studentEmail", user.email || "");
 
         // Dispatch custom event to notify other components about auth change
         window.dispatchEvent(new Event("authChange"));
@@ -104,10 +84,19 @@ const StudentLoginPage = () => {
         // Redirect to student dashboard
         router.push("/student-dashboard");
       } else {
-        setError(data.message || "Нэвтрэхэд алдаа гарлаа");
+        setError("Нэвтрэхэд алдаа гарлаа");
       }
-    } catch (error) {
-      setError("Сүлжээний алдаа гарлаа");
+    } catch (error: any) {
+      console.error("Firebase login error:", error);
+      if (error.code === "auth/user-not-found") {
+        setError("Имэйл хаяг бүртгэгдээгүй байна");
+      } else if (error.code === "auth/wrong-password") {
+        setError("Нууц үг буруу байна");
+      } else if (error.code === "auth/invalid-email") {
+        setError("Имэйл хаягийн формат буруу байна");
+      } else {
+        setError("Нэвтрэхэд алдаа гарлаа");
+      }
     } finally {
       setLoading(false);
     }
@@ -199,7 +188,7 @@ const StudentLoginPage = () => {
                 onError={handleGoogleError}
                 text="Google-р нэвтрэх"
                 disabled={loading}
-                callbackUrl="/oauth/student"
+                userType="student"
               />
 
               {/* Links */}

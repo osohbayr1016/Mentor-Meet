@@ -4,17 +4,22 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import FirstStudentSignup from "./_components/FirstStudentSignup";
 import SecondStudentSignup from "./_components/SecondStudentSignup";
 import ThirdStudentSignUp from "./_components/ThirdStudentSignUp";
 import FourthStudentSignup from "./_components/FourthStudentSignup";
 import GoogleOAuthButton from "../../components/GoogleOAuthButton";
+import { useFirebaseAuth } from "../../lib/firebase-auth";
+import {
+  convertFirebaseUser,
+  storeFirebaseUser,
+} from "../../lib/firebase-integration";
 
 type SignupStep = "email" | "otp" | "password" | "profile";
 
 const StudentSignupPage = () => {
   const router = useRouter();
+  const { user, signUp } = useFirebaseAuth();
   const [googleUserData, setGoogleUserData] = useState<any>(null);
   const [isGoogleAuth, setIsGoogleAuth] = useState(false);
   const [currentStep, setCurrentStep] = useState<SignupStep>("email");
@@ -30,8 +35,8 @@ const StudentSignupPage = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
 
   // Handle Google OAuth success
-  const handleGoogleSuccess = async (session: any) => {
-    console.log("Google OAuth success called with session:", session);
+  const handleGoogleSuccess = async () => {
+    console.log("Firebase Google OAuth success called with user:", user);
     setIsGoogleAuth(true);
     setLoading(true);
     setError("");
@@ -45,7 +50,7 @@ const StudentSignupPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: session.user?.email }),
+        body: JSON.stringify({ email: user?.email }),
       });
 
       const checkData = await checkResponse.json();
@@ -55,13 +60,12 @@ const StudentSignupPage = () => {
         // Student doesn't exist, proceed with Google signup
         console.log("Email available, proceeding with Google signup");
         setGoogleUserData({
-          email: session.user?.email,
-          name: session.user?.name,
-          image: session.user?.image,
-          accessToken: session.accessToken,
+          email: user?.email,
+          name: user?.displayName,
+          image: user?.photoURL,
         });
-        setEmail(session.user?.email || "");
-        setNickname(session.user?.name?.split(" ")[0] || "Student");
+        setEmail(user?.email || "");
+        setNickname(user?.displayName?.split(" ")[0] || "Student");
         setCurrentStep("profile"); // Skip to profile step for Google users
       } else {
         // Student already exists, try to login with Google
@@ -73,7 +77,7 @@ const StudentSignupPage = () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              email: session.user?.email,
+              email: user?.email,
               googleAuth: true,
             }),
           });
@@ -84,7 +88,7 @@ const StudentSignupPage = () => {
           if (loginResponse.ok && loginData.token) {
             // Store the authentication data
             localStorage.setItem("studentToken", loginData.token);
-            localStorage.setItem("studentEmail", session.user?.email || "");
+            localStorage.setItem("studentEmail", user?.email || "");
             localStorage.setItem("studentUser", JSON.stringify(loginData.user));
 
             console.log("Google login successful, redirecting to dashboard");
@@ -212,26 +216,31 @@ const StudentSignupPage = () => {
     setError("");
 
     try {
-      const API_BASE_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      const response = await fetch(`${API_BASE_URL}/createPassword`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      // Use Firebase Authentication to create account
+      const user = await signUp(email, password);
 
-      const data = await response.json();
+      if (user) {
+        // Store Firebase user data in localStorage for compatibility
+        const userData = convertFirebaseUser(user, "student");
+        storeFirebaseUser(userData);
 
-      if (response.ok) {
+        // Move to profile step
         setCurrentStep("profile");
         setError("");
       } else {
-        setError(data.message || "Нууц үг үүсгэхэд алдаа гарлаа");
+        setError("Бүртгэл үүсгэхэд алдаа гарлаа");
       }
-    } catch (error) {
-      setError("Сүлжээний алдаа гарлаа");
+    } catch (error: any) {
+      console.error("Firebase signup error:", error);
+      if (error.code === "auth/email-already-in-use") {
+        setError("Энэ имэйл хаяг аль хэдийн бүртгэгдсэн байна");
+      } else if (error.code === "auth/invalid-email") {
+        setError("Имэйл хаягийн формат буруу байна");
+      } else if (error.code === "auth/weak-password") {
+        setError("Нууц үг хүчгүй байна");
+      } else {
+        setError("Бүртгэл үүсгэхэд алдаа гарлаа");
+      }
     } finally {
       setLoading(false);
     }
@@ -347,7 +356,7 @@ const StudentSignupPage = () => {
               onError={handleGoogleError}
               text="Google-р бүртгүүлэх"
               disabled={loading}
-              callbackUrl="/oauth/student"
+              userType="student"
             />
           </div>
         );

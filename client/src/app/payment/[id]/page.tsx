@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 import BookingModal from "../../../components/BookingModal";
 import { ArrowLeft, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";

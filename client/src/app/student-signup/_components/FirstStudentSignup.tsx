@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { signIn, useSession } from "next-auth/react";
+// Firebase auth is handled by parent component
 import { useRouter } from "next/navigation";
 // import axios from "axios";
 
@@ -26,32 +26,6 @@ const FirstStudentSignup = ({
   onGoogleSignIn,
 }: Props) => {
   const router = useRouter();
-  const { data: session } = useSession();
-
-  const handleGoogleSignIn = async () => {
-    try {
-      const result = await signIn("google", {
-        callbackUrl: "/student-signup",
-        redirect: false,
-      });
-
-      if (result?.ok && session?.user) {
-        // Google sign-in successful
-        const userData = {
-          email: session.user.email,
-          name: session.user.name,
-          image: session.user.image,
-          accessToken: session.accessToken,
-        };
-
-        if (onGoogleSignIn) {
-          onGoogleSignIn(userData);
-        }
-      }
-    } catch (error) {
-      console.error("Google sign-in error:", error);
-    }
-  };
 
   return (
     <div className="relative w-full h-screen">
@@ -87,7 +61,7 @@ const FirstStudentSignup = ({
                 {/* Google Sign-In Button */}
                 <div className="flex flex-col gap-4">
                   <button
-                    onClick={handleGoogleSignIn}
+                    onClick={onGoogleSignIn}
                     className="flex items-center justify-center gap-3 bg-white text-gray-700 rounded-[40px] py-[12px] px-[20px] w-full font-medium hover:bg-gray-50 transition-colors"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">

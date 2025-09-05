@@ -1,24 +1,24 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import MeetingManager from "../../components/MeetingManager";
+import { useFirebaseAuth } from "../../lib/firebase-auth";
 
 export default function MeetingsPage() {
-  const { data: session, status } = useSession();
+  const { user, loading } = useFirebaseAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "loading") return; // Still loading
-    if (!session) {
-      router.push("/auth/signin");
+    if (loading) return; // Still loading
+    if (!user) {
+      router.push("/role-selection");
     }
-  }, [session, status, router]);
+  }, [user, loading, router]);
 
-  if (status === "loading") {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-lg">Loading...</div>
@@ -26,7 +26,7 @@ export default function MeetingsPage() {
     );
   }
 
-  if (!session) {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-lg">Redirecting to sign in...</div>
