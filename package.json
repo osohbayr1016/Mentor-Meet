@@ -4,12 +4,14 @@
   "description": "Mentor Meet - Full Stack Application",
   "private": true,
   "scripts": {
-    "build": "cd server && npm run build",
-    "start": "cd server && npm start",
+    "build": "cd server && npm install && npm run build",
+    "start": "cd server && node start.js",
     "dev": "cd server && npm run dev",
     "install-server": "cd server && npm install",
     "install-client": "cd client && npm install",
-    "install-all": "npm run install-server && npm run install-client"
+    "install-all": "npm run install-server && npm run install-client",
+    "render:build": "cd server && npm install && npm run build",
+    "render:start": "cd server && node start.js"
   },
   "workspaces": [
     "client",
