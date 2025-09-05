@@ -62,21 +62,21 @@ export const HomeChat = () => {
 
     setUserEmail(email || "");
 
-    fetch(
-      `${
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-      }/getMessages`,
-      {
-        headers: {
-          Authorization: `Bearer ${studentToken || mentorToken}`,
-        },
-      }
-    )
-      .then((res) => res.json())
-      .then((data: Message[]) => {
-        setMessages(data);
-      })
-      .catch(() => {});
+    // fetch(
+    //   `${
+    //     process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+    //   }/getMessages`,
+    //   {
+    //     headers: {
+    //       Authorization: `Bearer ${studentToken || mentorToken}`,
+    //     },
+    //   }
+    // )
+    //   .then((res) => res.json())
+    //   .then((data: Message[]) => {
+    //     setMessages(data);
+    //   })
+    //   .catch(() => {});
   }, []);
 
   useEffect(() => {

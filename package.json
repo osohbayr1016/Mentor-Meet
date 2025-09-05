@@ -1,0 +1,30 @@
+{
+  "name": "mentor-meet",
+  "version": "1.0.0",
+  "description": "Mentor Meet - Full Stack Application",
+  "private": true,
+  "scripts": {
+    "build": "cd server && npm run build",
+    "start": "cd server && npm start",
+    "dev": "cd server && npm run dev",
+    "install-server": "cd server && npm install",
+    "install-client": "cd client && npm install",
+    "install-all": "npm run install-server && npm run install-client"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "keywords": [
+    "mentor",
+    "meeting",
+    "education",
+    "fullstack"
+  ],
+  "author": "",
+  "license": "ISC"
+}
